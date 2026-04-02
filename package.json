@@ -1,0 +1,8 @@
+{
+  "name": "u-club",
+  "private": true,
+  "scripts": {
+    "dev:api": "pnpm --filter @u-club/api dev"
+  },
+  "devDependencies": {}
+}
