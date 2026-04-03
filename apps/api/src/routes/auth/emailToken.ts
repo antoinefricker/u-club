@@ -24,13 +24,19 @@ router.post('/email_token', async (req: Request, res: Response) => {
 
   await db('login_tokens').where({ id: loginToken.id }).del();
 
+  const user = await db('users').where({ email: loginToken.email }).first();
+  if (!user) {
+    res.status(401).json({ error: 'user not found' });
+    return;
+  }
+
   const jwtSecret = process.env.JWT_SECRET;
   if (!jwtSecret) {
     res.status(500).json({ error: 'server configuration error' });
     return;
   }
 
-  const accessToken = jwt.sign({ email: loginToken.email }, jwtSecret, {
+  const accessToken = jwt.sign({ sub: user.id, email: user.email }, jwtSecret, {
     expiresIn: '7d',
   });
 

@@ -1,16 +1,14 @@
-import express, { Request, Response } from 'express';
-import db from './db.js';
+import express from 'express';
+import healthRouter from './routes/health.js';
 import authRouter from './routes/auth/index.js';
+import usersRouter from './routes/users/index.js';
 
 const app = express();
 
 app.use(express.json());
 
-app.get('/health', async (req: Request, res: Response) => {
-  const result = await db.raw('SELECT NOW()');
-  res.json({ status: 'ok', time: result.rows[0].now });
-});
-
+app.use(healthRouter);
 app.use('/auth', authRouter);
+app.use('/users', usersRouter);
 
 export default app;

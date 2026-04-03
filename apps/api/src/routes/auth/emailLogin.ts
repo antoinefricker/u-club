@@ -13,6 +13,13 @@ router.post('/email_login', async (req: Request, res: Response) => {
     return;
   }
 
+  const user = await db('users').where({ email }).first();
+  if (!user) {
+    // Return success even if user doesn't exist to prevent email enumeration
+    res.json({ message: 'login email sent' });
+    return;
+  }
+
   const token = crypto.randomBytes(32).toString('hex');
   const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
