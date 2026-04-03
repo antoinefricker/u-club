@@ -4,5 +4,6 @@
   "scripts": {
     "dev:api": "pnpm --filter @u-club/api dev"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "packageManager": "pnpm@10.8.0"
 }
