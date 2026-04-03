@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: uclub
+          POSTGRES_PASSWORD: uclub
+          POSTGRES_DB: uclub
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgres://uclub:uclub@localhost:5432/uclub
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm --filter @u-club/api typecheck
+
+      - name: Lint
+        run: pnpm --filter @u-club/api lint
+
+      - name: Format
+        run: pnpm --filter @u-club/api format:check
+
+      - name: Test
+        run: pnpm --filter @u-club/api test
