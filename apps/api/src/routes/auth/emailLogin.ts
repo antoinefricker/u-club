@@ -5,6 +5,42 @@ import mailer from '../../mailer.js';
 
 const router = Router();
 
+/**
+ * @openapi
+ * /auth/email_login:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Request a magic login link
+ *     description: Sends a one-time login token to the given email address. Always returns success to prevent email enumeration.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *     responses:
+ *       200:
+ *         description: Login email sent (or silently ignored if user does not exist)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: login email sent
+ *       400:
+ *         description: Missing email
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 router.post('/email_login', async (req: Request, res: Response) => {
   const { email } = req.body;
 

@@ -6,6 +6,7 @@ Monorepo for the u-club project.
 
 - **PWA**: http://localhost:5173
 - **API**: http://localhost:4000
+- **API docs** (Swagger): http://localhost:4000/api-docs
 - **Mailpit** (email inbox): http://localhost:8025
 
 ## Prerequisites
@@ -38,12 +39,13 @@ make migrate
 
 ## Services
 
-| Service  | URL                        |
-| -------- | -------------------------- |
-| PWA      | http://localhost:5173      |
-| API      | http://localhost:4000      |
-| Mailpit  | http://localhost:8025      |
-| Postgres | localhost:5432             |
+| Service      | URL                            |
+| ------------ | ------------------------------ |
+| PWA          | http://localhost:5173           |
+| API          | http://localhost:4000           |
+| API docs     | http://localhost:4000/api-docs  |
+| Mailpit      | http://localhost:8025           |
+| Postgres     | localhost:5432                  |
 
 ## Available commands
 

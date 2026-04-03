@@ -4,6 +4,46 @@ import db from '../../db.js';
 
 const router = Router();
 
+/**
+ * @openapi
+ * /auth/email_token:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Exchange a magic link token for a JWT
+ *     description: Validates the one-time token from the login email, resolves the user, and returns a JWT access token.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [token]
+ *             properties:
+ *               token:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: JWT access token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 access_token:
+ *                   type: string
+ *       400:
+ *         description: Missing token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       401:
+ *         description: Invalid or expired token, or user not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 router.post('/email_token', async (req: Request, res: Response) => {
   const { token } = req.body;
 
