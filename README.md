@@ -4,6 +4,7 @@ Monorepo for the u-club project.
 
 ## Local URLs
 
+- **PWA**: http://localhost:5173
 - **API**: http://localhost:4000
 - **Mailpit** (email inbox): http://localhost:8025
 
@@ -39,6 +40,7 @@ make migrate
 
 | Service  | URL                        |
 | -------- | -------------------------- |
+| PWA      | http://localhost:5173      |
 | API      | http://localhost:4000      |
 | Mailpit  | http://localhost:8025      |
 | Postgres | localhost:5432             |
@@ -54,6 +56,6 @@ migrate-up     Run the next pending migration
 migrate-down   Rollback the last migration
 migrate-status Show current migration status
 migrate-make   Create a new migration
-dev-start      Start postgres, mailpit and api in dev mode
+dev-start      Start postgres, mailpit, api and pwa in dev mode
 dev-stop       Stop dev services
 ```

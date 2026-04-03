@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help install dev-start dev-stop migrate migrate-up migrate-down migrate-status migrate-make
+.PHONY: help install lint lint-fix format format-check typecheck test dev-start dev-stop migrate migrate-up migrate-down migrate-status migrate-make
 
 help:
 	@grep -E '^## ' $(MAKEFILE_LIST) | sed 's/## //'
@@ -13,6 +13,30 @@ endef
 ## install: Install dependencies
 install:
 	pnpm install
+
+## lint: Run linter on all packages
+lint:
+	pnpm lint
+
+## lint-fix: Fix lint issues on all packages
+lint-fix:
+	pnpm lint:fix
+
+## format: Format all packages
+format:
+	pnpm format
+
+## format-check: Check formatting on all packages
+format-check:
+	pnpm format:check
+
+## typecheck: Type-check all packages
+typecheck:
+	pnpm typecheck
+
+## test: Run tests on all packages
+test:
+	pnpm test
 
 ## migrate: Run pending migrations
 migrate:
@@ -42,7 +66,7 @@ migrate-make:
 dev-stop:
 	docker compose stop postgres mailpit
 
-## dev-start: Start postgres and api in dev mode
+## dev-start: Start postgres, mailpit, api and pwa in dev mode
 dev-start:
 	docker compose up -d postgres mailpit
-	pnpm dev:api
+	pnpm dev:api & pnpm dev:pwa

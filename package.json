@@ -2,7 +2,14 @@
   "name": "u-club",
   "private": true,
   "scripts": {
-    "dev:api": "pnpm --filter @u-club/api dev"
+    "dev:api": "pnpm --filter @u-club/api dev",
+    "dev:pwa": "pnpm --filter @u-club/pwa dev",
+    "lint": "pnpm -r run lint",
+    "lint:fix": "pnpm -r run lint:fix",
+    "format": "pnpm -r run format",
+    "format:check": "pnpm -r run format:check",
+    "typecheck": "pnpm -r run typecheck",
+    "test": "pnpm -r run test"
   },
   "devDependencies": {},
   "packageManager": "pnpm@10.8.0"
