@@ -26,7 +26,7 @@ router.post('/email_login', async (req: Request, res: Response) => {
     from: process.env.SMTP_FROM || 'noreply@u-club.app',
     to: email,
     subject: 'Your login code',
-    text: `Your login token is: ${token}\n\nThis token expires in 15 minutes.`,
+    text: `Your login link is: ${token}\n\nThis token expires in 15 minutes.`,
   });
 
   res.json({ message: 'login email sent' });
