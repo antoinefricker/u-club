@@ -3,6 +3,8 @@ dist
 .env
 .env.*
 !.env.example
+.envrc
+!.envrc.dist
 *.log
 .DS_Store
 .turbo
