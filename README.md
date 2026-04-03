@@ -47,17 +47,33 @@ make migrate
 | Mailpit      | http://localhost:8025           |
 | Postgres     | localhost:5432                  |
 
+## Database schema
+
+The full entity-relationship diagram is maintained in [`database-diagram.mermaid`](./database-diagram.mermaid).
+
+```mermaid
+erDiagram
+    USER ||--o{ LOGIN_TOKEN : "requests"
+    USER ||--o{ REVOKED_TOKEN : "revokes"
+```
+
 ## Available commands
 
 Run `make help` to list all commands:
 
 ```
 install        Install dependencies
+lint           Run linter on all packages
+lint-fix       Fix lint issues on all packages
+format         Format all packages
+format-check   Check formatting on all packages
+typecheck      Type-check all packages
+test           Run tests on all packages
 migrate        Run pending migrations
 migrate-up     Run the next pending migration
 migrate-down   Rollback the last migration
 migrate-status Show current migration status
-migrate-make   Create a new migration
+migrate-make   Create a new migration (usage: make migrate-make name=create_users)
 dev-start      Start postgres, mailpit, api and pwa in dev mode
 dev-stop       Stop dev services
 ```

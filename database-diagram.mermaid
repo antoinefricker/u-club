@@ -1,253 +1,34 @@
 erDiagram
-    %% ── Core People ──────────────────────────────────────
-    MEMBER {
+    USER {
         uuid id PK
         string first_name
         string last_name
-        date date_of_birth
-        string gender
-        string email
+        string display_name
+        text bio
         string phone
-        string address
-        string city
-        string postal_code
-        string emergency_contact_name
-        string emergency_contact_phone
-        string photo_url
-        string status "active / inactive / suspended"
-        date joined_at
-        date created_at
-        date updated_at
+        string email UK
+        string password
+        date birthdate
+        timestamp created_at
+        timestamp updated_at
     }
 
-    STAFF {
+    LOGIN_TOKEN {
         uuid id PK
-        string first_name
-        string last_name
         string email
-        string phone
-        string role "coach / admin / physio / manager"
-        date hired_at
-        decimal salary
-        string status "active / inactive"
-        date created_at
-        date updated_at
+        string token UK
+        timestamp expires_at
+        timestamp created_at
     }
 
-    %% ── Membership & Billing ─────────────────────────────
-    MEMBERSHIP_PLAN {
+    REVOKED_TOKEN {
         uuid id PK
-        string name "e.g. Annual, Monthly, Youth"
-        text description
-        decimal price
-        string billing_cycle "monthly / quarterly / yearly"
-        int duration_days
-        boolean is_active
-        date created_at
-    }
-
-    MEMBERSHIP {
-        uuid id PK
-        uuid member_id FK
-        uuid plan_id FK
-        date start_date
-        date end_date
-        string status "active / expired / cancelled"
-        date created_at
-    }
-
-    PAYMENT {
-        uuid id PK
-        uuid member_id FK
-        uuid membership_id FK
-        decimal amount
-        string currency
-        string method "card / cash / transfer / direct_debit"
-        string status "pending / completed / failed / refunded"
-        date paid_at
-        string reference
-        date created_at
-    }
-
-    INVOICE {
-        uuid id PK
-        uuid member_id FK
-        uuid payment_id FK
-        string invoice_number
-        decimal total_amount
-        decimal tax_amount
-        string status "draft / sent / paid / overdue"
-        date issued_at
-        date due_date
-    }
-
-    %% ── Sports & Teams ───────────────────────────────────
-    SPORT {
-        uuid id PK
-        string name "e.g. Football, Tennis, Swimming"
-        text description
-        string category "team / individual"
-    }
-
-    TEAM {
-        uuid id PK
-        uuid sport_id FK
-        string name
-        string age_group "U12 / U16 / Senior / Veteran"
-        string level "recreational / competitive / elite"
-        int max_members
-        string season "2025-2026"
-        date created_at
-    }
-
-    TEAM_MEMBER {
-        uuid id PK
-        uuid team_id FK
-        uuid member_id FK
-        string role "player / captain / substitute"
-        date joined_at
-        date left_at
-    }
-
-    TEAM_STAFF {
-        uuid id PK
-        uuid team_id FK
-        uuid staff_id FK
-        string role "head_coach / assistant / physio"
-        date assigned_at
-    }
-
-    %% ── Facilities & Bookings ────────────────────────────
-    FACILITY {
-        uuid id PK
-        string name "e.g. Main Pitch, Court A, Pool"
-        string type "pitch / court / pool / gym / room"
-        int capacity
-        string location
-        boolean is_indoor
-        string status "available / maintenance / closed"
-    }
-
-    BOOKING {
-        uuid id PK
-        uuid facility_id FK
-        uuid booked_by_member FK
-        uuid booked_by_staff FK
-        string title
-        datetime start_time
-        datetime end_time
-        string recurrence "none / weekly / biweekly"
-        string status "confirmed / cancelled / pending"
-        date created_at
-    }
-
-    %% ── Training & Events ────────────────────────────────
-    TRAINING_SESSION {
-        uuid id PK
-        uuid team_id FK
-        uuid facility_id FK
-        uuid coach_id FK
-        datetime start_time
-        datetime end_time
-        string type "practice / friendly / fitness"
-        text notes
-    }
-
-    ATTENDANCE {
-        uuid id PK
-        uuid training_session_id FK
-        uuid member_id FK
-        string status "present / absent / excused / late"
-        text notes
-    }
-
-    EVENT {
-        uuid id PK
-        uuid sport_id FK
-        uuid facility_id FK
-        string name
-        string type "match / tournament / social / meeting"
-        datetime start_time
-        datetime end_time
-        string location
-        text description
-        int max_participants
-        date created_at
-    }
-
-    EVENT_PARTICIPANT {
-        uuid id PK
-        uuid event_id FK
-        uuid member_id FK
-        string role "participant / organizer / volunteer"
-        date registered_at
-    }
-
-    %% ── Equipment & Inventory ────────────────────────────
-    EQUIPMENT {
-        uuid id PK
-        uuid sport_id FK
-        string name
-        string category "ball / net / goal / uniform / other"
-        int quantity
-        string condition "new / good / fair / poor"
-        string storage_location
-        date purchased_at
-    }
-
-    EQUIPMENT_LOAN {
-        uuid id PK
-        uuid equipment_id FK
-        uuid member_id FK
-        int quantity
-        date loaned_at
-        date returned_at
-        string status "on_loan / returned / lost"
-    }
-
-    %% ── Communication ────────────────────────────────────
-    NOTIFICATION {
-        uuid id PK
-        uuid member_id FK
-        string channel "email / sms / push"
-        string subject
-        text body
-        string status "sent / failed / pending"
-        date sent_at
+        text token UK
+        timestamp expires_at
+        timestamp created_at
     }
 
     %% ── Relationships ────────────────────────────────────
 
-    MEMBER        ||--o{ MEMBERSHIP         : "subscribes to"
-    MEMBERSHIP_PLAN ||--o{ MEMBERSHIP       : "defines"
-    MEMBER        ||--o{ PAYMENT            : "makes"
-    MEMBERSHIP    ||--o{ PAYMENT            : "paid via"
-    MEMBER        ||--o{ INVOICE            : "receives"
-    PAYMENT       |o--o| INVOICE            : "generates"
-
-    SPORT         ||--o{ TEAM               : "played by"
-    TEAM          ||--o{ TEAM_MEMBER        : "has"
-    MEMBER        ||--o{ TEAM_MEMBER        : "plays in"
-    TEAM          ||--o{ TEAM_STAFF         : "coached by"
-    STAFF         ||--o{ TEAM_STAFF         : "assigned to"
-
-    FACILITY      ||--o{ BOOKING            : "reserved via"
-    MEMBER        |o--o{ BOOKING            : "books"
-    STAFF         |o--o{ BOOKING            : "books"
-
-    TEAM          ||--o{ TRAINING_SESSION   : "trains at"
-    FACILITY      ||--o{ TRAINING_SESSION   : "hosts"
-    STAFF         ||--o{ TRAINING_SESSION   : "leads"
-    TRAINING_SESSION ||--o{ ATTENDANCE      : "tracked by"
-    MEMBER        ||--o{ ATTENDANCE         : "attends"
-
-    SPORT         |o--o{ EVENT              : "related to"
-    FACILITY      |o--o{ EVENT              : "hosts"
-    EVENT         ||--o{ EVENT_PARTICIPANT  : "has"
-    MEMBER        ||--o{ EVENT_PARTICIPANT  : "joins"
-
-    SPORT         |o--o{ EQUIPMENT          : "uses"
-    EQUIPMENT     ||--o{ EQUIPMENT_LOAN     : "lent via"
-    MEMBER        ||--o{ EQUIPMENT_LOAN     : "borrows"
-
-    MEMBER        ||--o{ NOTIFICATION       : "receives"
+    USER          ||--o{ LOGIN_TOKEN        : "requests"
+    USER          ||--o{ REVOKED_TOKEN      : "revokes"

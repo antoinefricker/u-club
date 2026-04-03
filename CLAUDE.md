@@ -20,6 +20,13 @@ When creating or editing an API route, always follow this workflow:
 5. **Update the OpenAPI annotation** (`@openapi` JSDoc) on the route to reflect any changes to request/response schemas, status codes, or descriptions
 6. **Update the Bruno file** (`apps/api/bruno/`) for the route so it stays in sync with the implementation
 
+## Database
+
+When creating or editing a migration or any database schema change:
+
+1. **Update `database-diagram.mermaid`** at the project root to reflect the new or modified tables, columns, and relationships
+2. **Display the updated diagram** to the user so they can review it visually
+
 ## Communication
 
 - Explain bash commands succinctly when asking for validation
