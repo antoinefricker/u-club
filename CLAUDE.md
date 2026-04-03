@@ -11,4 +11,4 @@
 
 ## Communication
 
-- Explain bash commands succinctly before running them
+- Explain bash commands succinctly when asking for validation
