@@ -13,10 +13,13 @@
     "format:check": "prettier --check src",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "migrate": "knex migrate:latest --knexfile knexfile.ts",
+    "migrate:make": "knex migrate:make --knexfile knexfile.ts -x ts"
   },
   "dependencies": {
     "express": "^5.1.0",
+    "knex": "^3.1.0",
     "pg": "^8.16.0"
   },
   "devDependencies": {

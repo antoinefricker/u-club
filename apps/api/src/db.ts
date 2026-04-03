@@ -1,7 +1,8 @@
-import pg from 'pg';
+import knex from 'knex';
 
-const pool = new pg.Pool({
-  connectionString: process.env.DATABASE_URL,
+const db = knex({
+  client: 'pg',
+  connection: process.env.DATABASE_URL,
 });
 
-export default pool;
+export default db;

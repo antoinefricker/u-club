@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeAll } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import request from 'supertest';
 
 vi.mock('../db.js', () => ({
   default: {
-    query: vi.fn().mockResolvedValue({
+    raw: vi.fn().mockResolvedValue({
       rows: [{ now: new Date('2024-01-01') }],
     }),
   },
