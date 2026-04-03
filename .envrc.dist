@@ -1,2 +1,7 @@
 export DATABASE_URL=
 export PORT=
+export SMTP_HOST=
+export SMTP_PORT=
+export SMTP_USER=
+export SMTP_PASS=
+export SMTP_FROM=
