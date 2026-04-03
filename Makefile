@@ -40,9 +40,9 @@ migrate-make:
 
 ## dev-stop: Stop dev services
 dev-stop:
-	docker compose stop postgres
+	docker compose stop postgres mailpit
 
 ## dev-start: Start postgres and api in dev mode
 dev-start:
-	docker compose up -d postgres
+	docker compose up -d postgres mailpit
 	pnpm dev:api
