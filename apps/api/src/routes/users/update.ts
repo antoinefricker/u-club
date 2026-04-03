@@ -5,14 +5,11 @@ import { hashPassword } from '../../password.js';
 const router = Router();
 
 const ALLOWED_FIELDS = [
-  'first_name',
-  'last_name',
   'display_name',
   'bio',
   'phone',
   'email',
   'password',
-  'birthdate',
 ] as const;
 
 /**
@@ -97,13 +94,10 @@ router.put('/:id', async (req: Request, res: Response) => {
     .update(updates)
     .returning([
       'id',
-      'first_name',
-      'last_name',
       'display_name',
       'bio',
       'phone',
       'email',
-      'birthdate',
       'created_at',
       'updated_at',
     ]);

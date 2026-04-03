@@ -40,13 +40,10 @@ const { default: app } = await import('../../app.js');
 
 const sampleUser = {
   id: 'uuid-1',
-  first_name: 'John',
-  last_name: 'Doe',
   display_name: 'johnd',
   bio: null,
   phone: null,
   email: 'john@example.com',
-  birthdate: null,
   created_at: '2026-01-01T00:00:00.000Z',
   updated_at: '2026-01-01T00:00:00.000Z',
 };
@@ -93,24 +90,8 @@ describe('GET /users/:id', () => {
 });
 
 describe('POST /users', () => {
-  it('should return 400 if first_name is missing', async () => {
-    const res = await request(app).post('/users').send({ last_name: 'Doe' });
-
-    expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'first_name is required');
-  });
-
-  it('should return 400 if last_name is missing', async () => {
-    const res = await request(app).post('/users').send({ first_name: 'John' });
-
-    expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'last_name is required');
-  });
-
   it('should return 400 if display_name is missing', async () => {
-    const res = await request(app)
-      .post('/users')
-      .send({ first_name: 'John', last_name: 'Doe' });
+    const res = await request(app).post('/users').send({});
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'display_name is required');
@@ -119,7 +100,7 @@ describe('POST /users', () => {
   it('should return 400 if email is missing', async () => {
     const res = await request(app)
       .post('/users')
-      .send({ first_name: 'John', last_name: 'Doe', display_name: 'johnd' });
+      .send({ display_name: 'johnd' });
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'email is required');
@@ -127,8 +108,6 @@ describe('POST /users', () => {
 
   it('should return 400 if password is missing', async () => {
     const res = await request(app).post('/users').send({
-      first_name: 'John',
-      last_name: 'Doe',
       display_name: 'johnd',
       email: 'john@example.com',
     });
@@ -141,8 +120,6 @@ describe('POST /users', () => {
     mockFirst.mockResolvedValueOnce(sampleUser);
 
     const res = await request(app).post('/users').send({
-      first_name: 'John',
-      last_name: 'Doe',
       display_name: 'johnd',
       email: 'john@example.com',
       password: 'secret',
@@ -157,8 +134,6 @@ describe('POST /users', () => {
     mockReturning.mockResolvedValueOnce([sampleUser]);
 
     const res = await request(app).post('/users').send({
-      first_name: 'John',
-      last_name: 'Doe',
       display_name: 'johnd',
       email: 'john@example.com',
       password: 'secret',
@@ -193,19 +168,19 @@ describe('PUT /users/:id', () => {
 
     const res = await request(app)
       .put('/users/nonexistent')
-      .send({ first_name: 'Jane' });
+      .send({ display_name: 'janed' });
 
     expect(res.status).toBe(404);
     expect(res.body).toHaveProperty('error', 'user not found');
   });
 
   it('should update and return the user', async () => {
-    const updated = { ...sampleUser, first_name: 'Jane' };
+    const updated = { ...sampleUser, display_name: 'janed' };
     mockReturning.mockResolvedValueOnce([updated]);
 
     const res = await request(app)
       .put('/users/uuid-1')
-      .send({ first_name: 'Jane' });
+      .send({ display_name: 'janed' });
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual(updated);

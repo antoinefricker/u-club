@@ -37,26 +37,7 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.post('/', async (req: Request, res: Response) => {
-  const {
-    first_name,
-    last_name,
-    display_name,
-    bio,
-    phone,
-    email,
-    password,
-    birthdate,
-  } = req.body;
-
-  if (!first_name || typeof first_name !== 'string') {
-    res.status(400).json({ error: 'first_name is required' });
-    return;
-  }
-
-  if (!last_name || typeof last_name !== 'string') {
-    res.status(400).json({ error: 'last_name is required' });
-    return;
-  }
+  const { display_name, bio, phone, email, password } = req.body;
 
   if (!display_name || typeof display_name !== 'string') {
     res.status(400).json({ error: 'display_name is required' });
@@ -83,24 +64,18 @@ router.post('/', async (req: Request, res: Response) => {
 
   const [user] = await db('users')
     .insert({
-      first_name,
-      last_name,
       display_name,
       bio: bio || null,
       phone: phone || null,
       email,
       password: hashedPassword,
-      birthdate: birthdate || null,
     })
     .returning([
       'id',
-      'first_name',
-      'last_name',
       'display_name',
       'bio',
       'phone',
       'email',
-      'birthdate',
       'created_at',
       'updated_at',
     ]);

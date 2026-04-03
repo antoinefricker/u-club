@@ -36,13 +36,10 @@ router.get('/:id', async (req: Request, res: Response) => {
   const user = await db('users')
     .select(
       'id',
-      'first_name',
-      'last_name',
       'display_name',
       'bio',
       'phone',
       'email',
-      'birthdate',
       'created_at',
       'updated_at',
     )
