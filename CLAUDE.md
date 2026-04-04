@@ -27,6 +27,14 @@ When creating or editing a migration or any database schema change:
 1. **Update `database-diagram.mermaid`** at the project root to reflect the new or modified tables, columns, and relationships
 2. **Display the updated diagram** to the user so they can review it visually
 
+## React Views (PWA)
+
+When creating or editing views in the PWA app:
+
+1. **Always use Mantine** components and hooks — do not use raw HTML or other UI libraries
+2. **Propose a preview first** — before writing any component code, describe the planned layout, components, and interactions to the user so they can validate the approach
+3. **Only create the content after the user approves** the proposed preview
+
 ## Communication
 
 - Explain bash commands succinctly when asking for validation

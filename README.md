@@ -39,13 +39,13 @@ make migrate
 
 ## Services
 
-| Service      | URL                            |
-| ------------ | ------------------------------ |
-| PWA          | http://localhost:5173           |
-| API          | http://localhost:4000           |
-| API docs     | http://localhost:4000/api-docs  |
-| Mailpit      | http://localhost:8025           |
-| Postgres     | localhost:5432                  |
+| Service  | URL                            |
+| -------- | ------------------------------ |
+| PWA      | http://localhost:5173          |
+| API      | http://localhost:4000          |
+| API docs | http://localhost:4000/api-docs |
+| Mailpit  | http://localhost:8025          |
+| Postgres | localhost:5432                 |
 
 ## Database schema
 
@@ -77,3 +77,7 @@ migrate-make   Create a new migration (usage: make migrate-make name=create_user
 dev-start      Start postgres, mailpit, api and pwa in dev mode
 dev-stop       Stop dev services
 ```
+
+## Documentations
+
+Mantine components https://mantine.dev/core/package/
