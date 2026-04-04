@@ -90,8 +90,8 @@ describe('POST /auth/login', () => {
       .send({ email: 'john@example.com', password: 'secret' });
 
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('access_token');
-    expect(typeof res.body.access_token).toBe('string');
+    expect(res.body).toHaveProperty('accessToken');
+    expect(typeof res.body.accessToken).toBe('string');
   });
 
   it('should return 500 if JWT_SECRET is not set', async () => {
