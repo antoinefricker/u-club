@@ -56,7 +56,7 @@ export function AccountPage() {
   return (
     <Stack align="center">
       <Paper shadow="sm" p="xl" radius="md" w="100%" maw={500}>
-        <form onSubmit={form.onSubmit(handleSubmit)}>
+        <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
           <Stack>
             <Title order={2} ta="center">
               My Account

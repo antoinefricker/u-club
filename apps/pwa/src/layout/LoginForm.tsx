@@ -50,7 +50,7 @@ export function LoginForm({ onSwitchMode }: LoginFormProps) {
   return (
     <Stack align="center" mt="xl">
       <Paper shadow="sm" p="xl" radius="md" w="100%" maw={400}>
-        <form onSubmit={form.onSubmit(handleSubmit)}>
+        <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
           <Stack>
             <Title order={3} ta="center">
               Login
