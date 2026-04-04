@@ -20,6 +20,17 @@ erDiagram
         timestamp created_at
     }
 
+    CLUB {
+        uuid id PK
+        string name
+        string code UK
+        text description
+        string media_logo_lg
+        string media_logo_sm
+        timestamp created_at
+        timestamp updated_at
+    }
+
     REVOKED_TOKEN {
         uuid id PK
         text token UK
