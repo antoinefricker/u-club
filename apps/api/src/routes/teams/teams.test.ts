@@ -130,14 +130,12 @@ describe('POST /teams', () => {
   it('should create a team and return 201', async () => {
     mockReturning.mockResolvedValueOnce([sampleTeam]);
 
-    const res = await request(app)
-      .post('/teams')
-      .send({
-        clubId: 'club-1',
-        label: 'U15 Boys',
-        year: 2026,
-        gender: 'male',
-      });
+    const res = await request(app).post('/teams').send({
+      clubId: 'club-1',
+      label: 'U15 Boys',
+      year: 2026,
+      gender: 'male',
+    });
 
     expect(res.status).toBe(201);
     expect(res.body).toEqual(sampleTeam);
