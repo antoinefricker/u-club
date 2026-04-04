@@ -12,15 +12,9 @@ import {
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useAuth } from '../auth/useAuth';
-import { useUserUpdate } from '../hooks/useUserUpdate';
+import { useUserUpdate, type UpdateUserPayload } from '../hooks/useUserUpdate';
 
-interface AccountFormValues {
-  displayName: string;
-  email: string;
-  phone: string;
-  bio: string;
-  password: string;
-}
+type AccountFormValues = UpdateUserPayload & { password: string };
 
 export function AccountPage() {
   const { user } = useAuth();

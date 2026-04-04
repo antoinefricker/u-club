@@ -1,16 +1,20 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, type UseMutationResult } from '@tanstack/react-query';
 import type { User } from '../types/User';
 import { useAuth } from '../auth/useAuth';
 
-type UpdateUserPayload = Omit<User, 'id' | 'createdAt' | 'updatedAt'> & {
+export type UpdateUserPayload = Omit<User, 'id' | 'createdAt' | 'updatedAt'> & {
   password?: string;
 };
 
-export function useUserUpdate() {
+export function useUserUpdate(): UseMutationResult<
+  User,
+  Error,
+  UpdateUserPayload
+> {
   const { user, token } = useAuth();
 
-  return useMutation({
-    mutationFn: async (values: UpdateUserPayload) => {
+  return useMutation<User, Error, UpdateUserPayload>({
+    mutationFn: async (values) => {
       const body: Record<string, string | null> = {
         displayName: values.displayName,
         email: values.email,
@@ -35,7 +39,7 @@ export function useUserUpdate() {
         throw new Error(data.error ?? 'Failed to update account');
       }
 
-      return res.json();
+      return res.json() as Promise<User>;
     },
   });
 }
