@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help install lint lint-fix format format-check typecheck test dev-start dev-stop migrate migrate-up migrate-down migrate-status migrate-make
+.PHONY: help install lint lint-fix format format-check typecheck test test-e2e dev-start dev-stop migrate migrate-up migrate-down migrate-status migrate-make
 
 help:
 	@grep -E '^## ' $(MAKEFILE_LIST) | sed 's/## //'
@@ -37,6 +37,10 @@ typecheck:
 ## test: Run tests on all packages
 test:
 	pnpm test
+
+## test-e2e: Run Playwright e2e tests (requires dev servers running)
+test-e2e:
+	pnpm test:e2e
 
 ## migrate: Run pending migrations
 migrate:

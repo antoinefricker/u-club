@@ -69,6 +69,7 @@ format         Format all packages
 format-check   Check formatting on all packages
 typecheck      Type-check all packages
 test           Run tests on all packages
+test-e2e       Run Playwright e2e tests (requires dev servers running)
 migrate        Run pending migrations
 migrate-up     Run the next pending migration
 migrate-down   Rollback the last migration
