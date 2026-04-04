@@ -31,6 +31,18 @@ erDiagram
         timestamp updated_at
     }
 
+    TEAM {
+        uuid id PK
+        uuid club_id FK
+        string label
+        integer year
+        enum gender
+        text description
+        boolean archived
+        timestamp created_at
+        timestamp updated_at
+    }
+
     REVOKED_TOKEN {
         uuid id PK
         text token UK
@@ -42,3 +54,4 @@ erDiagram
 
     USER          ||--o{ LOGIN_TOKEN        : "requests"
     USER          ||--o{ REVOKED_TOKEN      : "revokes"
+    CLUB          ||--o{ TEAM               : "has"
