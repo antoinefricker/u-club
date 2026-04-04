@@ -1,0 +1,17 @@
+meta {
+  name: Resend Confirmation
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/auth/resend_confirmation
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "john@example.com"
+  }
+}

@@ -1,0 +1,15 @@
+meta {
+  name: Get Club
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/clubs/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: paste-club-id-here
+}

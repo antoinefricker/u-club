@@ -56,6 +56,75 @@ const options: swaggerJsdoc.Options = {
             password: { type: 'string', format: 'password' },
           },
         },
+        Club: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            name: { type: 'string' },
+            code: { type: 'string' },
+            description: { type: 'string', nullable: true },
+            mediaLogoLg: { type: 'string', nullable: true },
+            mediaLogoSm: { type: 'string', nullable: true },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        CreateClubRequest: {
+          type: 'object',
+          required: ['name', 'code'],
+          properties: {
+            name: { type: 'string' },
+            code: { type: 'string' },
+            description: { type: 'string', nullable: true },
+            mediaLogoLg: { type: 'string', nullable: true },
+            mediaLogoSm: { type: 'string', nullable: true },
+          },
+        },
+        UpdateClubRequest: {
+          type: 'object',
+          properties: {
+            name: { type: 'string' },
+            code: { type: 'string' },
+            description: { type: 'string', nullable: true },
+            mediaLogoLg: { type: 'string', nullable: true },
+            mediaLogoSm: { type: 'string', nullable: true },
+          },
+        },
+        Team: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            clubId: { type: 'string', format: 'uuid' },
+            label: { type: 'string' },
+            year: { type: 'integer' },
+            gender: { type: 'string', enum: ['male', 'female', 'both'] },
+            description: { type: 'string', nullable: true },
+            archived: { type: 'boolean' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        CreateTeamRequest: {
+          type: 'object',
+          required: ['clubId', 'label', 'year', 'gender'],
+          properties: {
+            clubId: { type: 'string', format: 'uuid' },
+            label: { type: 'string' },
+            year: { type: 'integer' },
+            gender: { type: 'string', enum: ['male', 'female', 'both'] },
+            description: { type: 'string', nullable: true },
+          },
+        },
+        UpdateTeamRequest: {
+          type: 'object',
+          properties: {
+            label: { type: 'string' },
+            year: { type: 'integer' },
+            gender: { type: 'string', enum: ['male', 'female', 'both'] },
+            description: { type: 'string', nullable: true },
+            archived: { type: 'boolean' },
+          },
+        },
         Error: {
           type: 'object',
           properties: {
