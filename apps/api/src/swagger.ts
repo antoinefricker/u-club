@@ -90,6 +90,41 @@ const options: swaggerJsdoc.Options = {
             mediaLogoSm: { type: 'string', nullable: true },
           },
         },
+        Team: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            clubId: { type: 'string', format: 'uuid' },
+            label: { type: 'string' },
+            year: { type: 'integer' },
+            gender: { type: 'string', enum: ['male', 'female', 'both'] },
+            description: { type: 'string', nullable: true },
+            archived: { type: 'boolean' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        CreateTeamRequest: {
+          type: 'object',
+          required: ['clubId', 'label', 'year', 'gender'],
+          properties: {
+            clubId: { type: 'string', format: 'uuid' },
+            label: { type: 'string' },
+            year: { type: 'integer' },
+            gender: { type: 'string', enum: ['male', 'female', 'both'] },
+            description: { type: 'string', nullable: true },
+          },
+        },
+        UpdateTeamRequest: {
+          type: 'object',
+          properties: {
+            label: { type: 'string' },
+            year: { type: 'integer' },
+            gender: { type: 'string', enum: ['male', 'female', 'both'] },
+            description: { type: 'string', nullable: true },
+            archived: { type: 'boolean' },
+          },
+        },
         Error: {
           type: 'object',
           properties: {
