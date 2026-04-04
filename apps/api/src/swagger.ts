@@ -56,6 +56,40 @@ const options: swaggerJsdoc.Options = {
             password: { type: 'string', format: 'password' },
           },
         },
+        Club: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            name: { type: 'string' },
+            code: { type: 'string' },
+            description: { type: 'string', nullable: true },
+            mediaLogoLg: { type: 'string', nullable: true },
+            mediaLogoSm: { type: 'string', nullable: true },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        CreateClubRequest: {
+          type: 'object',
+          required: ['name', 'code'],
+          properties: {
+            name: { type: 'string' },
+            code: { type: 'string' },
+            description: { type: 'string', nullable: true },
+            mediaLogoLg: { type: 'string', nullable: true },
+            mediaLogoSm: { type: 'string', nullable: true },
+          },
+        },
+        UpdateClubRequest: {
+          type: 'object',
+          properties: {
+            name: { type: 'string' },
+            code: { type: 'string' },
+            description: { type: 'string', nullable: true },
+            mediaLogoLg: { type: 'string', nullable: true },
+            mediaLogoSm: { type: 'string', nullable: true },
+          },
+        },
         Error: {
           type: 'object',
           properties: {

@@ -5,6 +5,7 @@ import { camelToSnake, snakeToCamel } from './middleware/caseConverter.js';
 import healthRouter from './routes/health.js';
 import authRouter from './routes/auth/index.js';
 import usersRouter from './routes/users/index.js';
+import clubsRouter from './routes/clubs/index.js';
 
 const app = express();
 
@@ -17,5 +18,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(healthRouter);
 app.use('/auth', authRouter);
 app.use('/users', usersRouter);
+app.use('/clubs', clubsRouter);
 
 export default app;
