@@ -6,30 +6,33 @@ const router = Router();
 
 /**
  * @openapi
- * /auth/email_token:
+ * /auth/confirm_email:
  *   post:
  *     tags: [Auth]
- *     summary: Exchange a magic link token for a JWT
- *     description: Validates the one-time token from the login email, resolves the user, and returns a JWT access token.
+ *     summary: Confirm email address
+ *     description: Validates the confirmation token, marks the email as verified, and returns a JWT access token.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required: [token]
+ *             required: [token, email]
  *             properties:
  *               token:
  *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
  *     responses:
  *       200:
- *         description: JWT access token
+ *         description: Email confirmed and JWT returned
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 accessToken:
+ *                 access_token:
  *                   type: string
  *       400:
  *         description: Missing token
@@ -44,16 +47,21 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/email_token', async (req: Request, res: Response) => {
-  const { token } = req.body;
+router.post('/confirm_email', async (req: Request, res: Response) => {
+  const { token, email } = req.body;
 
   if (!token || typeof token !== 'string') {
     res.status(400).json({ error: 'token is required' });
     return;
   }
 
+  if (!email || typeof email !== 'string') {
+    res.status(400).json({ error: 'email is required' });
+    return;
+  }
+
   const loginToken = await db('login_tokens')
-    .where({ token })
+    .where({ token, email, type: 'confirmation' })
     .where('expires_at', '>', new Date())
     .first();
 
@@ -70,11 +78,9 @@ router.post('/email_token', async (req: Request, res: Response) => {
     return;
   }
 
-  if (!user.email_verified_at) {
-    await db('users')
-      .where({ id: user.id })
-      .update({ email_verified_at: new Date() });
-  }
+  await db('users')
+    .where({ id: user.id })
+    .update({ email_verified_at: new Date() });
 
   const jwtSecret = process.env.JWT_SECRET;
   if (!jwtSecret) {

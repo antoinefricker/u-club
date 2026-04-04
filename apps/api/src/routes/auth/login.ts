@@ -48,6 +48,12 @@ const router = Router();
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
+ *       403:
+ *         description: Email not verified
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 router.post('/login', async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -73,6 +79,11 @@ router.post('/login', async (req: Request, res: Response) => {
 
   if (!valid) {
     res.status(401).json({ error: 'invalid email or password' });
+    return;
+  }
+
+  if (!user.email_verified_at) {
+    res.status(403).json({ error: 'email not verified' });
     return;
   }
 

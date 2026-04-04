@@ -33,6 +33,7 @@ import { TeamsPage } from './pages/TeamsPage.tsx';
 import { ClubPage } from './pages/ClubPage.tsx';
 import { AccountPage } from './pages/AccountPage.tsx';
 import { AgendaPage } from './pages/AgendaPage.tsx';
+import { ConfirmEmailPage } from './pages/ConfirmEmailPage.tsx';
 
 const queryClient = new QueryClient();
 

@@ -11,16 +11,16 @@ import {
   Text,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useAuth } from '../auth/useAuth';
 
 interface RegisterFormProps {
   onSwitchMode: () => void;
 }
 
 export function RegisterForm({ onSwitchMode }: RegisterFormProps) {
-  const { login } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
+  const [resending, setResending] = useState(false);
 
   const form = useForm({
     initialValues: {
@@ -51,14 +51,58 @@ export function RegisterForm({ onSwitchMode }: RegisterFormProps) {
         throw new Error(body.error ?? 'Error creating account');
       }
 
-      // Auto-login after successful registration
-      await login(values.email, values.password);
+      setRegisteredEmail(values.email);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error creating account');
     } finally {
       setLoading(false);
     }
   };
+
+  const handleResend = async () => {
+    if (!registeredEmail) return;
+    setResending(true);
+    try {
+      await fetch('/api/auth/resend_confirmation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: registeredEmail }),
+      });
+    } finally {
+      setResending(false);
+    }
+  };
+
+  if (registeredEmail) {
+    return (
+      <Stack align="center" mt="xl">
+        <Paper shadow="sm" p="xl" radius="md" w="100%" maw={400}>
+          <Stack>
+            <Title order={3} ta="center">
+              Check your email
+            </Title>
+            <Alert color="blue" variant="light">
+              We sent a confirmation link to <strong>{registeredEmail}</strong>.
+              Click the link to activate your account.
+            </Alert>
+            <Button
+              variant="light"
+              fullWidth
+              loading={resending}
+              onClick={handleResend}
+            >
+              Resend confirmation email
+            </Button>
+            <Text size="sm" ta="center">
+              <Anchor component="button" type="button" onClick={onSwitchMode}>
+                Back to login
+              </Anchor>
+            </Text>
+          </Stack>
+        </Paper>
+      </Stack>
+    );
+  }
 
   return (
     <Stack align="center" mt="xl">

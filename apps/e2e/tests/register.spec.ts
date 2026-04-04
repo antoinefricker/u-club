@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Registration", () => {
-  test("should create a new account and auto-login", async ({ page }) => {
+  test("should show check your email after registration", async ({ page }) => {
     await page.goto("/");
 
     await page.getByRole("button", { name: "Create an account" }).click();
@@ -10,7 +10,10 @@ test.describe("Registration", () => {
     await page.getByLabel("Password").fill("password123");
     await page.getByRole("button", { name: "Create my account" }).click();
 
-    await expect(page.getByText("New User")).toBeVisible();
+    await expect(page.getByText("Check your email")).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Resend confirmation email" }),
+    ).toBeVisible();
   });
 
   test("should show error for missing display name", async ({ page }) => {

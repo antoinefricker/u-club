@@ -77,11 +77,29 @@ describe('POST /auth/login', () => {
     expect(res.body).toHaveProperty('error', 'invalid email or password');
   });
 
+  it('should return 403 if email is not verified', async () => {
+    mockFirst.mockResolvedValueOnce({
+      id: 'uuid-1',
+      email: 'john@example.com',
+      password: 'hashed:password',
+      email_verified_at: null,
+    });
+    mockVerifyPassword.mockResolvedValueOnce(true);
+
+    const res = await request(app)
+      .post('/auth/login')
+      .send({ email: 'john@example.com', password: 'secret' });
+
+    expect(res.status).toBe(403);
+    expect(res.body).toHaveProperty('error', 'email not verified');
+  });
+
   it('should return a JWT for valid credentials', async () => {
     mockFirst.mockResolvedValueOnce({
       id: 'uuid-1',
       email: 'john@example.com',
       password: 'hashed:password',
+      email_verified_at: '2026-01-01T00:00:00.000Z',
     });
     mockVerifyPassword.mockResolvedValueOnce(true);
 
@@ -100,6 +118,7 @@ describe('POST /auth/login', () => {
       id: 'uuid-1',
       email: 'john@example.com',
       password: 'hashed:password',
+      email_verified_at: '2026-01-01T00:00:00.000Z',
     });
     mockVerifyPassword.mockResolvedValueOnce(true);
 

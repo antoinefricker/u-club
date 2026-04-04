@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { createVerifiedUser } from "./helpers";
 
 let testCounter = 0;
 
@@ -17,13 +18,7 @@ test.describe("Account update", () => {
   test.beforeEach(async ({ page, request }) => {
     testUser = createTestUser();
 
-    await request.post("/api/users", {
-      data: {
-        displayName: testUser.displayName,
-        email: testUser.email,
-        password: testUser.password,
-      },
-    });
+    await createVerifiedUser(request, testUser);
 
     await page.goto("/");
     await page.getByLabel("Email").fill(testUser.email);

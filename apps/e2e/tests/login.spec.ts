@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { createVerifiedUser } from "./helpers";
 
 const TEST_USER = {
   displayName: "Login Test User",
@@ -8,13 +9,7 @@ const TEST_USER = {
 
 test.describe("Login", () => {
   test.beforeAll(async ({ request }) => {
-    await request.post("/api/users", {
-      data: {
-        displayName: TEST_USER.displayName,
-        email: TEST_USER.email,
-        password: TEST_USER.password,
-      },
-    });
+    await createVerifiedUser(request, TEST_USER);
   });
 
   test("should login with valid credentials", async ({ page }) => {

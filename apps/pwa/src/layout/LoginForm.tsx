@@ -21,6 +21,8 @@ export function LoginForm({ onSwitchMode }: LoginFormProps) {
   const { login } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
+  const [resending, setResending] = useState(false);
 
   const form = useForm({
     initialValues: {
@@ -35,15 +37,34 @@ export function LoginForm({ onSwitchMode }: LoginFormProps) {
 
   const handleSubmit = async (values: typeof form.values) => {
     setError(null);
+    setUnverifiedEmail(null);
     setLoading(true);
     try {
       await login(values.email, values.password);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Invalid email or password',
-      );
+      const message =
+        err instanceof Error ? err.message : 'Invalid email or password';
+      if (message === 'email not verified') {
+        setUnverifiedEmail(values.email);
+      } else {
+        setError(message);
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    if (!unverifiedEmail) return;
+    setResending(true);
+    try {
+      await fetch('/api/auth/resend_confirmation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: unverifiedEmail }),
+      });
+    } finally {
+      setResending(false);
     }
   };
 
@@ -60,6 +81,23 @@ export function LoginForm({ onSwitchMode }: LoginFormProps) {
               <Alert color="red" variant="light">
                 {error}
               </Alert>
+            )}
+
+            {unverifiedEmail && (
+              <>
+                <Alert color="orange" variant="light">
+                  Please verify your email address. Check your inbox for the
+                  confirmation link.
+                </Alert>
+                <Button
+                  variant="light"
+                  fullWidth
+                  loading={resending}
+                  onClick={handleResend}
+                >
+                  Resend confirmation email
+                </Button>
+              </>
             )}
 
             <TextInput
