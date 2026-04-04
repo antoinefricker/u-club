@@ -1,6 +1,8 @@
 import { Router, Request, Response } from 'express';
+import crypto from 'node:crypto';
 import db from '../../db.js';
 import { hashPassword } from '../../password.js';
+import mailer from '../../mailer.js';
 
 const router = Router();
 
@@ -79,6 +81,24 @@ router.post('/', async (req: Request, res: Response) => {
       'created_at',
       'updated_at',
     ]);
+
+  const token = crypto.randomBytes(32).toString('hex');
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+  await db('login_tokens').insert({
+    email,
+    token,
+    expires_at: expiresAt,
+    type: 'confirmation',
+  });
+
+  const appUrl = process.env.APP_URL || 'http://localhost:5173';
+  await mailer.sendMail({
+    from: process.env.SMTP_FROM || 'noreply@u-club.app',
+    to: email,
+    subject: 'Confirm your email',
+    text: `Click here to confirm your email: ${appUrl}/confirm-email?token=${token}&email=${encodeURIComponent(email)}\n\nThis link expires in 24 hours.`,
+  });
 
   res.status(201).json(user);
 });

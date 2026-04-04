@@ -32,8 +32,10 @@ vi.mock('../../password.js', () => ({
   verifyPassword: vi.fn().mockResolvedValue(true),
 }));
 
+const mockSendMail = vi.fn().mockResolvedValue({});
+
 vi.mock('../../mailer.js', () => ({
-  default: { sendMail: vi.fn().mockResolvedValue({}) },
+  default: { sendMail: mockSendMail },
 }));
 
 const { default: app } = await import('../../app.js');
@@ -141,6 +143,25 @@ describe('POST /users', () => {
 
     expect(res.status).toBe(201);
     expect(res.body).toEqual(sampleUser);
+  });
+
+  it('should send confirmation email after creation', async () => {
+    mockFirst.mockResolvedValueOnce(undefined);
+    mockReturning.mockResolvedValueOnce([sampleUser]);
+
+    await request(app).post('/users').send({
+      display_name: 'johnd',
+      email: 'john@example.com',
+      password: 'secret',
+    });
+
+    expect(mockInsert).toHaveBeenCalled();
+    expect(mockSendMail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: 'john@example.com',
+        subject: 'Confirm your email',
+      }),
+    );
   });
 });
 
