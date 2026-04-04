@@ -37,7 +37,11 @@ When creating or editing views in the PWA app:
 
 ## Pull Requests
 
-When creating a PR, include a summary and a test plan formatted as a todo checklist. Do not check any items in the test plan — leave them all unchecked.
+When creating a pull Request, generate a summary section and a test plan section formatted as a todo checklist. Do not check any items in the test plan — leave them all unchecked.
+
+## Makefile
+
+When creating or editing a Makefile command, always update the Makefile documentation in `README.md` to reflect the change.
 
 ## Communication
 

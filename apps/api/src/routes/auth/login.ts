@@ -34,7 +34,7 @@ const router = Router();
  *             schema:
  *               type: object
  *               properties:
- *                 access_token:
+ *                 accessToken:
  *                   type: string
  *       400:
  *         description: Missing email or password

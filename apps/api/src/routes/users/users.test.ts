@@ -42,12 +42,12 @@ const { default: app } = await import('../../app.js');
 
 const sampleUser = {
   id: 'uuid-1',
-  display_name: 'johnd',
+  displayName: 'johnd',
   bio: null,
   phone: null,
   email: 'john@example.com',
-  created_at: '2026-01-01T00:00:00.000Z',
-  updated_at: '2026-01-01T00:00:00.000Z',
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
 };
 
 beforeEach(() => {
@@ -92,7 +92,7 @@ describe('GET /users/:id', () => {
 });
 
 describe('POST /users', () => {
-  it('should return 400 if display_name is missing', async () => {
+  it('should return 400 if displayName is missing', async () => {
     const res = await request(app).post('/users').send({});
 
     expect(res.status).toBe(400);
@@ -102,7 +102,7 @@ describe('POST /users', () => {
   it('should return 400 if email is missing', async () => {
     const res = await request(app)
       .post('/users')
-      .send({ display_name: 'johnd' });
+      .send({ displayName: 'johnd' });
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'email is required');
@@ -110,7 +110,7 @@ describe('POST /users', () => {
 
   it('should return 400 if password is missing', async () => {
     const res = await request(app).post('/users').send({
-      display_name: 'johnd',
+      displayName: 'johnd',
       email: 'john@example.com',
     });
 
@@ -122,7 +122,7 @@ describe('POST /users', () => {
     mockFirst.mockResolvedValueOnce(sampleUser);
 
     const res = await request(app).post('/users').send({
-      display_name: 'johnd',
+      displayName: 'johnd',
       email: 'john@example.com',
       password: 'secret',
     });
@@ -136,7 +136,7 @@ describe('POST /users', () => {
     mockReturning.mockResolvedValueOnce([sampleUser]);
 
     const res = await request(app).post('/users').send({
-      display_name: 'johnd',
+      displayName: 'johnd',
       email: 'john@example.com',
       password: 'secret',
     });
@@ -189,19 +189,19 @@ describe('PUT /users/:id', () => {
 
     const res = await request(app)
       .put('/users/nonexistent')
-      .send({ display_name: 'janed' });
+      .send({ displayName: 'janed' });
 
     expect(res.status).toBe(404);
     expect(res.body).toHaveProperty('error', 'user not found');
   });
 
   it('should update and return the user', async () => {
-    const updated = { ...sampleUser, display_name: 'janed' };
+    const updated = { ...sampleUser, displayName: 'janed' };
     mockReturning.mockResolvedValueOnce([updated]);
 
     const res = await request(app)
       .put('/users/uuid-1')
-      .send({ display_name: 'janed' });
+      .send({ displayName: 'janed' });
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual(updated);

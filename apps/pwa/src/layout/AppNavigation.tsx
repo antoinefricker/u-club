@@ -58,7 +58,7 @@ export function AppNavigation() {
 
       <div className={classes.footer}>
         <Title order={6} c="white">
-          {user?.display_name}
+          {user?.displayName}
         </Title>
         <a
           href="#"

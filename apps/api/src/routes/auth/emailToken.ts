@@ -29,7 +29,7 @@ const router = Router();
  *             schema:
  *               type: object
  *               properties:
- *                 access_token:
+ *                 accessToken:
  *                   type: string
  *       400:
  *         description: Missing token

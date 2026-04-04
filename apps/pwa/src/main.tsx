@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router';
 import { MantineProvider, createTheme } from '@mantine/core';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const theme = createTheme({
   primaryColor: 'brand',
@@ -34,25 +35,28 @@ import { AccountPage } from './pages/AccountPage.tsx';
 import { AgendaPage } from './pages/AgendaPage.tsx';
 import { ConfirmEmailPage } from './pages/ConfirmEmailPage.tsx';
 
+const queryClient = new QueryClient();
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <MantineProvider theme={theme}>
       <Notifications />
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="confirm-email" element={<ConfirmEmailPage />} />
-            <Route element={<App />}>
-              <Route index element={<DashboardPage />} />
-              <Route path="club" element={<ClubPage />} />
-              <Route path="teams" element={<TeamsPage />} />
-              <Route path="account" element={<AccountPage />} />
-              <Route path="agenda" element={<AgendaPage />} />
-              <Route path="account" element={<AccountPage />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route element={<App />}>
+                <Route index element={<DashboardPage />} />
+                <Route path="club" element={<ClubPage />} />
+                <Route path="teams" element={<TeamsPage />} />
+                <Route path="account" element={<AccountPage />} />
+                <Route path="agenda" element={<AgendaPage />} />
+                <Route path="account" element={<AccountPage />} />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
+      </QueryClientProvider>
     </MantineProvider>
   </StrictMode>,
 );

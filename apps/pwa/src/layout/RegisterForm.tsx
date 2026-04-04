@@ -24,12 +24,12 @@ export function RegisterForm({ onSwitchMode }: RegisterFormProps) {
 
   const form = useForm({
     initialValues: {
-      display_name: '',
+      displayName: '',
       email: '',
       password: '',
     },
     validate: {
-      display_name: (v) => (v.length > 0 ? null : 'Display name is required'),
+      displayName: (v) => (v.length > 0 ? null : 'Display name is required'),
       email: (v) => (/^\S+@\S+\.\S+$/.test(v) ? null : 'Invalid email'),
       password: (v) =>
         v.length >= 6 ? null : 'Password must be at least 6 characters',
@@ -107,7 +107,7 @@ export function RegisterForm({ onSwitchMode }: RegisterFormProps) {
   return (
     <Stack align="center" mt="xl">
       <Paper shadow="sm" p="xl" radius="md" w="100%" maw={400}>
-        <form onSubmit={form.onSubmit(handleSubmit)}>
+        <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
           <Stack>
             <Title order={3} ta="center">
               Create an account
@@ -123,7 +123,7 @@ export function RegisterForm({ onSwitchMode }: RegisterFormProps) {
               label="Display name"
               placeholder="Your display name"
               required
-              {...form.getInputProps('display_name')}
+              {...form.getInputProps('displayName')}
             />
 
             <TextInput

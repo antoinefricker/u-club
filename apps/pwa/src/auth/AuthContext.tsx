@@ -5,7 +5,8 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { AuthContext, type User } from './authContextValue';
+import { AuthContext } from './authContextValue';
+import type { User } from '../types/User';
 
 const TOKEN_KEY = 'access_token';
 
@@ -26,11 +27,13 @@ async function fetchUser(userId: string, token: string): Promise<User> {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setToken] = useState<string | null>(
-    () => localStorage.getItem(TOKEN_KEY),
+  const [token, setToken] = useState<string | null>(() =>
+    localStorage.getItem(TOKEN_KEY),
   );
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(() => !!localStorage.getItem(TOKEN_KEY));
+  const [loading, setLoading] = useState(
+    () => !!localStorage.getItem(TOKEN_KEY),
+  );
 
   useEffect(() => {
     if (!token) return;
@@ -56,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error(body.error ?? 'Login failed');
     }
 
-    const { access_token } = await res.json();
+    const { accessToken: access_token } = await res.json();
     const { sub } = parseJwtPayload(access_token);
     const userData = await fetchUser(sub, access_token);
 
@@ -77,9 +80,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, [token]);
 
+  const updateUser = useCallback((updatedUser: User) => {
+    setUser(updatedUser);
+  }, []);
+
   const value = useMemo(
-    () => ({ token, user, isAuthenticated: token !== null, login, logout }),
-    [token, user, login, logout],
+    () => ({
+      token,
+      user,
+      isAuthenticated: token !== null,
+      login,
+      logout,
+      updateUser,
+    }),
+    [token, user, login, logout, updateUser],
   );
 
   if (loading) return null;

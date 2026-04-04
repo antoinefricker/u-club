@@ -93,7 +93,7 @@ describe('POST /auth/email_token', () => {
       .send({ token: 'valid-token' });
 
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('access_token');
-    expect(typeof res.body.access_token).toBe('string');
+    expect(res.body).toHaveProperty('accessToken');
+    expect(typeof res.body.accessToken).toBe('string');
   });
 });

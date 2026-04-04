@@ -69,6 +69,7 @@ format         Format all packages
 format-check   Check formatting on all packages
 typecheck      Type-check all packages
 test           Run tests on all packages
+test-e2e       Run Playwright e2e tests (requires dev servers running)
 migrate        Run pending migrations
 migrate-up     Run the next pending migration
 migrate-down   Rollback the last migration
@@ -80,4 +81,8 @@ dev-stop       Stop dev services
 
 ## Documentations
 
-Mantine components https://mantine.dev/core/package/
+- Mantine components https://mantine.dev/core/package/
+- Tabler icons https://tabler.io/icons
+- TanStack router https://tanstack.com/router/latest
+- Express https://expressjs.com/en/5x/api.html
+- Swagger JSDoc https://github.com/Surnet/swagger-jsdoc/tree/v6/docs
