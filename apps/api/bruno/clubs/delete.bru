@@ -1,0 +1,15 @@
+meta {
+  name: Delete Club
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/clubs/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: paste-club-id-here
+}
