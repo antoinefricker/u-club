@@ -32,6 +32,7 @@ import { TeamsPage } from './pages/TeamsPage.tsx';
 import { ClubPage } from './pages/ClubPage.tsx';
 import { AccountPage } from './pages/AccountPage.tsx';
 import { AgendaPage } from './pages/AgendaPage.tsx';
+import { ConfirmEmailPage } from './pages/ConfirmEmailPage.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -40,6 +41,7 @@ createRoot(document.getElementById('root')!).render(
       <AuthProvider>
         <BrowserRouter>
           <Routes>
+            <Route path="confirm-email" element={<ConfirmEmailPage />} />
             <Route element={<App />}>
               <Route index element={<DashboardPage />} />
               <Route path="club" element={<ClubPage />} />
