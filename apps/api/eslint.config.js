@@ -9,4 +9,11 @@ export default tseslint.config(
   {
     ignores: ['dist'],
   },
+  {
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
 );
