@@ -27,19 +27,19 @@ const options: swaggerJsdoc.Options = {
           type: 'object',
           properties: {
             id: { type: 'string', format: 'uuid' },
-            display_name: { type: 'string' },
+            displayName: { type: 'string' },
             bio: { type: 'string', nullable: true },
             phone: { type: 'string', nullable: true },
             email: { type: 'string', format: 'email' },
-            created_at: { type: 'string', format: 'date-time' },
-            updated_at: { type: 'string', format: 'date-time' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
           },
         },
         CreateUserRequest: {
           type: 'object',
-          required: ['display_name', 'email', 'password'],
+          required: ['displayName', 'email', 'password'],
           properties: {
-            display_name: { type: 'string' },
+            displayName: { type: 'string' },
             bio: { type: 'string', nullable: true },
             phone: { type: 'string', nullable: true },
             email: { type: 'string', format: 'email' },
@@ -49,7 +49,7 @@ const options: swaggerJsdoc.Options = {
         UpdateUserRequest: {
           type: 'object',
           properties: {
-            display_name: { type: 'string' },
+            displayName: { type: 'string' },
             bio: { type: 'string', nullable: true },
             phone: { type: 'string', nullable: true },
             email: { type: 'string', format: 'email' },

@@ -35,6 +35,10 @@ When creating or editing views in the PWA app:
 2. **Propose a preview first** — before writing any component code, describe the planned layout, components, and interactions to the user so they can validate the approach
 3. **Only create the content after the user approves** the proposed preview
 
+## Makefile
+
+When creating or editing a Makefile command, always update the Makefile documentation in `README.md` to reflect the change.
+
 ## Communication
 
 - Explain bash commands succinctly when asking for validation
