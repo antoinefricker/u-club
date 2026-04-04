@@ -1,5 +1,12 @@
+import { Outlet } from 'react-router';
+import { PageLayout } from './layout/PageLayout';
+
 function App() {
-  return <h1>Hello World</h1>;
+  return (
+    <PageLayout>
+      <Outlet />
+    </PageLayout>
+  );
 }
 
 export default App;
