@@ -17,7 +17,7 @@ import { useUserUpdate, type UpdateUserPayload } from '../hooks/useUserUpdate';
 type AccountFormValues = UpdateUserPayload & { password: string };
 
 export function AccountPage() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const mutation = useUserUpdate();
 
@@ -39,7 +39,8 @@ export function AccountPage() {
   const handleSubmit = (values: AccountFormValues) => {
     setError(null);
     mutation.mutate(values, {
-      onSuccess: () => {
+      onSuccess: (updatedUser) => {
+        updateUser(updatedUser);
         form.setFieldValue('password', '');
         notifications.show({
           title: 'Account updated',

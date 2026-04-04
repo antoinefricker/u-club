@@ -80,9 +80,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, [token]);
 
+  const updateUser = useCallback((updatedUser: User) => {
+    setUser(updatedUser);
+  }, []);
+
   const value = useMemo(
-    () => ({ token, user, isAuthenticated: token !== null, login, logout }),
-    [token, user, login, logout],
+    () => ({
+      token,
+      user,
+      isAuthenticated: token !== null,
+      login,
+      logout,
+      updateUser,
+    }),
+    [token, user, login, logout, updateUser],
   );
 
   if (loading) return null;
