@@ -80,4 +80,8 @@ dev-stop       Stop dev services
 
 ## Documentations
 
-Mantine components https://mantine.dev/core/package/
+- Mantine components https://mantine.dev/core/package/
+- Tabler icons https://tabler.io/icons
+- TanStack router https://tanstack.com/router/latest
+- Express https://expressjs.com/en/5x/api.html
+- Swagger JSDoc https://github.com/Surnet/swagger-jsdoc/tree/v6/docs
