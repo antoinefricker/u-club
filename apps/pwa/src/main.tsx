@@ -51,7 +51,6 @@ createRoot(document.getElementById('root')!).render(
                 <Route path="teams" element={<TeamsPage />} />
                 <Route path="account" element={<AccountPage />} />
                 <Route path="agenda" element={<AgendaPage />} />
-                <Route path="account" element={<AccountPage />} />
               </Route>
             </Routes>
           </BrowserRouter>
