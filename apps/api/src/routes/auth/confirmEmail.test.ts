@@ -101,8 +101,8 @@ describe('POST /auth/confirm_email', () => {
       .send({ token: 'valid-token', email: 'test@example.com' });
 
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('access_token');
-    expect(typeof res.body.access_token).toBe('string');
+    expect(res.body).toHaveProperty('accessToken');
+    expect(typeof res.body.accessToken).toBe('string');
     expect(mockUpdate).toHaveBeenCalled();
     expect(mockDel).toHaveBeenCalled();
   });
