@@ -1,14 +1,5 @@
 import { createContext } from 'react';
-
-export interface User {
-  id: string;
-  display_name: string;
-  bio: string | null;
-  phone: string | null;
-  email: string;
-  created_at: string;
-  updated_at: string;
-}
+import type { User } from '../types/User';
 
 export interface AuthContextValue {
   token: string | null;

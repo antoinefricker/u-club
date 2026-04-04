@@ -15,7 +15,7 @@ import { useAuth } from '../auth/useAuth';
 import { useUserUpdate } from '../hooks/useUserUpdate';
 
 interface AccountFormValues {
-  display_name: string;
+  displayName: string;
   email: string;
   phone: string;
   bio: string;
@@ -29,14 +29,14 @@ export function AccountPage() {
 
   const form = useForm<AccountFormValues>({
     initialValues: {
-      display_name: user?.display_name ?? '',
+      displayName: user?.displayName ?? '',
       email: user?.email ?? '',
       phone: user?.phone ?? '',
       bio: user?.bio ?? '',
       password: '',
     },
     validate: {
-      display_name: (v) =>
+      displayName: (v) =>
         v.trim().length > 0 ? null : 'Display name is required',
       email: (v) => (/^\S+@\S+\.\S+$/.test(v) ? null : 'Invalid email'),
     },
@@ -77,7 +77,7 @@ export function AccountPage() {
             <TextInput
               label="Display name"
               required
-              {...form.getInputProps('display_name')}
+              {...form.getInputProps('displayName')}
             />
 
             <TextInput

@@ -1,21 +1,18 @@
 import { useMutation } from '@tanstack/react-query';
+import type { User } from '../types/User';
 import { useAuth } from '../auth/useAuth';
 
-interface UpdateUserPayload {
-  display_name: string;
-  email: string;
-  phone: string;
-  bio: string;
+type UpdateUserPayload = Omit<User, 'id' | 'createdAt' | 'updatedAt'> & {
   password?: string;
-}
+};
 
 export function useUserUpdate() {
   const { user, token } = useAuth();
 
   return useMutation({
     mutationFn: async (values: UpdateUserPayload) => {
-      const body: Record<string, string> = {
-        display_name: values.display_name,
+      const body: Record<string, string | null> = {
+        displayName: values.displayName,
         email: values.email,
         phone: values.phone,
         bio: values.bio,
