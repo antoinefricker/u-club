@@ -19,15 +19,12 @@
   - with categories of todos (availables/selected/referee/lunch/transport/table)
   - selectable in a date range
 - **Event announcements** — publishable posts linked to events, shared with club/team members
-- **Seed database**
-  - 2 clubs
-  - 45 teams in each club
-  - 25 members each
-  - related user
-  - admin
-  - allow to clear all data
 - **Team chat link** — add `chat_link` field on teams for external group chat URLs (WhatsApp/Telegram)
 - **In-app messaging** — WebSocket-based team/club messaging with stored history (future)
+- **FFBB integration** — connect to FFBB APIs to import competition calendars, results, club/team data
+  - Explore `ffbb-api-client-v2` Python client or build a Node equivalent
+  - Import match schedules and results
+  - Sync member licenses
 - **Protected route wrapper (PWA)**
   — Redirect unauthenticated users on the React side instead of relying on API 401s
 
@@ -40,12 +37,10 @@
 ## Developer experience
 
 - **API client generation** — Auto-generate a typed API client from Swagger spec for the PWA
-- **Database seeding script** — `make seed` command to populate dev data (admin user, sample club, teams)
 
 ## PWA
 
-- **Lost password**
-- **One timepassword**
+- **One time password**
 - **PWA polish**
   - app icons (192x192, 512x512)
   - offline fallback page
@@ -68,5 +63,6 @@
   - teams management (CRUD)
   - members management (CRUD)
 - **Route guards** — Role-based UI: hide admin-only nav items from regular users
+- **i18n** — Internationalization with react-i18next (French/English)
 - **Loading/error states** — Add loading skeletons and error boundaries to pages
 - **Pagination** — Cursor or offset pagination on list endpoints as data grows

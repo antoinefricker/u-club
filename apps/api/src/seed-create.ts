@@ -98,8 +98,8 @@ async function seed() {
 
   const s = spinner();
 
-  const adminEmail = process.env.SEED_ADMIN_EMAIL || 'admin@u-club.app';
-  const managerEmail = process.env.SEED_MANAGER_EMAIL || 'manager@u-club.app';
+  const adminEmail = process.env.SEED_ADMIN_EMAIL || 'admin@eggplant.app';
+  const managerEmail = process.env.SEED_MANAGER_EMAIL || 'manager@eggplant.app';
   const seedPassword = process.env.SEED_PASSWORD || 'password123';
 
   s.start('Hashing passwords');
@@ -190,7 +190,7 @@ async function seed() {
 
         let userId: string | null = null;
         if (Math.random() < 0.8) {
-          const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}.${totalMembers}@seed.u-club.app`;
+          const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}.${totalMembers}@seed.eggplant.app`;
           const [user] = await db('users')
             .insert({
               display_name: `${firstName} ${lastName}`,

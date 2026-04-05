@@ -4,9 +4,9 @@ const options: swaggerJsdoc.Options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'U-Club API',
+      title: 'Eggplant API',
       version: '0.0.1',
-      description: 'API for the U-Club sports club management platform',
+      description: 'API for the Eggplant sports club management platform',
     },
     servers: [
       {

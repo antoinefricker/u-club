@@ -47,36 +47,36 @@ test-e2e:
 ## migrate: Run pending migrations
 migrate:
 	$(check_postgres)
-	pnpm --filter @u-club/api migrate
+	pnpm --filter @eggplant/api migrate
 
 ## migrate-up: Run the next pending migration
 migrate-up:
 	$(check_postgres)
-	pnpm --filter @u-club/api migrate:up
+	pnpm --filter @eggplant/api migrate:up
 
 ## migrate-down: Rollback the last migration
 migrate-down:
 	$(check_postgres)
-	pnpm --filter @u-club/api migrate:down
+	pnpm --filter @eggplant/api migrate:down
 
 ## migrate-status: Show current migration status
 migrate-status:
 	$(check_postgres)
-	pnpm --filter @u-club/api migrate:status
+	pnpm --filter @eggplant/api migrate:status
 
 ## migrate-make: Create a new migration (usage: make migrate-make name=create_users)
 migrate-make:
-	pnpm --filter @u-club/api migrate:make -- $(name)
+	pnpm --filter @eggplant/api migrate:make -- $(name)
 
 ## seed-create: Clear and seed database with dev data (use FORCE=1 to skip confirmation)
 seed-create:
 	$(check_postgres)
-	pnpm --filter @u-club/api seed $(if $(filter 1,$(FORCE)),-- --force)
+	pnpm --filter @eggplant/api seed $(if $(filter 1,$(FORCE)),-- --force)
 
 ## seed-clear: Clear all data from database (use FORCE=1 to skip confirmation)
 seed-clear:
 	$(check_postgres)
-	pnpm --filter @u-club/api seed:clear $(if $(filter 1,$(FORCE)),-- --force)
+	pnpm --filter @eggplant/api seed:clear $(if $(filter 1,$(FORCE)),-- --force)
 
 ## dev-stop: Stop dev services
 dev-stop:

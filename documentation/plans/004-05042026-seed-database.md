@@ -7,9 +7,9 @@ We need a seed script to populate the dev database with realistic data for testi
 ## Data to generate
 
 - 1 admin user (email/password from `SEED_ADMIN_EMAIL` / `SEED_PASSWORD` env vars)
-  define default value in .envrc.dist (admin@u-club.app / password123)
+  define default value in .envrc.dist (admin@eggplant.app / password123)
 - 1 manager user (email/password from `SEED_MANAGER_EMAIL` / `SEED_PASSWORD` env vars)
-  define default value in .envrc.dist (manager@u-club.app / password123)
+  define default value in .envrc.dist (manager@eggplant.app / password123)
 - 4 member statuses (pending validation, active, inactive)
 - 2 clubs
   - one club named CSG Baskin' have 3 teams in Senior age category, of both genders, named "Lions" and "Tigres"
@@ -57,14 +57,14 @@ We need a seed script to populate the dev database with realistic data for testi
 ### 4. Makefile commands
 
 - **Modify:** `Makefile`
-  - Add `seed` — runs `pnpm --filter @u-club/api seed`
-  - Add `seed-clear` — runs `pnpm --filter @u-club/api seed:clear`
+  - Add `seed` — runs `pnpm --filter @eggplant/api seed`
+  - Add `seed-clear` — runs `pnpm --filter @eggplant/api seed:clear`
 - **Modify:** `README.md` — document new commands
 
 ### 5. Env vars
 
-- `SEED_ADMIN_EMAIL` (default: admin@u-club.app)
-- `SEED_MANAGER_EMAIL` (default: manager@u-club.app)
+- `SEED_ADMIN_EMAIL` (default: admin@eggplant.app)
+- `SEED_MANAGER_EMAIL` (default: manager@eggplant.app)
 - `SEED_PASSWORD` (default: password123)
 - **Modify:** `.envrc.dist` — add these vars
 

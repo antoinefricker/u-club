@@ -1,13 +1,17 @@
-# u-club
+<p align="center">
+  <img src="./documentation/eggplant-logo.png" alt="Eggplant" width="320" />
+</p>
 
-Monorepo for the u-club project.
+# Eggplant
 
-## Local URLs
+Basketball club management platform designed for medium-sized organisations. Manage clubs, teams, members, events, and game-day assignments — from roster planning to match logistics.
 
-- **PWA**: http://localhost:5173
-- **API**: http://localhost:4000
-- **API docs** (Swagger): http://localhost:4000/api-docs
-- **Mailpit** (email inbox): http://localhost:8025
+## Tech stack
+
+- **Frontend**: React 19, Mantine, TanStack Query, Vite (PWA)
+- **Backend**: Express 5, Knex, PostgreSQL, Zod, JWT auth
+- **Testing**: Vitest, Playwright, Supertest
+- **Tooling**: GitHub Actions, Husky, lint-staged, Docker
 
 ## Prerequisites
 
@@ -20,8 +24,8 @@ Monorepo for the u-club project.
 
 ```bash
 # Clone the repo
-git clone git@github.com:antoinefricker/u-club.git
-cd u-club
+git clone git@github.com:antoinefricker/eggplant.git
+cd eggplant
 
 # Set up environment variables
 cp .envrc.dist .envrc
@@ -35,17 +39,18 @@ make dev-start
 
 # Run migrations
 make migrate
+
+# Seed database (optional)
+make seed-create
 ```
 
 ## Services
 
-| Service  | URL                            |
-| -------- | ------------------------------ |
-| PWA      | http://localhost:5173          |
-| API      | http://localhost:4000          |
-| API docs | http://localhost:4000/api-docs |
-| Mailpit  | http://localhost:8025          |
-| Postgres | localhost:5432                 |
+- **PWA**: http://localhost:5173
+- **API**: http://localhost:4000
+- **API docs** (Swagger): http://localhost:4000/api-docs
+- **Mailpit** (email inbox): http://localhost:8025
+- **Postgres**: localhost:5432
 
 ## Available commands
 
@@ -65,27 +70,28 @@ migrate-up     Run the next pending migration
 migrate-down   Rollback the last migration
 migrate-status Show current migration status
 migrate-make   Create a new migration (usage: make migrate-make name=create_users)
-seed           Clear and seed database with dev data
-seed-clear     Clear all data from database
+seed-create    Clear and seed database with dev data (use FORCE=1 to skip confirmation)
+seed-clear     Clear all data from database (use FORCE=1 to skip confirmation)
 dev-start      Start postgres, mailpit, api and pwa in dev mode
 dev-stop       Stop dev services (node servers + docker)
 ```
 
-## Documentations
+## Documentation
 
 - [Project roadmap](./documentation/roadmap.md)
-- Past Claude plans are stored in [`documentation/plans`](./documentation/plans/index.md)
-- The entity-relationship diagram is maintained in [`database-diagram.mermaid`](./documentation/database-diagram.mermaid)
-- API routes are testable through a [Bruno](https://www.usebruno.com/) collection under [`documentation/bruno`](./documentation/bruno)
+- [Implementation plans](./documentation/plans/index.md)
+- [Database diagram](./documentation/database-diagram.mermaid)
+- [Bruno API collection](./documentation/bruno)
 
-### Dependencies documentation
+### Dependencies
 
-- Front
-  - [TanStack router](https://tanstack.com/router/latest)
-  - [TanStack query](https://tanstack.com/query/latest)
-  - [Mantine components](https://mantine.dev/core/package/)
-  - [Tabler icons](https://tabler.io/icons)
-- Back
+- Frontend
+  - [Mantine](https://mantine.dev/core/package/)
+  - [TanStack Query](https://tanstack.com/query/latest)
+  - [TanStack Router](https://tanstack.com/router/latest)
+  - [Tabler Icons](https://tabler.io/icons)
+- Backend
   - [Express](https://expressjs.com/en/5x/api.html)
   - [Knex](https://knexjs.org/guide/)
+  - [Zod](https://zod.dev)
   - [Swagger-JSDoc](https://github.com/Surnet/swagger-jsdoc/tree/v6/docs)

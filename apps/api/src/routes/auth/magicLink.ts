@@ -66,7 +66,7 @@ router.post(
     });
 
     await mailer.sendMail({
-      from: process.env.SMTP_FROM || 'noreply@u-club.app',
+      from: process.env.SMTP_FROM || 'noreply@eggplant.app',
       to: email,
       subject: 'Your login code',
       text: `Your login link is: ${token}\n\nThis token expires in 15 minutes.`,

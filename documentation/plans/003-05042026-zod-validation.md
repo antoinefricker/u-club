@@ -12,7 +12,7 @@ Replace inline validation in create/update routes with Zod schemas. Keep databas
 
 ### 1. Install Zod
 
-- `pnpm --filter @u-club/api add zod`
+- `pnpm --filter @eggplant/api add zod`
 
 ### 2. Create validate middleware
 
@@ -75,6 +75,6 @@ For each create/update route:
 
 ## Verification
 
-1. `pnpm --filter @u-club/api test`
+1. `pnpm --filter @eggplant/api test`
 2. `pnpm lint`
 3. Manual: send invalid requests → verify structured error responses

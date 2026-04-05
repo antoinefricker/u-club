@@ -1,16 +1,16 @@
 {
-  "name": "u-club",
+  "name": "eggplant",
   "private": true,
   "scripts": {
-    "dev:api": "pnpm --filter @u-club/api dev",
-    "dev:pwa": "pnpm --filter @u-club/pwa dev",
+    "dev:api": "pnpm --filter @eggplant/api dev",
+    "dev:pwa": "pnpm --filter @eggplant/pwa dev",
     "lint": "pnpm -r run lint",
     "lint:fix": "pnpm -r run lint:fix",
     "format": "pnpm -r run format",
     "format:check": "pnpm -r run format:check",
     "typecheck": "pnpm -r run typecheck",
     "test": "pnpm -r run test",
-    "test:e2e": "pnpm --filter @u-club/e2e test",
+    "test:e2e": "pnpm --filter @eggplant/e2e test",
     "prepare": "husky"
   },
   "devDependencies": {
