@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const createMemberStatusSchema = z.object({
-  label: z.string({ required_error: 'label is required' }),
+  label: z.string({ error: 'label is required' }),
 });
 
 export const updateMemberStatusSchema = z

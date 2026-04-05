@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 export const createUserSchema = z.object({
-  display_name: z.string({ required_error: 'display_name is required' }),
-  email: z.string({ required_error: 'email is required' }),
-  password: z.string({ required_error: 'password is required' }),
+  display_name: z.string({ error: 'display_name is required' }),
+  email: z.string({ error: 'email is required' }),
+  password: z.string({ error: 'password is required' }),
   bio: z.string().nullable().optional(),
   phone: z.string().nullable().optional(),
 });

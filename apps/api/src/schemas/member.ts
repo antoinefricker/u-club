@@ -1,15 +1,13 @@
 import { z } from 'zod';
 
 export const createMemberSchema = z.object({
-  first_name: z.string({ required_error: 'first_name is required' }),
-  last_name: z.string({ required_error: 'last_name is required' }),
+  first_name: z.string({ error: 'first_name is required' }),
+  last_name: z.string({ error: 'last_name is required' }),
   gender: z.enum(['male', 'female'], {
-    required_error: 'gender is required',
-    invalid_type_error: "gender must be 'male' or 'female'",
+    error: "gender must be 'male' or 'female'",
   }),
   year: z.number({
-    required_error: 'year is required',
-    invalid_type_error: 'year must be a number',
+    error: 'year is required',
   }),
   user_id: z.string().nullable().optional(),
   status_id: z.string().nullable().optional(),
@@ -23,7 +21,7 @@ export const updateMemberSchema = z
     last_name: z.string().optional(),
     gender: z
       .enum(['male', 'female'], {
-        invalid_type_error: "gender must be 'male' or 'female'",
+        error: "gender must be 'male' or 'female'",
       })
       .optional(),
     year: z.number().optional(),

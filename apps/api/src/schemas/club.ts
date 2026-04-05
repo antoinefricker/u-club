@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 export const createClubSchema = z.object({
-  name: z.string({ required_error: 'name is required' }),
-  code: z.string({ required_error: 'code is required' }),
+  name: z.string({ error: 'name is required' }),
+  code: z.string({ error: 'code is required' }),
   description: z.string().nullable().optional(),
   media_logo_lg: z.string().nullable().optional(),
   media_logo_sm: z.string().nullable().optional(),
