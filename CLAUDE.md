@@ -16,6 +16,7 @@ When planning a non-trivial feature
 ## Code Quality
 
 - Always run linter and prettier after editing a file
+- Always run `pnpm lint` before committing to catch unused imports and other issues
 
 ## API Routes
 
