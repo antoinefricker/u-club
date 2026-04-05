@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import db from '../../db.js';
 import { requireAuth } from '../../middleware/auth.js';
-import { requireRole } from '../../middleware/requireRole.js';
+import { requireSelfOrRole } from '../../middleware/requireSelfOrRole.js';
 
 const router = Router();
 
@@ -35,7 +35,7 @@ const router = Router();
 router.get(
   '/:id',
   requireAuth,
-  requireRole('admin', 'manager'),
+  requireSelfOrRole('admin', 'manager'),
   async (req: Request, res: Response) => {
     const { id } = req.params;
 
