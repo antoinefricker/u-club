@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./documentation/eggplant-logo.png" alt="Eggplant" width="120" />
+</p>
+
 # eggplant
 
 Monorepo for the eggplant project.
