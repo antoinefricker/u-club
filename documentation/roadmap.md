@@ -18,6 +18,7 @@
   — a to-do-list for each event
   - with categories of todos (availables/selected/referee/lunch/transport/table)
   - selectable in a date range
+- **Event announcements** — publishable posts linked to events, shared with club/team members
 - **Seed database**
   - 2 clubs
   - 45 teams in each club
@@ -25,6 +26,8 @@
   - related user
   - admin
   - allow to clear all data
+- **Team chat link** — add `chat_link` field on teams for external group chat URLs (WhatsApp/Telegram)
+- **In-app messaging** — WebSocket-based team/club messaging with stored history (future)
 - **Protected route wrapper (PWA)**
   — Redirect unauthenticated users on the React side instead of relying on API 401s
 
@@ -43,7 +46,11 @@
 
 - **Lost password**
 - **One timepassword**
-- **A real PWA**
+- **PWA polish**
+  - app icons (192x192, 512x512)
+  - offline fallback page
+  - theme color / splash screen
+  - push notifications
 - **Club page**
   - events
   - teams
@@ -56,6 +63,10 @@
   - filter by date range
   - filter by team
   - export
+- **Admin pages**
+  - clubs management (CRUD)
+  - teams management (CRUD)
+  - members management (CRUD)
 - **Route guards** — Role-based UI: hide admin-only nav items from regular users
 - **Loading/error states** — Add loading skeletons and error boundaries to pages
 - **Pagination** — Cursor or offset pagination on list endpoints as data grows
