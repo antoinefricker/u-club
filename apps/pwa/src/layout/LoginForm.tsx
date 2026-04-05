@@ -15,9 +15,10 @@ import { useAuth } from '../auth/useAuth';
 
 interface LoginFormProps {
   onSwitchMode: () => void;
+  onForgotPassword: () => void;
 }
 
-export function LoginForm({ onSwitchMode }: LoginFormProps) {
+export function LoginForm({ onSwitchMode, onForgotPassword }: LoginFormProps) {
   const { login } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -114,6 +115,16 @@ export function LoginForm({ onSwitchMode }: LoginFormProps) {
               required
               {...form.getInputProps('password')}
             />
+
+            <Text size="sm" ta="right">
+              <Anchor
+                component="button"
+                type="button"
+                onClick={onForgotPassword}
+              >
+                Forgot password?
+              </Anchor>
+            </Text>
 
             <Button type="submit" fullWidth loading={loading}>
               Connect
