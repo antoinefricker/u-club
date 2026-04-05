@@ -93,9 +93,13 @@ router.post('/login', async (req: Request, res: Response) => {
     return;
   }
 
-  const accessToken = jwt.sign({ sub: user.id, email: user.email }, jwtSecret, {
-    expiresIn: '7d',
-  });
+  const accessToken = jwt.sign(
+    { sub: user.id, email: user.email, role: user.role },
+    jwtSecret,
+    {
+      expiresIn: '7d',
+    },
+  );
 
   res.json({ access_token: accessToken });
 });

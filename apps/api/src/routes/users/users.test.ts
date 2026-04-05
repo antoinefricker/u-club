@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
+import { createTestToken } from '../../test-utils.js';
 
 const mockSelect = vi.fn().mockReturnThis();
 const mockWhere = vi.fn().mockReturnThis();
@@ -9,6 +10,7 @@ const mockInsert = vi.fn().mockReturnThis();
 const mockReturning = vi.fn();
 const mockUpdate = vi.fn().mockReturnThis();
 const mockDel = vi.fn();
+const mockCount = vi.fn().mockReturnThis();
 
 vi.mock('../../db.js', () => {
   const db = Object.assign(
@@ -21,6 +23,7 @@ vi.mock('../../db.js', () => {
       returning: mockReturning,
       update: mockUpdate,
       del: mockDel,
+      count: mockCount,
     })),
     { raw: vi.fn() },
   );
@@ -46,11 +49,16 @@ const sampleUser = {
   bio: null,
   phone: null,
   email: 'john@example.com',
+  role: 'user',
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
 };
 
+const adminToken = createTestToken('uuid-1', 'admin@example.com', 'admin');
+const selfToken = createTestToken('uuid-1', 'john@example.com', 'user');
+
 beforeEach(() => {
+  process.env.JWT_SECRET = 'test-secret';
   vi.clearAllMocks();
   // Reset chaining: each call to db('users') returns a fresh chain
   mockSelect.mockReturnThis();
@@ -58,13 +66,16 @@ beforeEach(() => {
   mockWhereNot.mockReturnThis();
   mockInsert.mockReturnThis();
   mockUpdate.mockReturnThis();
+  mockCount.mockReturnThis();
 });
 
 describe('GET /users', () => {
   it('should return a list of users', async () => {
     mockSelect.mockResolvedValueOnce([sampleUser]);
 
-    const res = await request(app).get('/users');
+    const res = await request(app)
+      .get('/users')
+      .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual([sampleUser]);
@@ -75,7 +86,9 @@ describe('GET /users/:id', () => {
   it('should return a user by id', async () => {
     mockFirst.mockResolvedValueOnce(sampleUser);
 
-    const res = await request(app).get('/users/uuid-1');
+    const res = await request(app)
+      .get('/users/uuid-1')
+      .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual(sampleUser);
@@ -84,7 +97,9 @@ describe('GET /users/:id', () => {
   it('should return 404 if user not found', async () => {
     mockFirst.mockResolvedValueOnce(undefined);
 
-    const res = await request(app).get('/users/nonexistent');
+    const res = await request(app)
+      .get('/users/nonexistent')
+      .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(404);
     expect(res.body).toHaveProperty('error', 'user not found');
@@ -119,7 +134,7 @@ describe('POST /users', () => {
   });
 
   it('should return 409 if email already exists', async () => {
-    mockFirst.mockResolvedValueOnce(sampleUser);
+    mockFirst.mockResolvedValueOnce(sampleUser); // email check
 
     const res = await request(app).post('/users').send({
       displayName: 'johnd',
@@ -132,7 +147,8 @@ describe('POST /users', () => {
   });
 
   it('should create a user and return 201', async () => {
-    mockFirst.mockResolvedValueOnce(undefined); // no existing user
+    mockFirst.mockResolvedValueOnce(undefined); // no existing email
+    mockFirst.mockResolvedValueOnce({ count: 1 }); // count query (not first user)
     mockReturning.mockResolvedValueOnce([sampleUser]);
 
     const res = await request(app).post('/users').send({
@@ -146,7 +162,8 @@ describe('POST /users', () => {
   });
 
   it('should send confirmation email after creation', async () => {
-    mockFirst.mockResolvedValueOnce(undefined);
+    mockFirst.mockResolvedValueOnce(undefined); // no existing email
+    mockFirst.mockResolvedValueOnce({ count: 1 }); // count query
     mockReturning.mockResolvedValueOnce([sampleUser]);
 
     await request(app).post('/users').send({
@@ -167,7 +184,10 @@ describe('POST /users', () => {
 
 describe('PUT /users/:id', () => {
   it('should return 400 if no valid fields provided', async () => {
-    const res = await request(app).put('/users/uuid-1').send({});
+    const res = await request(app)
+      .put('/users/uuid-1')
+      .set('Authorization', `Bearer ${selfToken}`)
+      .send({});
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'no valid fields to update');
@@ -178,6 +198,7 @@ describe('PUT /users/:id', () => {
 
     const res = await request(app)
       .put('/users/uuid-2')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({ email: 'john@example.com' });
 
     expect(res.status).toBe(409);
@@ -189,6 +210,7 @@ describe('PUT /users/:id', () => {
 
     const res = await request(app)
       .put('/users/nonexistent')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({ displayName: 'janed' });
 
     expect(res.status).toBe(404);
@@ -201,6 +223,7 @@ describe('PUT /users/:id', () => {
 
     const res = await request(app)
       .put('/users/uuid-1')
+      .set('Authorization', `Bearer ${selfToken}`)
       .send({ displayName: 'janed' });
 
     expect(res.status).toBe(200);
@@ -212,7 +235,9 @@ describe('DELETE /users/:id', () => {
   it('should return 404 if user not found', async () => {
     mockDel.mockResolvedValueOnce(0);
 
-    const res = await request(app).delete('/users/nonexistent');
+    const res = await request(app)
+      .delete('/users/nonexistent')
+      .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(404);
     expect(res.body).toHaveProperty('error', 'user not found');
@@ -221,7 +246,9 @@ describe('DELETE /users/:id', () => {
   it('should delete and return 204', async () => {
     mockDel.mockResolvedValueOnce(1);
 
-    const res = await request(app).delete('/users/uuid-1');
+    const res = await request(app)
+      .delete('/users/uuid-1')
+      .set('Authorization', `Bearer ${selfToken}`);
 
     expect(res.status).toBe(204);
   });

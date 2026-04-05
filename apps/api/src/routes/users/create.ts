@@ -64,6 +64,9 @@ router.post('/', async (req: Request, res: Response) => {
 
   const hashedPassword = await hashPassword(password);
 
+  const userCount = await db('users').count('id as count').first();
+  const role = Number(userCount?.count) === 0 ? 'admin' : 'user';
+
   const [user] = await db('users')
     .insert({
       display_name,
@@ -71,6 +74,7 @@ router.post('/', async (req: Request, res: Response) => {
       phone: phone || null,
       email,
       password: hashedPassword,
+      role,
     })
     .returning([
       'id',
@@ -78,6 +82,7 @@ router.post('/', async (req: Request, res: Response) => {
       'bio',
       'phone',
       'email',
+      'role',
       'created_at',
       'updated_at',
     ]);

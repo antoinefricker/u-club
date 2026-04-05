@@ -1,5 +1,7 @@
 import { Router, Request, Response } from 'express';
 import db from '../../db.js';
+import { requireAuth } from '../../middleware/auth.js';
+import { requireRole } from '../../middleware/requireRole.js';
 
 const router = Router();
 
@@ -9,6 +11,8 @@ const router = Router();
  *   get:
  *     tags: [Users]
  *     summary: List all users
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Array of users
@@ -19,18 +23,24 @@ const router = Router();
  *               items:
  *                 $ref: '#/components/schemas/User'
  */
-router.get('/', async (req: Request, res: Response) => {
-  const users = await db('users').select(
-    'id',
-    'display_name',
-    'bio',
-    'phone',
-    'email',
-    'created_at',
-    'updated_at',
-  );
+router.get(
+  '/',
+  requireAuth,
+  requireRole('admin', 'manager'),
+  async (req: Request, res: Response) => {
+    const users = await db('users').select(
+      'id',
+      'display_name',
+      'bio',
+      'phone',
+      'email',
+      'role',
+      'created_at',
+      'updated_at',
+    );
 
-  res.json(users);
-});
+    res.json(users);
+  },
+);
 
 export default router;

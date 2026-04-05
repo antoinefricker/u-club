@@ -1,5 +1,7 @@
 import { Router, Request, Response } from 'express';
 import db from '../../db.js';
+import { requireAuth } from '../../middleware/auth.js';
+import { requireRole } from '../../middleware/requireRole.js';
 
 const router = Router();
 
@@ -26,17 +28,22 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.delete('/:id', async (req: Request, res: Response) => {
-  const { id } = req.params;
+router.delete(
+  '/:id',
+  requireAuth,
+  requireRole('admin'),
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
 
-  const deleted = await db('clubs').where({ id }).del();
+    const deleted = await db('clubs').where({ id }).del();
 
-  if (!deleted) {
-    res.status(404).json({ error: 'club not found' });
-    return;
-  }
+    if (!deleted) {
+      res.status(404).json({ error: 'club not found' });
+      return;
+    }
 
-  res.status(204).send();
-});
+    res.status(204).send();
+  },
+);
 
 export default router;

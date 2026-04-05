@@ -1,5 +1,7 @@
 import { Router, Request, Response } from 'express';
 import db from '../../db.js';
+import { requireAuth } from '../../middleware/auth.js';
+import { requireRole } from '../../middleware/requireRole.js';
 
 const ALLOWED_FIELDS = [
   'label',
@@ -52,52 +54,57 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.put('/:id', async (req: Request, res: Response) => {
-  const { id } = req.params;
+router.put(
+  '/:id',
+  requireAuth,
+  requireRole('admin', 'manager'),
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
 
-  const updates: Record<string, unknown> = {};
-  for (const field of ALLOWED_FIELDS) {
-    if (req.body[field] !== undefined) {
-      updates[field] = req.body[field];
+    const updates: Record<string, unknown> = {};
+    for (const field of ALLOWED_FIELDS) {
+      if (req.body[field] !== undefined) {
+        updates[field] = req.body[field];
+      }
     }
-  }
 
-  if (Object.keys(updates).length === 0) {
-    res.status(400).json({ error: 'no valid fields to update' });
-    return;
-  }
+    if (Object.keys(updates).length === 0) {
+      res.status(400).json({ error: 'no valid fields to update' });
+      return;
+    }
 
-  if (
-    updates.gender &&
-    !VALID_GENDERS.includes(updates.gender as (typeof VALID_GENDERS)[number])
-  ) {
-    res.status(400).json({ error: 'gender must be male, female, or both' });
-    return;
-  }
+    if (
+      updates.gender &&
+      !VALID_GENDERS.includes(updates.gender as (typeof VALID_GENDERS)[number])
+    ) {
+      res.status(400).json({ error: 'gender must be male, female, or both' });
+      return;
+    }
 
-  updates.updated_at = new Date().toISOString();
+    updates.updated_at = new Date().toISOString();
 
-  const [team] = await db('teams')
-    .where({ id })
-    .update(updates)
-    .returning([
-      'id',
-      'club_id',
-      'label',
-      'year',
-      'gender',
-      'description',
-      'archived',
-      'created_at',
-      'updated_at',
-    ]);
+    const [team] = await db('teams')
+      .where({ id })
+      .update(updates)
+      .returning([
+        'id',
+        'club_id',
+        'label',
+        'year',
+        'gender',
+        'description',
+        'archived',
+        'created_at',
+        'updated_at',
+      ]);
 
-  if (!team) {
-    res.status(404).json({ error: 'team not found' });
-    return;
-  }
+    if (!team) {
+      res.status(404).json({ error: 'team not found' });
+      return;
+    }
 
-  res.json(team);
-});
+    res.json(team);
+  },
+);
 
 export default router;

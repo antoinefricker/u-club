@@ -1,5 +1,7 @@
 import { Router, Request, Response } from 'express';
 import db from '../../db.js';
+import { requireAuth } from '../../middleware/auth.js';
+import { requireRole } from '../../middleware/requireRole.js';
 
 const router = Router();
 
@@ -26,25 +28,30 @@ const router = Router();
  *               items:
  *                 $ref: '#/components/schemas/Team'
  */
-router.get('/', async (req: Request, res: Response) => {
-  const query = db('teams').select(
-    'id',
-    'club_id',
-    'label',
-    'year',
-    'gender',
-    'description',
-    'archived',
-    'created_at',
-    'updated_at',
-  );
+router.get(
+  '/',
+  requireAuth,
+  requireRole('admin', 'manager'),
+  async (req: Request, res: Response) => {
+    const query = db('teams').select(
+      'id',
+      'club_id',
+      'label',
+      'year',
+      'gender',
+      'description',
+      'archived',
+      'created_at',
+      'updated_at',
+    );
 
-  if (req.query.club_id) {
-    query.where({ club_id: req.query.club_id });
-  }
+    if (req.query.club_id) {
+      query.where({ club_id: req.query.club_id });
+    }
 
-  const teams = await query;
-  res.json(teams);
-});
+    const teams = await query;
+    res.json(teams);
+  },
+);
 
 export default router;

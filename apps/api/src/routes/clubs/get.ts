@@ -1,5 +1,7 @@
 import { Router, Request, Response } from 'express';
 import db from '../../db.js';
+import { requireAuth } from '../../middleware/auth.js';
+import { requireRole } from '../../middleware/requireRole.js';
 
 const router = Router();
 
@@ -30,29 +32,34 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/:id', async (req: Request, res: Response) => {
-  const { id } = req.params;
+router.get(
+  '/:id',
+  requireAuth,
+  requireRole('admin', 'manager'),
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
 
-  const club = await db('clubs')
-    .select(
-      'id',
-      'name',
-      'code',
-      'description',
-      'media_logo_lg',
-      'media_logo_sm',
-      'created_at',
-      'updated_at',
-    )
-    .where({ id })
-    .first();
+    const club = await db('clubs')
+      .select(
+        'id',
+        'name',
+        'code',
+        'description',
+        'media_logo_lg',
+        'media_logo_sm',
+        'created_at',
+        'updated_at',
+      )
+      .where({ id })
+      .first();
 
-  if (!club) {
-    res.status(404).json({ error: 'club not found' });
-    return;
-  }
+    if (!club) {
+      res.status(404).json({ error: 'club not found' });
+      return;
+    }
 
-  res.json(club);
-});
+    res.json(club);
+  },
+);
 
 export default router;

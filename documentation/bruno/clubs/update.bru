@@ -7,7 +7,7 @@ meta {
 put {
   url: {{baseUrl}}/clubs/:id
   body: json
-  auth: none
+  auth: bearer
 }
 
 params:path {
@@ -18,4 +18,8 @@ body:json {
   {
     "name": "FC Updated"
   }
+}
+
+auth:bearer {
+  token: {{accessToken}}
 }

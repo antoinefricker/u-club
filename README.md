@@ -47,16 +47,6 @@ make migrate
 | Mailpit  | http://localhost:8025          |
 | Postgres | localhost:5432                 |
 
-## Database schema
-
-The full entity-relationship diagram is maintained in [`database-diagram.mermaid`](./database-diagram.mermaid).
-
-```mermaid
-erDiagram
-    USER ||--o{ LOGIN_TOKEN : "requests"
-    USER ||--o{ REVOKED_TOKEN : "revokes"
-```
-
 ## Available commands
 
 Run `make help` to list all commands:
@@ -81,8 +71,17 @@ dev-stop       Stop dev services
 
 ## Documentations
 
-- Mantine components https://mantine.dev/core/package/
-- Tabler icons https://tabler.io/icons
-- TanStack router https://tanstack.com/router/latest
-- Express https://expressjs.com/en/5x/api.html
-- Swagger JSDoc https://github.com/Surnet/swagger-jsdoc/tree/v6/docs
+- Past Claude plans are stored in [`documentation/plans`](./documentation/plans/index.md)
+- The entity-relationship diagram is maintained in [`database-diagram.mermaid`](./documentation/database-diagram.mermaid)
+- API routes are testable through a [Bruno](https://www.usebruno.com/) collection under [`documentation/bruno`](./documentation/bruno)
+
+### Dependencies documentation
+
+- Front
+  - [TanStack router](https://tanstack.com/router/latest)
+  - [TanStack query](https://tanstack.com/query/latest)
+  - [Mantine components](https://mantine.dev/core/package/)
+  - [Tabler icons](https://tabler.io/icons)
+- Back
+  - [Express](https://expressjs.com/en/5x/api.html)
+  - [Swagger-JSDoc](https://github.com/Surnet/swagger-jsdoc/tree/v6/docs)

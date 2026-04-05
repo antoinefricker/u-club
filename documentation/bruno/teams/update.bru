@@ -7,7 +7,7 @@ meta {
 put {
   url: {{baseUrl}}/teams/:id
   body: json
-  auth: none
+  auth: bearer
 }
 
 params:path {
@@ -18,4 +18,8 @@ body:json {
   {
     "label": "U16 Boys"
   }
+}
+
+auth:bearer {
+  token: {{accessToken}}
 }

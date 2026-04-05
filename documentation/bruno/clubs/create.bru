@@ -7,7 +7,7 @@ meta {
 post {
   url: {{baseUrl}}/clubs
   body: json
-  auth: none
+  auth: bearer
 }
 
 body:json {
@@ -16,4 +16,8 @@ body:json {
     "code": "FCE",
     "description": "A sample club"
   }
+}
+
+auth:bearer {
+  token: {{accessToken}}
 }

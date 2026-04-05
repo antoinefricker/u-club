@@ -8,4 +8,5 @@ dist
 *.log
 .DS_Store
 .turbo
-.claude
+.claude/worktrees
+.claude/settings.local.json

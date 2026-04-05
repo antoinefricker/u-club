@@ -7,14 +7,12 @@ export function ConfirmEmailPage() {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const token = searchParams.get('token');
-    const email = searchParams.get('email');
+  const token = searchParams.get('token');
+  const email = searchParams.get('email');
+  const isValid = Boolean(token && email);
 
-    if (!token || !email) {
-      setError('Invalid confirmation link.');
-      return;
-    }
+  useEffect(() => {
+    if (!token || !email) return;
 
     fetch('/api/auth/confirm_email', {
       method: 'POST',
@@ -36,14 +34,18 @@ export function ConfirmEmailPage() {
       .catch((err) => {
         setError(err instanceof Error ? err.message : 'Confirmation failed');
       });
-  }, [searchParams, navigate]);
+  }, [token, email, navigate]);
 
   return (
     <Stack align="center" mt="xl">
       <Paper shadow="sm" p="xl" radius="md" w="100%" maw={400}>
         <Stack align="center">
           <Title order={3}>Email Confirmation</Title>
-          {error ? (
+          {!isValid ? (
+            <Alert color="red" variant="light" w="100%">
+              Invalid confirmation link.
+            </Alert>
+          ) : error ? (
             <Alert color="red" variant="light" w="100%">
               {error}
             </Alert>
