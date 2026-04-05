@@ -2,7 +2,10 @@
 
 ## Planning
 
-When planning a non-trivial feature, always save the plan to `documentation/plans/<index>-<DD/MM/YYYY>-<topic>.md` so the user can review it.
+When planning a non-trivial feature
+
+- always save the plan to `documentation/plans/<index>-<DD/MM/YYYY>-<topic>.md` so the user can review it.
+- update `index.md` listing existing files in `documentation/plans/`
 
 ## Commits
 
