@@ -85,4 +85,5 @@ dev-stop       Stop dev services (node servers + docker)
   - [Tabler icons](https://tabler.io/icons)
 - Back
   - [Express](https://expressjs.com/en/5x/api.html)
+  - [Knex](https://knexjs.org/guide/)
   - [Swagger-JSDoc](https://github.com/Surnet/swagger-jsdoc/tree/v6/docs)
