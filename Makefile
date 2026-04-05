@@ -66,13 +66,23 @@ migrate-status:
 migrate-make:
 	pnpm --filter @u-club/api migrate:make -- $(name)
 
-## seed: Seed database with dev data
+## seed: Clear and seed database with dev data
+# use FORCE=1 to skip confirmation
 seed:
-	$(check_postgres)
+	@if [ "$(FORCE)" != "1" ]; then \
+		echo "This will clear and seed the database with dev data."; \
+		read -p "Are you sure? [y/N] " confirm && [ "$$confirm" = "y" ] || (echo "Aborted." && exit 1); \
+	fi
+	$(MAKE) seed-clear FORCE=1
 	pnpm --filter @u-club/api seed
 
 ## seed-clear: Clear all data from database
+# use FORCE=1 to skip confirmation
 seed-clear:
+	@if [ "$(FORCE)" != "1" ]; then \
+		echo "This will delete ALL data from the database."; \
+		read -p "Are you sure? [y/N] " confirm && [ "$$confirm" = "y" ] || (echo "Aborted." && exit 1); \
+	fi
 	$(check_postgres)
 	pnpm --filter @u-club/api seed:clear
 
