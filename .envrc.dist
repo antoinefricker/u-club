@@ -6,3 +6,6 @@ export SMTP_USER=
 export SMTP_PASS=
 export SMTP_FROM=
 export JWT_SECRET=
+export SEED_ADMIN_EMAIL=admin@u-club.app
+export SEED_MANAGER_EMAIL=manager@u-club.app
+export SEED_PASSWORD=password123

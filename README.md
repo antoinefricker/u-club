@@ -65,6 +65,8 @@ migrate-up     Run the next pending migration
 migrate-down   Rollback the last migration
 migrate-status Show current migration status
 migrate-make   Create a new migration (usage: make migrate-make name=create_users)
+seed           Clear and seed database with dev data
+seed-clear     Clear all data from database
 dev-start      Start postgres, mailpit, api and pwa in dev mode
 dev-stop       Stop dev services (node servers + docker)
 ```
