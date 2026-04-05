@@ -71,6 +71,7 @@ dev-stop       Stop dev services
 
 ## Documentations
 
+- [Project roadmap](./documentation/roadmap.md)
 - Past Claude plans are stored in [`documentation/plans`](./documentation/plans/index.md)
 - The entity-relationship diagram is maintained in [`database-diagram.mermaid`](./documentation/database-diagram.mermaid)
 - API routes are testable through a [Bruno](https://www.usebruno.com/) collection under [`documentation/bruno`](./documentation/bruno)
