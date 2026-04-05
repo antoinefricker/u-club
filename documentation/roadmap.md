@@ -2,21 +2,6 @@
 
 ## Architecture & Data model
 
-- **Create members entity**
-  — a member is linked to a user
-  - member can belong to multiple teams
-  - member have a specific role in each given team (player/coach/assistant/sparring)
-  - columns:
-    - id
-    - created_at
-    - updated_at
-    - first_name
-    - last_name
-    - birth_date
-    - license
-    - gender
-- **Member-Team assignment**
-  — `team_members` table linking players/coaches to teams
 - **Complex users**
   - users that are not members (parents or relative)
 - **Create events entity**
@@ -40,8 +25,6 @@
   - related user
   - admin
   - allow to clear all data
-- **Request validation library**
-  — Adopt Zod for schema validation to replace inline checks in route handlers
 - **Protected route wrapper (PWA)**
   — Redirect unauthenticated users on the React side instead of relying on API 401s
 
@@ -55,7 +38,6 @@
 
 - **API client generation** — Auto-generate a typed API client from Swagger spec for the PWA
 - **Database seeding script** — `make seed` command to populate dev data (admin user, sample club, teams)
-- **Pre-commit hooks** — Husky + lint-staged to catch lint/format issues before CI
 
 ## PWA
 
