@@ -1,0 +1,19 @@
+meta {
+  name: Get Team
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/teams/:id
+  body: none
+  auth: bearer
+}
+
+params:path {
+  id: paste-team-id-here
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

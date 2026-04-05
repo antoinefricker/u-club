@@ -1,0 +1,25 @@
+meta {
+  name: Update Team
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/teams/:id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: paste-team-id-here
+}
+
+body:json {
+  {
+    "label": "U16 Boys"
+  }
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

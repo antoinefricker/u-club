@@ -1,0 +1,23 @@
+meta {
+  name: Create Club
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/clubs
+  body: json
+  auth: bearer
+}
+
+body:json {
+  {
+    "name": "FC Example",
+    "code": "FCE",
+    "description": "A sample club"
+  }
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

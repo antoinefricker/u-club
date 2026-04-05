@@ -1,0 +1,25 @@
+meta {
+  name: Update User
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/users/:id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: paste-user-id-here
+}
+
+body:json {
+  {
+    "display_name": "janed"
+  }
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
