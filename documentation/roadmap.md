@@ -18,6 +18,7 @@
   — a to-do-list for each event
   - with categories of todos (availables/selected/referee/lunch/transport/table)
   - selectable in a date range
+- **Event announcements** — publishable posts linked to events, shared with club/team members
 - **Seed database**
   - 2 clubs
   - 45 teams in each club
