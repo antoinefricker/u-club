@@ -46,13 +46,11 @@ make seed-create
 
 ## Services
 
-| Service          | URL                                       |
-| ---------------- | ----------------------------------------- |
-| PWA              | http://localhost:5173                     |
-| API              | http://localhost:4000                     |
-| API docs         | http://localhost:4000/api-docs            |
-| Mailpit          | http://localhost:8025                     |
-| Postgres         | localhost:5432                            |
+- **PWA**: http://localhost:5173
+- **API**: http://localhost:4000
+- **API docs** (Swagger): http://localhost:4000/api-docs
+- **Mailpit** (email inbox): http://localhost:8025
+- **Postgres**: localhost:5432
 
 ## Available commands
 
