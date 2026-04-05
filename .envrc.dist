@@ -1,5 +1,6 @@
 export DATABASE_URL=postgres://uclub:uclub@localhost:5432/uclub
-export PORT=
+export API_PORT=4000
+export PWA_PORT=5173
 export SMTP_HOST=localhost
 export SMTP_PORT=1025
 export SMTP_USER=

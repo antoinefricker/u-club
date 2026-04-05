@@ -83,7 +83,7 @@ jobs:
       SMTP_USER: ""
       SMTP_PASS: ""
       SMTP_FROM: test@uclub.dev
-      PORT: 4000
+      API_PORT: 4000
 
     steps:
       - uses: actions/checkout@v6
