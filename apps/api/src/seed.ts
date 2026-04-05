@@ -48,7 +48,9 @@ function generateBaskinTeams(): TeamDef[] {
 }
 
 async function seed() {
-  console.log('Seeding database...\n');
+  console.log('\n  +--------------------------+');
+  console.log('  |   SEEDING DATABASE...    |');
+  console.log('  +--------------------------+\n');
 
   const adminEmail = process.env.SEED_ADMIN_EMAIL || 'admin@u-club.app';
   const adminPassword = process.env.SEED_ADMIN_PASSWORD || 'admin123';
@@ -64,7 +66,7 @@ async function seed() {
     role: 'admin',
     email_verified_at: new Date(),
   });
-  console.log(`  Admin: ${adminEmail}`);
+  console.log(`  Admin .... ${adminEmail}`);
 
   // Create manager user
   await db('users').insert({
@@ -74,7 +76,7 @@ async function seed() {
     role: 'manager',
     email_verified_at: new Date(),
   });
-  console.log(`  Manager: ${managerEmail}`);
+  console.log(`  Manager .. ${managerEmail}`);
 
   // Create member statuses
   const statusLabels = ['pending validation', 'active', 'inactive'];
@@ -85,7 +87,7 @@ async function seed() {
       .returning('id');
     statusIds.push(status.id);
   }
-  console.log(`  ${statusLabels.length} statuses created`);
+  console.log(`  Statuses . ${statusLabels.join(', ')}`);
 
   // Club definitions
   const clubs = [
@@ -102,7 +104,7 @@ async function seed() {
     const [club] = await db('clubs')
       .insert({ name: clubDef.name, code: clubDef.code })
       .returning('id');
-    console.log(`\n  Club: ${clubDef.name} (${clubDef.teams.length} teams)`);
+    console.log(`\n  +-- ${clubDef.name} (${clubDef.teams.length} teams)`);
 
     for (const teamDef of clubDef.teams) {
       const [team] = await db('teams')
@@ -195,12 +197,13 @@ async function seed() {
     }
   }
 
-  console.log(`\nDone!`);
-  console.log(`  ${totalMembers} members`);
+  console.log('\n  +--------------------------+');
+  console.log('  |       ALL DONE!          |');
+  console.log('  +--------------------------+');
+  console.log(`\n  ${totalMembers} members`);
   console.log(`  ${totalUsers} linked users`);
-  console.log(
-    `  ${totalAssignments} team assignments (${crossAssigned} cross-team)`,
-  );
+  console.log(`  ${totalAssignments} team assignments`);
+  console.log(`  ${crossAssigned} players moonlighting on other teams\n`);
 
   await db.destroy();
 }

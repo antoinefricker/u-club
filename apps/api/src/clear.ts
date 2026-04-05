@@ -1,38 +1,31 @@
 import db from './db.js';
 
+const tables = [
+  'team_assignments',
+  'members',
+  'member_statuses',
+  'teams',
+  'clubs',
+  'login_tokens',
+  'revoked_tokens',
+  'users',
+];
+
 async function clear() {
-  console.log('Clearing database...');
+  console.log('\n  +--------------------------+');
+  console.log('  |   CLEARING DATABASE...   |');
+  console.log('  +--------------------------+\n');
 
-  // Order matters — delete from tables with FK dependencies first
-  await db('team_assignments').del();
-  console.log('  team_assignments cleared');
+  for (const table of tables) {
+    const count = await db(table).del();
+    console.log(`  - ${table} ${count > 0 ? `(${count} rows)` : '(empty)'}`);
+  }
 
-  await db('members').del();
-  console.log('  members cleared');
-
-  await db('member_statuses').del();
-  console.log('  member_statuses cleared');
-
-  await db('teams').del();
-  console.log('  teams cleared');
-
-  await db('clubs').del();
-  console.log('  clubs cleared');
-
-  await db('login_tokens').del();
-  console.log('  login_tokens cleared');
-
-  await db('revoked_tokens').del();
-  console.log('  revoked_tokens cleared');
-
-  await db('users').del();
-  console.log('  users cleared');
-
-  console.log('\nDone! All data cleared.');
+  console.log('\n  All clean! Fresh as a whistle.\n');
   await db.destroy();
 }
 
 clear().catch((err) => {
-  console.error('Clear failed:', err);
+  console.error('Seed clear failed:', err);
   process.exit(1);
 });
