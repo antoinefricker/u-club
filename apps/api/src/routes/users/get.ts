@@ -1,5 +1,7 @@
 import { Router, Request, Response } from 'express';
 import db from '../../db.js';
+import { requireAuth } from '../../middleware/auth.js';
+import { requireRole } from '../../middleware/requireRole.js';
 
 const router = Router();
 
@@ -30,28 +32,34 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/:id', async (req: Request, res: Response) => {
-  const { id } = req.params;
+router.get(
+  '/:id',
+  requireAuth,
+  requireRole('admin', 'manager'),
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
 
-  const user = await db('users')
-    .select(
-      'id',
-      'display_name',
-      'bio',
-      'phone',
-      'email',
-      'created_at',
-      'updated_at',
-    )
-    .where({ id })
-    .first();
+    const user = await db('users')
+      .select(
+        'id',
+        'display_name',
+        'bio',
+        'phone',
+        'email',
+        'role',
+        'created_at',
+        'updated_at',
+      )
+      .where({ id })
+      .first();
 
-  if (!user) {
-    res.status(404).json({ error: 'user not found' });
-    return;
-  }
+    if (!user) {
+      res.status(404).json({ error: 'user not found' });
+      return;
+    }
 
-  res.json(user);
-});
+    res.json(user);
+  },
+);
 
 export default router;

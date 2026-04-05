@@ -1,9 +1,14 @@
 # Project Guidelines
 
+## Planning
+
+When planning a non-trivial feature, always save the plan to `documentation/plans/<index>-<DD/MM/YYYY>-<topic>.md` so the user can review it.
+
 ## Commits
 
 - Use conventional commits (e.g. `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`)
 - Do not add co-author lines to commits
+- Always propose the commit message and wait for user approval before committing
 
 ## Code Quality
 

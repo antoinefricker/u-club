@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
+import { createTestToken } from '../../test-utils.js';
 
 const mockSelect = vi.fn().mockReturnThis();
 const mockWhere = vi.fn().mockReturnThis();
@@ -35,6 +36,7 @@ vi.mock('../../mailer.js', () => ({
 }));
 
 const { default: app } = await import('../../app.js');
+const adminToken = createTestToken('uuid-1', 'admin@example.com', 'admin');
 
 const sampleTeam = {
   id: 'team-1',
@@ -49,6 +51,7 @@ const sampleTeam = {
 };
 
 beforeEach(() => {
+  process.env.JWT_SECRET = 'test-secret';
   vi.clearAllMocks();
   mockSelect.mockReturnThis();
   mockWhere.mockReturnThis();
@@ -60,7 +63,9 @@ describe('GET /teams', () => {
   it('should return a list of teams', async () => {
     mockSelect.mockResolvedValueOnce([sampleTeam]);
 
-    const res = await request(app).get('/teams');
+    const res = await request(app)
+      .get('/teams')
+      .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual([sampleTeam]);
@@ -71,7 +76,9 @@ describe('GET /teams/:id', () => {
   it('should return a team by id', async () => {
     mockFirst.mockResolvedValueOnce(sampleTeam);
 
-    const res = await request(app).get('/teams/team-1');
+    const res = await request(app)
+      .get('/teams/team-1')
+      .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual(sampleTeam);
@@ -80,7 +87,9 @@ describe('GET /teams/:id', () => {
   it('should return 404 if team not found', async () => {
     mockFirst.mockResolvedValueOnce(undefined);
 
-    const res = await request(app).get('/teams/nonexistent');
+    const res = await request(app)
+      .get('/teams/nonexistent')
+      .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(404);
     expect(res.body).toHaveProperty('error', 'team not found');
@@ -91,6 +100,7 @@ describe('POST /teams', () => {
   it('should return 400 if club_id is missing', async () => {
     const res = await request(app)
       .post('/teams')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({ label: 'U15', year: 2026, gender: 'male' });
 
     expect(res.status).toBe(400);
@@ -100,6 +110,7 @@ describe('POST /teams', () => {
   it('should return 400 if label is missing', async () => {
     const res = await request(app)
       .post('/teams')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({ clubId: 'club-1', year: 2026, gender: 'male' });
 
     expect(res.status).toBe(400);
@@ -109,6 +120,7 @@ describe('POST /teams', () => {
   it('should return 400 if year is missing', async () => {
     const res = await request(app)
       .post('/teams')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({ clubId: 'club-1', label: 'U15', gender: 'male' });
 
     expect(res.status).toBe(400);
@@ -118,6 +130,7 @@ describe('POST /teams', () => {
   it('should return 400 if gender is invalid', async () => {
     const res = await request(app)
       .post('/teams')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({ clubId: 'club-1', label: 'U15', year: 2026, gender: 'other' });
 
     expect(res.status).toBe(400);
@@ -130,12 +143,15 @@ describe('POST /teams', () => {
   it('should create a team and return 201', async () => {
     mockReturning.mockResolvedValueOnce([sampleTeam]);
 
-    const res = await request(app).post('/teams').send({
-      clubId: 'club-1',
-      label: 'U15 Boys',
-      year: 2026,
-      gender: 'male',
-    });
+    const res = await request(app)
+      .post('/teams')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        clubId: 'club-1',
+        label: 'U15 Boys',
+        year: 2026,
+        gender: 'male',
+      });
 
     expect(res.status).toBe(201);
     expect(res.body).toEqual(sampleTeam);
@@ -144,7 +160,10 @@ describe('POST /teams', () => {
 
 describe('PUT /teams/:id', () => {
   it('should return 400 if no valid fields provided', async () => {
-    const res = await request(app).put('/teams/team-1').send({});
+    const res = await request(app)
+      .put('/teams/team-1')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({});
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'no valid fields to update');
@@ -155,6 +174,7 @@ describe('PUT /teams/:id', () => {
 
     const res = await request(app)
       .put('/teams/nonexistent')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({ label: 'U16' });
 
     expect(res.status).toBe(404);
@@ -164,6 +184,7 @@ describe('PUT /teams/:id', () => {
   it('should return 400 if gender is invalid', async () => {
     const res = await request(app)
       .put('/teams/team-1')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({ gender: 'other' });
 
     expect(res.status).toBe(400);
@@ -179,6 +200,7 @@ describe('PUT /teams/:id', () => {
 
     const res = await request(app)
       .put('/teams/team-1')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({ label: 'U16 Boys' });
 
     expect(res.status).toBe(200);
@@ -190,7 +212,9 @@ describe('DELETE /teams/:id', () => {
   it('should return 404 if team not found', async () => {
     mockDel.mockResolvedValueOnce(0);
 
-    const res = await request(app).delete('/teams/nonexistent');
+    const res = await request(app)
+      .delete('/teams/nonexistent')
+      .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(404);
     expect(res.body).toHaveProperty('error', 'team not found');
@@ -199,7 +223,9 @@ describe('DELETE /teams/:id', () => {
   it('should delete and return 204', async () => {
     mockDel.mockResolvedValueOnce(1);
 
-    const res = await request(app).delete('/teams/team-1');
+    const res = await request(app)
+      .delete('/teams/team-1')
+      .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(204);
   });

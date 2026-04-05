@@ -1,5 +1,7 @@
 import { Router, Request, Response } from 'express';
 import db from '../../db.js';
+import { requireAuth } from '../../middleware/auth.js';
+import { requireRole } from '../../middleware/requireRole.js';
 
 const router = Router();
 
@@ -56,54 +58,59 @@ const ALLOWED_FIELDS = [
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.put('/:id', async (req: Request, res: Response) => {
-  const { id } = req.params;
+router.put(
+  '/:id',
+  requireAuth,
+  requireRole('admin', 'manager'),
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
 
-  const updates: Record<string, unknown> = {};
-  for (const field of ALLOWED_FIELDS) {
-    if (req.body[field] !== undefined) {
-      updates[field] = req.body[field];
+    const updates: Record<string, unknown> = {};
+    for (const field of ALLOWED_FIELDS) {
+      if (req.body[field] !== undefined) {
+        updates[field] = req.body[field];
+      }
     }
-  }
 
-  if (Object.keys(updates).length === 0) {
-    res.status(400).json({ error: 'no valid fields to update' });
-    return;
-  }
-
-  if (updates.code) {
-    const existing = await db('clubs')
-      .where({ code: updates.code })
-      .whereNot({ id })
-      .first();
-    if (existing) {
-      res.status(409).json({ error: 'code already in use' });
+    if (Object.keys(updates).length === 0) {
+      res.status(400).json({ error: 'no valid fields to update' });
       return;
     }
-  }
 
-  updates.updated_at = new Date().toISOString();
+    if (updates.code) {
+      const existing = await db('clubs')
+        .where({ code: updates.code })
+        .whereNot({ id })
+        .first();
+      if (existing) {
+        res.status(409).json({ error: 'code already in use' });
+        return;
+      }
+    }
 
-  const [club] = await db('clubs')
-    .where({ id })
-    .update(updates)
-    .returning([
-      'id',
-      'name',
-      'code',
-      'description',
-      'media_logo_lg',
-      'media_logo_sm',
-      'created_at',
-      'updated_at',
-    ]);
+    updates.updated_at = new Date().toISOString();
 
-  if (!club) {
-    res.status(404).json({ error: 'club not found' });
-    return;
-  }
+    const [club] = await db('clubs')
+      .where({ id })
+      .update(updates)
+      .returning([
+        'id',
+        'name',
+        'code',
+        'description',
+        'media_logo_lg',
+        'media_logo_sm',
+        'created_at',
+        'updated_at',
+      ]);
 
-  res.json(club);
-});
+    if (!club) {
+      res.status(404).json({ error: 'club not found' });
+      return;
+    }
+
+    res.json(club);
+  },
+);
 
 export default router;

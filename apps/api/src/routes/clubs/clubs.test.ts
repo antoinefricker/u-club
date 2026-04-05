@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
+import { createTestToken } from '../../test-utils.js';
 
 const mockSelect = vi.fn().mockReturnThis();
 const mockWhere = vi.fn().mockReturnThis();
@@ -37,6 +38,7 @@ vi.mock('../../mailer.js', () => ({
 }));
 
 const { default: app } = await import('../../app.js');
+const adminToken = createTestToken('uuid-1', 'admin@example.com', 'admin');
 
 const sampleClub = {
   id: 'club-1',
@@ -50,6 +52,7 @@ const sampleClub = {
 };
 
 beforeEach(() => {
+  process.env.JWT_SECRET = 'test-secret';
   vi.clearAllMocks();
   mockSelect.mockReturnThis();
   mockWhere.mockReturnThis();
@@ -62,7 +65,9 @@ describe('GET /clubs', () => {
   it('should return a list of clubs', async () => {
     mockSelect.mockResolvedValueOnce([sampleClub]);
 
-    const res = await request(app).get('/clubs');
+    const res = await request(app)
+      .get('/clubs')
+      .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual([sampleClub]);
@@ -73,7 +78,9 @@ describe('GET /clubs/:id', () => {
   it('should return a club by id', async () => {
     mockFirst.mockResolvedValueOnce(sampleClub);
 
-    const res = await request(app).get('/clubs/club-1');
+    const res = await request(app)
+      .get('/clubs/club-1')
+      .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual(sampleClub);
@@ -82,7 +89,9 @@ describe('GET /clubs/:id', () => {
   it('should return 404 if club not found', async () => {
     mockFirst.mockResolvedValueOnce(undefined);
 
-    const res = await request(app).get('/clubs/nonexistent');
+    const res = await request(app)
+      .get('/clubs/nonexistent')
+      .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(404);
     expect(res.body).toHaveProperty('error', 'club not found');
@@ -91,14 +100,20 @@ describe('GET /clubs/:id', () => {
 
 describe('POST /clubs', () => {
   it('should return 400 if name is missing', async () => {
-    const res = await request(app).post('/clubs').send({ code: 'FCE' });
+    const res = await request(app)
+      .post('/clubs')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ code: 'FCE' });
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'name is required');
   });
 
   it('should return 400 if code is missing', async () => {
-    const res = await request(app).post('/clubs').send({ name: 'FC Example' });
+    const res = await request(app)
+      .post('/clubs')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ name: 'FC Example' });
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'code is required');
@@ -109,6 +124,7 @@ describe('POST /clubs', () => {
 
     const res = await request(app)
       .post('/clubs')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({ name: 'FC Example', code: 'FCE' });
 
     expect(res.status).toBe(409);
@@ -121,6 +137,7 @@ describe('POST /clubs', () => {
 
     const res = await request(app)
       .post('/clubs')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({ name: 'FC Example', code: 'FCE' });
 
     expect(res.status).toBe(201);
@@ -130,7 +147,10 @@ describe('POST /clubs', () => {
 
 describe('PUT /clubs/:id', () => {
   it('should return 400 if no valid fields provided', async () => {
-    const res = await request(app).put('/clubs/club-1').send({});
+    const res = await request(app)
+      .put('/clubs/club-1')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({});
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'no valid fields to update');
@@ -139,7 +159,10 @@ describe('PUT /clubs/:id', () => {
   it('should return 409 if updated code already in use', async () => {
     mockFirst.mockResolvedValueOnce(sampleClub);
 
-    const res = await request(app).put('/clubs/club-2').send({ code: 'FCE' });
+    const res = await request(app)
+      .put('/clubs/club-2')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ code: 'FCE' });
 
     expect(res.status).toBe(409);
     expect(res.body).toHaveProperty('error', 'code already in use');
@@ -150,6 +173,7 @@ describe('PUT /clubs/:id', () => {
 
     const res = await request(app)
       .put('/clubs/nonexistent')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({ name: 'Updated' });
 
     expect(res.status).toBe(404);
@@ -162,6 +186,7 @@ describe('PUT /clubs/:id', () => {
 
     const res = await request(app)
       .put('/clubs/club-1')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({ name: 'FC Updated' });
 
     expect(res.status).toBe(200);
@@ -173,7 +198,9 @@ describe('DELETE /clubs/:id', () => {
   it('should return 404 if club not found', async () => {
     mockDel.mockResolvedValueOnce(0);
 
-    const res = await request(app).delete('/clubs/nonexistent');
+    const res = await request(app)
+      .delete('/clubs/nonexistent')
+      .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(404);
     expect(res.body).toHaveProperty('error', 'club not found');
@@ -182,7 +209,9 @@ describe('DELETE /clubs/:id', () => {
   it('should delete and return 204', async () => {
     mockDel.mockResolvedValueOnce(1);
 
-    const res = await request(app).delete('/clubs/club-1');
+    const res = await request(app)
+      .delete('/clubs/club-1')
+      .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(204);
   });
