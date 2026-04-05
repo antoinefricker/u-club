@@ -2,19 +2,10 @@ import { Router, Request, Response } from 'express';
 import db from '../../db.js';
 import { requireAuth } from '../../middleware/auth.js';
 import { requireRole } from '../../middleware/requireRole.js';
+import { validate } from '../../middleware/validate.js';
+import { updateMemberSchema } from '../../schemas/member.js';
 
 const router = Router();
-
-const ALLOWED_FIELDS = [
-  'first_name',
-  'last_name',
-  'birth_date',
-  'license',
-  'gender',
-  'year',
-  'user_id',
-  'status_id',
-] as const;
 
 /**
  * @openapi
@@ -59,30 +50,11 @@ router.put(
   '/:id',
   requireAuth,
   requireRole('admin', 'manager'),
+  validate(updateMemberSchema),
   async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    const updates: Record<string, unknown> = {};
-    for (const field of ALLOWED_FIELDS) {
-      if (req.body[field] !== undefined) {
-        updates[field] = req.body[field];
-      }
-    }
-
-    if (Object.keys(updates).length === 0) {
-      res.status(400).json({ error: 'no valid fields to update' });
-      return;
-    }
-
-    if (
-      updates.gender !== undefined &&
-      updates.gender !== 'male' &&
-      updates.gender !== 'female'
-    ) {
-      res.status(400).json({ error: "gender must be 'male' or 'female'" });
-      return;
-    }
-
+    const updates = { ...req.body };
     updates.updated_at = new Date().toISOString();
 
     const [member] = await db('members')

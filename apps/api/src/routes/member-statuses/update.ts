@@ -2,10 +2,10 @@ import { Router, Request, Response } from 'express';
 import db from '../../db.js';
 import { requireAuth } from '../../middleware/auth.js';
 import { requireRole } from '../../middleware/requireRole.js';
+import { validate } from '../../middleware/validate.js';
+import { updateMemberStatusSchema } from '../../schemas/memberStatus.js';
 
 const router = Router();
-
-const ALLOWED_FIELDS = ['label'] as const;
 
 /**
  * @openapi
@@ -59,20 +59,11 @@ router.put(
   '/:id',
   requireAuth,
   requireRole('admin'),
+  validate(updateMemberStatusSchema),
   async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    const updates: Record<string, unknown> = {};
-    for (const field of ALLOWED_FIELDS) {
-      if (req.body[field] !== undefined) {
-        updates[field] = req.body[field];
-      }
-    }
-
-    if (Object.keys(updates).length === 0) {
-      res.status(400).json({ error: 'no valid fields to update' });
-      return;
-    }
+    const updates = { ...req.body };
 
     if (updates.label) {
       const existing = await db('member_statuses')

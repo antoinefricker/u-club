@@ -2,6 +2,8 @@ import { Router, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import db from '../../db.js';
 import { verifyPassword } from '../../password.js';
+import { validate } from '../../middleware/validate.js';
+import { loginSchema } from '../../schemas/auth.js';
 
 const router = Router();
 
@@ -55,53 +57,47 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/login', async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+router.post(
+  '/login',
+  validate(loginSchema),
+  async (req: Request, res: Response) => {
+    const { email, password } = req.body;
 
-  if (!email || typeof email !== 'string') {
-    res.status(400).json({ error: 'email is required' });
-    return;
-  }
+    const user = await db('users').where({ email }).first();
 
-  if (!password || typeof password !== 'string') {
-    res.status(400).json({ error: 'password is required' });
-    return;
-  }
+    if (!user) {
+      res.status(401).json({ error: 'invalid email or password' });
+      return;
+    }
 
-  const user = await db('users').where({ email }).first();
+    const valid = await verifyPassword(password, user.password);
 
-  if (!user) {
-    res.status(401).json({ error: 'invalid email or password' });
-    return;
-  }
+    if (!valid) {
+      res.status(401).json({ error: 'invalid email or password' });
+      return;
+    }
 
-  const valid = await verifyPassword(password, user.password);
+    if (!user.email_verified_at) {
+      res.status(403).json({ error: 'email not verified' });
+      return;
+    }
 
-  if (!valid) {
-    res.status(401).json({ error: 'invalid email or password' });
-    return;
-  }
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      res.status(500).json({ error: 'server configuration error' });
+      return;
+    }
 
-  if (!user.email_verified_at) {
-    res.status(403).json({ error: 'email not verified' });
-    return;
-  }
+    const accessToken = jwt.sign(
+      { sub: user.id, email: user.email, role: user.role },
+      jwtSecret,
+      {
+        expiresIn: '7d',
+      },
+    );
 
-  const jwtSecret = process.env.JWT_SECRET;
-  if (!jwtSecret) {
-    res.status(500).json({ error: 'server configuration error' });
-    return;
-  }
-
-  const accessToken = jwt.sign(
-    { sub: user.id, email: user.email, role: user.role },
-    jwtSecret,
-    {
-      expiresIn: '7d',
-    },
-  );
-
-  res.json({ access_token: accessToken });
-});
+    res.json({ access_token: accessToken });
+  },
+);
 
 export default router;

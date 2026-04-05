@@ -2,8 +2,8 @@ import { Router, Request, Response } from 'express';
 import db from '../../db.js';
 import { requireAuth } from '../../middleware/auth.js';
 import { requireRole } from '../../middleware/requireRole.js';
-
-const VALID_ROLES = ['player', 'coach', 'assistant', 'sparring'] as const;
+import { validate } from '../../middleware/validate.js';
+import { createTeamAssignmentSchema } from '../../schemas/teamAssignment.js';
 
 const router = Router({ mergeParams: true });
 
@@ -103,21 +103,10 @@ router.post(
   '/',
   requireAuth,
   requireRole('admin', 'manager'),
+  validate(createTeamAssignmentSchema),
   async (req: Request, res: Response) => {
     const { teamId } = req.params;
     const { member_id, role } = req.body;
-
-    if (!member_id || typeof member_id !== 'string') {
-      res.status(400).json({ error: 'member_id is required' });
-      return;
-    }
-
-    if (!role || !VALID_ROLES.includes(role)) {
-      res
-        .status(400)
-        .json({ error: 'role must be player, coach, assistant, or sparring' });
-      return;
-    }
 
     const existing = await db('team_assignments')
       .where({ team_id: teamId, member_id })

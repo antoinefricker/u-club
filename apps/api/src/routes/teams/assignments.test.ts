@@ -84,7 +84,7 @@ describe('POST /teams/:teamId/members', () => {
       .send({ role: 'player' });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'member_id is required');
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 400 if role is missing', async () => {
@@ -94,10 +94,7 @@ describe('POST /teams/:teamId/members', () => {
       .send({ member_id: 'member-1' });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty(
-      'error',
-      'role must be player, coach, assistant, or sparring',
-    );
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 400 if role is invalid', async () => {
@@ -107,10 +104,7 @@ describe('POST /teams/:teamId/members', () => {
       .send({ member_id: 'member-1', role: 'goalkeeper' });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty(
-      'error',
-      'role must be player, coach, assistant, or sparring',
-    );
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 409 if member is already assigned', async () => {

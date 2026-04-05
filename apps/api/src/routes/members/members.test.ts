@@ -112,7 +112,7 @@ describe('POST /members', () => {
       .send({ lastName: 'Doe', gender: 'male', year: 2026 });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'first_name is required');
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 400 if lastName is missing', async () => {
@@ -122,7 +122,7 @@ describe('POST /members', () => {
       .send({ firstName: 'John', gender: 'male', year: 2026 });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'last_name is required');
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 400 if gender is invalid', async () => {
@@ -137,10 +137,7 @@ describe('POST /members', () => {
       });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty(
-      'error',
-      "gender is required and must be 'male' or 'female'",
-    );
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 400 if year is missing', async () => {
@@ -150,10 +147,7 @@ describe('POST /members', () => {
       .send({ firstName: 'John', lastName: 'Doe', gender: 'male' });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty(
-      'error',
-      'year is required and must be a number',
-    );
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should create a member and return 201', async () => {
@@ -177,7 +171,7 @@ describe('PUT /members/:id', () => {
       .send({});
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'no valid fields to update');
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 400 if gender is invalid', async () => {
@@ -187,10 +181,7 @@ describe('PUT /members/:id', () => {
       .send({ gender: 'other' });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty(
-      'error',
-      "gender must be 'male' or 'female'",
-    );
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 404 if member not found', async () => {

@@ -1,0 +1,21 @@
+import { z } from 'zod';
+
+export const createClubSchema = z.object({
+  name: z.string({ required_error: 'name is required' }),
+  code: z.string({ required_error: 'code is required' }),
+  description: z.string().nullable().optional(),
+  media_logo_lg: z.string().nullable().optional(),
+  media_logo_sm: z.string().nullable().optional(),
+});
+
+export const updateClubSchema = z
+  .object({
+    name: z.string().optional(),
+    code: z.string().optional(),
+    description: z.string().nullable().optional(),
+    media_logo_lg: z.string().nullable().optional(),
+    media_logo_sm: z.string().nullable().optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, {
+    message: 'no valid fields to update',
+  });

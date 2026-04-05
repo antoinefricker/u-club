@@ -39,7 +39,7 @@ describe('POST /auth/resend_confirmation', () => {
     const res = await request(app).post('/auth/resend_confirmation').send({});
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'email is required');
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 200 silently if user does not exist', async () => {

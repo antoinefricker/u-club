@@ -38,7 +38,7 @@ describe('POST /auth/login', () => {
       .send({ password: 'secret' });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'email is required');
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 400 if password is missing', async () => {
@@ -47,7 +47,7 @@ describe('POST /auth/login', () => {
       .send({ email: 'john@example.com' });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'password is required');
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 401 if user not found', async () => {

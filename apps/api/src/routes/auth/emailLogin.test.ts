@@ -39,7 +39,7 @@ describe('POST /auth/email_login', () => {
     const res = await request(app).post('/auth/email_login').send({});
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'email is required');
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return success without sending email if user does not exist', async () => {
