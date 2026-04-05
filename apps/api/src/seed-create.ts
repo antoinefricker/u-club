@@ -91,10 +91,10 @@ async function seed() {
 
   // Clear first
   log.step('Clearing existing data');
-  execSync(
-    `tsx ${new URL('./seed-clear.ts', import.meta.url).pathname} --force`,
-    { stdio: 'inherit' },
-  );
+  execSync('pnpm seed:clear -- --force', {
+    stdio: 'inherit',
+    cwd: new URL('..', import.meta.url).pathname,
+  });
 
   const s = spinner();
 
