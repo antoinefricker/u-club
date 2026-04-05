@@ -18,7 +18,9 @@
     "migrate:up": "knex migrate:up --knexfile knexfile.js",
     "migrate:down": "knex migrate:down --knexfile knexfile.js",
     "migrate:status": "knex migrate:status --knexfile knexfile.js",
-    "migrate:make": "knex migrate:make --knexfile knexfile.js -x ts"
+    "migrate:make": "knex migrate:make --knexfile knexfile.js -x ts",
+    "seed": "tsx src/seed.ts",
+    "seed:clear": "tsx src/clear.ts"
   },
   "dependencies": {
     "express": "^5.1.0",
