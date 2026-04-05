@@ -66,7 +66,7 @@ migrate-down   Rollback the last migration
 migrate-status Show current migration status
 migrate-make   Create a new migration (usage: make migrate-make name=create_users)
 dev-start      Start postgres, mailpit, api and pwa in dev mode
-dev-stop       Stop dev services
+dev-stop       Stop dev services (node servers + docker)
 ```
 
 ## Documentations

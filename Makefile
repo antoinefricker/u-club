@@ -68,6 +68,8 @@ migrate-make:
 
 ## dev-stop: Stop dev services
 dev-stop:
+	-lsof -ti:4000 | xargs kill 2>/dev/null
+	-lsof -ti:5173 | xargs kill 2>/dev/null
 	docker compose stop postgres mailpit
 
 ## dev-start: Start postgres, mailpit, api and pwa in dev mode
