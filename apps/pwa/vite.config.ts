@@ -8,8 +8,8 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'U-Club',
-        short_name: 'U-Club',
+        name: 'Eggplant',
+        short_name: 'Eggplant',
         start_url: '/',
         display: 'standalone',
         background_color: '#ffffff',

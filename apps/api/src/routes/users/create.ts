@@ -89,7 +89,7 @@ router.post(
 
     const appUrl = process.env.APP_URL || 'http://localhost:5173';
     await mailer.sendMail({
-      from: process.env.SMTP_FROM || 'noreply@u-club.app',
+      from: process.env.SMTP_FROM || 'noreply@eggplant.app',
       to: email,
       subject: 'Verify your email',
       text: `Click here to verify your email: ${appUrl}/verify-email?token=${token}&email=${encodeURIComponent(email)}\n\nThis link expires in 24 hours.`,

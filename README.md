@@ -1,6 +1,6 @@
-# u-club
+# eggplant
 
-Monorepo for the u-club project.
+Monorepo for the eggplant project.
 
 ## Local URLs
 
@@ -20,8 +20,8 @@ Monorepo for the u-club project.
 
 ```bash
 # Clone the repo
-git clone git@github.com:antoinefricker/u-club.git
-cd u-club
+git clone git@github.com:antoinefricker/eggplant.git
+cd eggplant
 
 # Set up environment variables
 cp .envrc.dist .envrc

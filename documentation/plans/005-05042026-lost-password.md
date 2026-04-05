@@ -99,6 +99,6 @@ Users who forget their password need a way to reset it. We'll reuse the existing
 - `documentation/bruno/auth/magic-link-verify.bru` (renamed)
 
 ## Verification
-1. `pnpm --filter @u-club/api test` — 112 tests pass
+1. `pnpm --filter @eggplant/api test` — 112 tests pass
 2. `pnpm lint` — clean
 3. Manual: click forgot password → check Mailpit → click link → set new password → verify login with new password

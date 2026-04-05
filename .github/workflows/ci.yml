@@ -14,9 +14,9 @@ jobs:
       postgres:
         image: postgres:17
         env:
-          POSTGRES_USER: uclub
-          POSTGRES_PASSWORD: uclub
-          POSTGRES_DB: uclub
+          POSTGRES_USER: eggplant
+          POSTGRES_PASSWORD: eggplant
+          POSTGRES_DB: eggplant
         ports:
           - 5432:5432
         options: >-
@@ -26,7 +26,7 @@ jobs:
           --health-retries 5
 
     env:
-      DATABASE_URL: postgres://uclub:uclub@localhost:5432/uclub
+      DATABASE_URL: postgres://eggplant:eggplant@localhost:5432/eggplant
 
     steps:
       - uses: actions/checkout@v6
@@ -41,16 +41,16 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - name: Typecheck
-        run: pnpm --filter @u-club/api typecheck
+        run: pnpm --filter @eggplant/api typecheck
 
       - name: Lint
-        run: pnpm --filter @u-club/api lint
+        run: pnpm --filter @eggplant/api lint
 
       - name: Format
-        run: pnpm --filter @u-club/api format:check
+        run: pnpm --filter @eggplant/api format:check
 
       - name: Test
-        run: pnpm --filter @u-club/api test
+        run: pnpm --filter @eggplant/api test
 
   e2e:
     runs-on: ubuntu-latest
@@ -59,9 +59,9 @@ jobs:
       postgres:
         image: postgres:17
         env:
-          POSTGRES_USER: uclub
-          POSTGRES_PASSWORD: uclub
-          POSTGRES_DB: uclub
+          POSTGRES_USER: eggplant
+          POSTGRES_PASSWORD: eggplant
+          POSTGRES_DB: eggplant
         ports:
           - 5432:5432
         options: >-
@@ -76,13 +76,13 @@ jobs:
           - 8025:8025
 
     env:
-      DATABASE_URL: postgres://uclub:uclub@localhost:5432/uclub
+      DATABASE_URL: postgres://eggplant:eggplant@localhost:5432/eggplant
       JWT_SECRET: ci-test-secret
       SMTP_HOST: localhost
       SMTP_PORT: 1025
       SMTP_USER: ""
       SMTP_PASS: ""
-      SMTP_FROM: test@uclub.dev
+      SMTP_FROM: test@eggplant.dev
       API_PORT: 4000
 
     steps:
@@ -97,9 +97,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - run: pnpm --filter @u-club/api migrate
+      - run: pnpm --filter @eggplant/api migrate
 
-      - run: pnpm --filter @u-club/e2e exec playwright install chromium
+      - run: pnpm --filter @eggplant/e2e exec playwright install chromium
 
       - name: Start API
         run: pnpm dev:api &

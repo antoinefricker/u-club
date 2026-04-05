@@ -27,7 +27,7 @@ export function AppNavigation() {
       <div className={classes.navbarMain}>
         <Group className={classes.header} justify="space-between">
           <div style={{ color: 'white', fontWeight: 700, fontSize: 28 }}>
-            U Club
+            Eggplant
           </div>
         </Group>
 

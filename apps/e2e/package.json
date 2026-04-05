@@ -1,5 +1,5 @@
 {
-  "name": "@u-club/e2e",
+  "name": "@eggplant/e2e",
   "private": true,
   "scripts": {
     "test": "playwright test",
