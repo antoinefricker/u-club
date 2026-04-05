@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help install lint lint-fix format format-check typecheck test test-e2e dev-start dev-stop migrate migrate-up migrate-down migrate-status migrate-make seed seed-clear
+.PHONY: help install lint lint-fix format format-check typecheck test test-e2e dev-start dev-stop migrate migrate-up migrate-down migrate-status migrate-make seed-create seed-clear
 
 help:
 	@grep -E '^## ' $(MAKEFILE_LIST) | sed 's/## //'
@@ -66,8 +66,8 @@ migrate-status:
 migrate-make:
 	pnpm --filter @u-club/api migrate:make -- $(name)
 
-## seed: Clear and seed database with dev data (use FORCE=1 to skip confirmation)
-seed:
+## seed-create: Clear and seed database with dev data (use FORCE=1 to skip confirmation)
+seed-create:
 	$(check_postgres)
 	pnpm --filter @u-club/api seed $(if $(filter 1,$(FORCE)),-- --force)
 

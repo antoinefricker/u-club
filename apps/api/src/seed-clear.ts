@@ -17,6 +17,15 @@ const tables = [
 async function clear() {
   intro('CLEAR DATABASE');
 
+  // Check DB connection
+  try {
+    await db.raw('SELECT 1');
+  } catch {
+    log.error('Unable to connect to the database. Is Postgres running?');
+    outro('Aborted.');
+    process.exit(1);
+  }
+
   if (!force) {
     const shouldContinue = await confirm({
       message: 'This will delete ALL data. Continue?',
