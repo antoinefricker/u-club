@@ -55,7 +55,7 @@ router.post(
   async (req: Request, res: Response) => {
     const { token, email } = req.body;
 
-    const loginToken = await db('login_tokens')
+    const loginToken = await db('auth_tokens')
       .where({ token, email, type: 'confirmation' })
       .where('expires_at', '>', new Date())
       .first();
@@ -65,7 +65,7 @@ router.post(
       return;
     }
 
-    await db('login_tokens').where({ id: loginToken.id }).del();
+    await db('auth_tokens').where({ id: loginToken.id }).del();
 
     const user = await db('users').where({ email: loginToken.email }).first();
     if (!user) {

@@ -59,7 +59,7 @@ router.post(
     const token = crypto.randomBytes(32).toString('hex');
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
-    await db('login_tokens').insert({
+    await db('auth_tokens').insert({
       email,
       token,
       expires_at: expiresAt,

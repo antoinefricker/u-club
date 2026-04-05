@@ -12,7 +12,7 @@ erDiagram
         timestamp updated_at
     }
 
-    LOGIN_TOKEN {
+    AUTH_TOKEN {
         uuid id PK
         string email
         string token UK
@@ -80,7 +80,7 @@ erDiagram
 
     %% ── Relationships ────────────────────────────────────
 
-    USER          ||--o{ LOGIN_TOKEN        : "requests"
+    USER          ||--o{ AUTH_TOKEN        : "requests"
     USER          ||--o{ REVOKED_TOKEN      : "revokes"
     CLUB          ||--o{ TEAM               : "has"
     USER          ||--o{ MEMBER             : "is"

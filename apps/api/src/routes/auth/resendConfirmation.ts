@@ -54,12 +54,12 @@ router.post(
       return;
     }
 
-    await db('login_tokens').where({ email, type: 'confirmation' }).del();
+    await db('auth_tokens').where({ email, type: 'confirmation' }).del();
 
     const token = crypto.randomBytes(32).toString('hex');
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    await db('login_tokens').insert({
+    await db('auth_tokens').insert({
       email,
       token,
       expires_at: expiresAt,
