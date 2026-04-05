@@ -9,12 +9,12 @@ export const magicLinkSchema = z.object({
   email: z.string({ error: 'email is required' }),
 });
 
-export const confirmEmailSchema = z.object({
+export const verifyEmailSchema = z.object({
   token: z.string({ error: 'token is required' }),
   email: z.string({ error: 'email is required' }),
 });
 
-export const resendConfirmationSchema = z.object({
+export const verifyEmailResendSchema = z.object({
   email: z.string({ error: 'email is required' }),
 });
 

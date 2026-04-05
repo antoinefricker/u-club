@@ -1,18 +1,17 @@
 meta {
-  name: Confirm Email
+  name: Verify Email Resend
   type: http
-  seq: 5
+  seq: 6
 }
 
 post {
-  url: {{baseUrl}}/auth/confirm_email
+  url: {{baseUrl}}/auth/verify_email_resend
   body: json
   auth: none
 }
 
 body:json {
   {
-    "token": "paste-token-here",
     "email": "john@example.com"
   }
 }

@@ -14,7 +14,7 @@ export function ConfirmEmailPage() {
   useEffect(() => {
     if (!token || !email) return;
 
-    fetch('/api/auth/confirm_email', {
+    fetch('/api/auth/verify_email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token, email }),

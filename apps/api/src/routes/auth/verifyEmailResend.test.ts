@@ -30,13 +30,13 @@ vi.mock('../../password.js', () => ({
 
 const { default: app } = await import('../../app.js');
 
-describe('POST /auth/resend_confirmation', () => {
+describe('POST /auth/verify_email_resend', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('should return 400 if email is missing', async () => {
-    const res = await request(app).post('/auth/resend_confirmation').send({});
+    const res = await request(app).post('/auth/verify_email_resend').send({});
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'validation error');
@@ -46,11 +46,11 @@ describe('POST /auth/resend_confirmation', () => {
     mockFirst.mockResolvedValueOnce(undefined);
 
     const res = await request(app)
-      .post('/auth/resend_confirmation')
+      .post('/auth/verify_email_resend')
       .send({ email: 'unknown@example.com' });
 
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('message', 'confirmation email sent');
+    expect(res.body).toHaveProperty('message', 'verification email sent');
     expect(mockSendMail).not.toHaveBeenCalled();
   });
 
@@ -62,11 +62,11 @@ describe('POST /auth/resend_confirmation', () => {
     });
 
     const res = await request(app)
-      .post('/auth/resend_confirmation')
+      .post('/auth/verify_email_resend')
       .send({ email: 'verified@example.com' });
 
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('message', 'confirmation email sent');
+    expect(res.body).toHaveProperty('message', 'verification email sent');
     expect(mockSendMail).not.toHaveBeenCalled();
   });
 
@@ -78,17 +78,17 @@ describe('POST /auth/resend_confirmation', () => {
     });
 
     const res = await request(app)
-      .post('/auth/resend_confirmation')
+      .post('/auth/verify_email_resend')
       .send({ email: 'unverified@example.com' });
 
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('message', 'confirmation email sent');
+    expect(res.body).toHaveProperty('message', 'verification email sent');
     expect(mockDel).toHaveBeenCalled();
     expect(mockInsert).toHaveBeenCalled();
     expect(mockSendMail).toHaveBeenCalledWith(
       expect.objectContaining({
         to: 'unverified@example.com',
-        subject: 'Confirm your email',
+        subject: 'Verify your email',
       }),
     );
   });

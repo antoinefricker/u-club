@@ -176,7 +176,7 @@ describe('POST /users', () => {
     expect(mockSendMail).toHaveBeenCalledWith(
       expect.objectContaining({
         to: 'john@example.com',
-        subject: 'Confirm your email',
+        subject: 'Verify your email',
       }),
     );
   });

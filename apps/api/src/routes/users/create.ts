@@ -91,8 +91,8 @@ router.post(
     await mailer.sendMail({
       from: process.env.SMTP_FROM || 'noreply@u-club.app',
       to: email,
-      subject: 'Confirm your email',
-      text: `Click here to confirm your email: ${appUrl}/confirm-email?token=${token}&email=${encodeURIComponent(email)}\n\nThis link expires in 24 hours.`,
+      subject: 'Verify your email',
+      text: `Click here to verify your email: ${appUrl}/verify-email?token=${token}&email=${encodeURIComponent(email)}\n\nThis link expires in 24 hours.`,
     });
 
     res.status(201).json(user);

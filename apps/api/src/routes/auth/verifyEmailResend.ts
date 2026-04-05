@@ -3,16 +3,16 @@ import crypto from 'node:crypto';
 import db from '../../db.js';
 import mailer from '../../mailer.js';
 import { validate } from '../../middleware/validate.js';
-import { resendConfirmationSchema } from '../../schemas/auth.js';
+import { verifyEmailResendSchema } from '../../schemas/auth.js';
 
 const router = Router();
 
 /**
  * @openapi
- * /auth/resend_confirmation:
+ * /auth/verify_email_resend:
  *   post:
  *     tags: [Auth]
- *     summary: Resend confirmation email
+ *     summary: Resend verification email
  *     description: Sends a new confirmation email. Always returns success to prevent email enumeration.
  *     requestBody:
  *       required: true
@@ -43,14 +43,14 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.post(
-  '/resend_confirmation',
-  validate(resendConfirmationSchema),
+  '/verify_email_resend',
+  validate(verifyEmailResendSchema),
   async (req: Request, res: Response) => {
     const { email } = req.body;
 
     const user = await db('users').where({ email }).first();
     if (!user || user.email_verified_at) {
-      res.json({ message: 'confirmation email sent' });
+      res.json({ message: 'verification email sent' });
       return;
     }
 
@@ -70,11 +70,11 @@ router.post(
     await mailer.sendMail({
       from: process.env.SMTP_FROM || 'noreply@u-club.app',
       to: email,
-      subject: 'Confirm your email',
-      text: `Click here to confirm your email: ${appUrl}/confirm-email?token=${token}&email=${encodeURIComponent(email)}\n\nThis link expires in 24 hours.`,
+      subject: 'Verify your email',
+      text: `Click here to verify your email: ${appUrl}/verify-email?token=${token}&email=${encodeURIComponent(email)}\n\nThis link expires in 24 hours.`,
     });
 
-    res.json({ message: 'confirmation email sent' });
+    res.json({ message: 'verification email sent' });
   },
 );
 

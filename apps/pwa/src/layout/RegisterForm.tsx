@@ -63,7 +63,7 @@ export function RegisterForm({ onSwitchMode }: RegisterFormProps) {
     if (!registeredEmail) return;
     setResending(true);
     try {
-      await fetch('/api/auth/resend_confirmation', {
+      await fetch('/api/auth/verify_email_resend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: registeredEmail }),

@@ -48,7 +48,7 @@ export async function createVerifiedUser(
   const [, token, encodedEmail] = match;
   const email = decodeURIComponent(encodedEmail);
 
-  await request.post("/api/auth/confirm_email", {
+  await request.post("/api/auth/verify_email", {
     data: { token, email },
   });
 

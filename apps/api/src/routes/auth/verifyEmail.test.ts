@@ -29,7 +29,7 @@ vi.mock('../../password.js', () => ({
 
 const { default: app } = await import('../../app.js');
 
-describe('POST /auth/confirm_email', () => {
+describe('POST /auth/verify_email', () => {
   beforeEach(() => {
     process.env.JWT_SECRET = 'test-secret';
     vi.clearAllMocks();
@@ -37,7 +37,7 @@ describe('POST /auth/confirm_email', () => {
 
   it('should return 400 if token is missing', async () => {
     const res = await request(app)
-      .post('/auth/confirm_email')
+      .post('/auth/verify_email')
       .send({ email: 'test@example.com' });
 
     expect(res.status).toBe(400);
@@ -46,7 +46,7 @@ describe('POST /auth/confirm_email', () => {
 
   it('should return 400 if email is missing', async () => {
     const res = await request(app)
-      .post('/auth/confirm_email')
+      .post('/auth/verify_email')
       .send({ token: 'valid-token' });
 
     expect(res.status).toBe(400);
@@ -57,7 +57,7 @@ describe('POST /auth/confirm_email', () => {
     mockFirst.mockResolvedValueOnce(undefined);
 
     const res = await request(app)
-      .post('/auth/confirm_email')
+      .post('/auth/verify_email')
       .send({ token: 'invalid-token', email: 'test@example.com' });
 
     expect(res.status).toBe(401);
@@ -75,7 +75,7 @@ describe('POST /auth/confirm_email', () => {
     mockFirst.mockResolvedValueOnce(undefined);
 
     const res = await request(app)
-      .post('/auth/confirm_email')
+      .post('/auth/verify_email')
       .send({ token: 'valid-token', email: 'deleted@example.com' });
 
     expect(res.status).toBe(401);
@@ -97,7 +97,7 @@ describe('POST /auth/confirm_email', () => {
     });
 
     const res = await request(app)
-      .post('/auth/confirm_email')
+      .post('/auth/verify_email')
       .send({ token: 'valid-token', email: 'test@example.com' });
 
     expect(res.status).toBe(200);

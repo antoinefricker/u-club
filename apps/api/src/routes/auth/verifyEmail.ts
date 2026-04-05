@@ -2,16 +2,16 @@ import { Router, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import db from '../../db.js';
 import { validate } from '../../middleware/validate.js';
-import { confirmEmailSchema } from '../../schemas/auth.js';
+import { verifyEmailSchema } from '../../schemas/auth.js';
 
 const router = Router();
 
 /**
  * @openapi
- * /auth/confirm_email:
+ * /auth/verify_email:
  *   post:
  *     tags: [Auth]
- *     summary: Confirm email address
+ *     summary: Verify email address
  *     description: Validates the confirmation token, marks the email as verified, and returns a JWT access token.
  *     requestBody:
  *       required: true
@@ -50,8 +50,8 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.post(
-  '/confirm_email',
-  validate(confirmEmailSchema),
+  '/verify_email',
+  validate(verifyEmailSchema),
   async (req: Request, res: Response) => {
     const { token, email } = req.body;
 

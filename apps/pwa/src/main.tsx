@@ -46,7 +46,7 @@ createRoot(document.getElementById('root')!).render(
         <AuthProvider>
           <BrowserRouter>
             <Routes>
-              <Route path="confirm-email" element={<ConfirmEmailPage />} />
+              <Route path="verify-email" element={<ConfirmEmailPage />} />
               <Route path="reset-password" element={<ResetPasswordPage />} />
               <Route element={<App />}>
                 <Route index element={<DashboardPage />} />
