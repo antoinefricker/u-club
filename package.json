@@ -10,8 +10,22 @@
     "format:check": "pnpm -r run format:check",
     "typecheck": "pnpm -r run typecheck",
     "test": "pnpm -r run test",
-    "test:e2e": "pnpm --filter @u-club/e2e test"
+    "test:e2e": "pnpm --filter @u-club/e2e test",
+    "prepare": "husky"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0"
+  },
+  "lint-staged": {
+    "apps/api/src/**/*.ts": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "apps/pwa/src/**/*.{ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
+  },
   "packageManager": "pnpm@10.8.0"
 }
