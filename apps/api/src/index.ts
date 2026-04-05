@@ -1,6 +1,6 @@
 import app from './app.js';
 
-const port = process.env.PORT || 4000;
+const port = process.env.API_PORT || 4000;
 
 app.listen(port, () => {
   const mailpitUrl = process.env.MAILPIT_URL || 'http://localhost:8025';

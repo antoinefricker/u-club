@@ -18,10 +18,10 @@ export default defineConfig({
     }),
   ],
   server: {
-    port: 5173,
+    port: Number(process.env.PWA_PORT) || 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:4000',
+        target: `http://localhost:${process.env.API_PORT || 4000}`,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },

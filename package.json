@@ -14,8 +14,10 @@
     "prepare": "husky"
   },
   "devDependencies": {
+    "eslint": "^10.2.0",
     "husky": "^9.1.7",
-    "lint-staged": "^16.4.0"
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.5.0"
   },
   "lint-staged": {
     "apps/api/src/**/*.ts": [
