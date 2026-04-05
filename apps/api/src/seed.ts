@@ -1,79 +1,6 @@
+import { faker } from '@faker-js/faker/locale/fr';
 import db from './db.js';
 import { hashPassword } from './password.js';
-
-const FIRST_NAMES_M = [
-  'Lucas',
-  'Hugo',
-  'Louis',
-  'Raphaël',
-  'Arthur',
-  'Jules',
-  'Adam',
-  'Maël',
-  'Léo',
-  'Nathan',
-  'Gabriel',
-  'Ethan',
-  'Théo',
-  'Noah',
-  'Tom',
-  'Mathis',
-  'Timéo',
-  'Liam',
-  'Paul',
-  'Sacha',
-];
-
-const FIRST_NAMES_F = [
-  'Emma',
-  'Jade',
-  'Louise',
-  'Alice',
-  'Chloé',
-  'Léa',
-  'Manon',
-  'Rose',
-  'Anna',
-  'Inès',
-  'Lina',
-  'Mila',
-  'Sarah',
-  'Eva',
-  'Camille',
-  'Zoé',
-  'Léonie',
-  'Clara',
-  'Juliette',
-  'Margaux',
-];
-
-const LAST_NAMES = [
-  'Martin',
-  'Bernard',
-  'Dubois',
-  'Thomas',
-  'Robert',
-  'Richard',
-  'Petit',
-  'Durand',
-  'Leroy',
-  'Moreau',
-  'Simon',
-  'Laurent',
-  'Lefebvre',
-  'Michel',
-  'Garcia',
-  'David',
-  'Bertrand',
-  'Roux',
-  'Vincent',
-  'Fournier',
-  'Morel',
-  'Girard',
-  'Andre',
-  'Mercier',
-  'Dupont',
-];
 
 const MEMBER_GENDERS = ['male', 'female'] as const;
 
@@ -83,49 +10,40 @@ interface TeamDef {
 }
 
 function randomItem<T>(arr: readonly T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-function randomInt(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  return faker.helpers.arrayElement(arr as T[]);
 }
 
 function generateCSGTeams(): TeamDef[] {
-  const categories = [
-    'U7',
-    'U9',
-    'U11',
-    'U13',
-    'U15',
-    'U18',
-    'U21',
-    'Senior',
-    'Leisure',
-  ];
+  const mixedCategories = ['U7', 'U9', 'Leisure'];
+  const genderedCategories = ['U11', 'U13', 'U15', 'U18', 'U21', 'Senior'];
   const teams: TeamDef[] = [];
 
-  for (const cat of categories) {
-    // Each category gets 2-4 teams with varied genders
-    const count = cat === 'Senior' || cat === 'Leisure' ? 4 : randomInt(3, 4);
+  for (const cat of mixedCategories) {
+    const count = faker.number.int({ min: 1, max: 2 });
     for (let i = 0; i < count; i++) {
-      const gender: 'male' | 'female' | 'both' =
-        i % 3 === 0 ? 'male' : i % 3 === 1 ? 'female' : 'both';
       const suffix = count > 1 ? ` ${i + 1}` : '';
-      teams.push({
-        label: `${cat} ${gender === 'both' ? 'Mixed' : gender === 'male' ? 'Boys' : 'Girls'}${suffix}`,
-        gender,
-      });
+      teams.push({ label: `${cat} Mixed${suffix}`, gender: 'both' });
     }
   }
 
-  return teams.slice(0, 30);
+  for (const cat of genderedCategories) {
+    for (const gender of ['male', 'female'] as const) {
+      const count = faker.number.int({ min: 1, max: 2 });
+      const genderLabel = gender === 'male' ? 'Boys' : 'Girls';
+      for (let i = 0; i < count; i++) {
+        const suffix = count > 1 ? ` ${i + 1}` : '';
+        teams.push({ label: `${cat} ${genderLabel} ${suffix}`, gender });
+      }
+    }
+  }
+
+  return teams;
 }
 
 function generateBaskinTeams(): TeamDef[] {
   return [
     { label: 'Baskin Senior', gender: 'both' },
-    { label: 'Baskin Youth', gender: 'both' },
-    { label: 'Baskin Discovery', gender: 'both' },
+    { label: 'Baskin Senior 2', gender: 'both' },
   ];
 }
 
@@ -200,12 +118,14 @@ async function seed() {
       // Create 25 members per team
       for (let m = 0; m < 25; m++) {
         const memberGender = randomItem(MEMBER_GENDERS);
-        const firstName =
-          memberGender === 'male'
-            ? randomItem(FIRST_NAMES_M)
-            : randomItem(FIRST_NAMES_F);
-        const lastName = randomItem(LAST_NAMES);
-        const birthYear = randomInt(2005, 2020);
+        const sex = memberGender === 'male' ? 'male' : 'female';
+        const firstName = faker.person.firstName(sex);
+        const lastName = faker.person.lastName();
+        const birthDate = faker.date.birthdate({
+          min: 2005,
+          max: 2020,
+          mode: 'year',
+        });
 
         // 80% get a linked user
         let userId: string | null = null;
@@ -230,7 +150,7 @@ async function seed() {
             status_id: randomItem(statusIds),
             first_name: firstName,
             last_name: lastName,
-            birth_date: `${birthYear}-${String(randomInt(1, 12)).padStart(2, '0')}-${String(randomInt(1, 28)).padStart(2, '0')}`,
+            birth_date: birthDate.toISOString().split('T')[0],
             gender: memberGender,
             year: 2026,
           })
