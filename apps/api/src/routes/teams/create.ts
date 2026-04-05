@@ -2,8 +2,8 @@ import { Router, Request, Response } from 'express';
 import db from '../../db.js';
 import { requireAuth } from '../../middleware/auth.js';
 import { requireRole } from '../../middleware/requireRole.js';
-
-const VALID_GENDERS = ['male', 'female', 'both'] as const;
+import { validate } from '../../middleware/validate.js';
+import { createTeamSchema } from '../../schemas/team.js';
 
 const router = Router();
 
@@ -37,28 +37,9 @@ router.post(
   '/',
   requireAuth,
   requireRole('admin', 'manager'),
+  validate(createTeamSchema),
   async (req: Request, res: Response) => {
     const { club_id, label, year, gender, description } = req.body;
-
-    if (!club_id || typeof club_id !== 'string') {
-      res.status(400).json({ error: 'club_id is required' });
-      return;
-    }
-
-    if (!label || typeof label !== 'string') {
-      res.status(400).json({ error: 'label is required' });
-      return;
-    }
-
-    if (year === undefined || typeof year !== 'number') {
-      res.status(400).json({ error: 'year is required' });
-      return;
-    }
-
-    if (!gender || !VALID_GENDERS.includes(gender)) {
-      res.status(400).json({ error: 'gender must be male, female, or both' });
-      return;
-    }
 
     const [team] = await db('teams')
       .insert({

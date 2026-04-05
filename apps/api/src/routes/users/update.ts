@@ -3,16 +3,10 @@ import db from '../../db.js';
 import { hashPassword } from '../../password.js';
 import { requireAuth } from '../../middleware/auth.js';
 import { requireSelfOrRole } from '../../middleware/requireSelfOrRole.js';
+import { validate } from '../../middleware/validate.js';
+import { updateUserSchema } from '../../schemas/user.js';
 
 const router = Router();
-
-const ALLOWED_FIELDS = [
-  'display_name',
-  'bio',
-  'phone',
-  'email',
-  'password',
-] as const;
 
 /**
  * @openapi
@@ -63,20 +57,11 @@ router.put(
   '/:id',
   requireAuth,
   requireSelfOrRole('admin'),
+  validate(updateUserSchema),
   async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    const updates: Record<string, unknown> = {};
-    for (const field of ALLOWED_FIELDS) {
-      if (req.body[field] !== undefined) {
-        updates[field] = req.body[field];
-      }
-    }
-
-    if (Object.keys(updates).length === 0) {
-      res.status(400).json({ error: 'no valid fields to update' });
-      return;
-    }
+    const updates: Record<string, unknown> = { ...req.body };
 
     if (updates.email) {
       const existing = await db('users')

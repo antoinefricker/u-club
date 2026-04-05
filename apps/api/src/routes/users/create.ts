@@ -3,6 +3,8 @@ import crypto from 'node:crypto';
 import db from '../../db.js';
 import { hashPassword } from '../../password.js';
 import mailer from '../../mailer.js';
+import { validate } from '../../middleware/validate.js';
+import { createUserSchema } from '../../schemas/user.js';
 
 const router = Router();
 
@@ -38,74 +40,63 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/', async (req: Request, res: Response) => {
-  const { display_name, bio, phone, email, password } = req.body;
+router.post(
+  '/',
+  validate(createUserSchema),
+  async (req: Request, res: Response) => {
+    const { display_name, bio, phone, email, password } = req.body;
 
-  if (!display_name || typeof display_name !== 'string') {
-    res.status(400).json({ error: 'display_name is required' });
-    return;
-  }
+    const existing = await db('users').where({ email }).first();
+    if (existing) {
+      res.status(409).json({ error: 'email already in use' });
+      return;
+    }
 
-  if (!email || typeof email !== 'string') {
-    res.status(400).json({ error: 'email is required' });
-    return;
-  }
+    const hashedPassword = await hashPassword(password);
 
-  if (!password || typeof password !== 'string') {
-    res.status(400).json({ error: 'password is required' });
-    return;
-  }
+    const userCount = await db('users').count('id as count').first();
+    const role = Number(userCount?.count) === 0 ? 'admin' : 'user';
 
-  const existing = await db('users').where({ email }).first();
-  if (existing) {
-    res.status(409).json({ error: 'email already in use' });
-    return;
-  }
+    const [user] = await db('users')
+      .insert({
+        display_name,
+        bio: bio || null,
+        phone: phone || null,
+        email,
+        password: hashedPassword,
+        role,
+      })
+      .returning([
+        'id',
+        'display_name',
+        'bio',
+        'phone',
+        'email',
+        'role',
+        'created_at',
+        'updated_at',
+      ]);
 
-  const hashedPassword = await hashPassword(password);
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-  const userCount = await db('users').count('id as count').first();
-  const role = Number(userCount?.count) === 0 ? 'admin' : 'user';
-
-  const [user] = await db('users')
-    .insert({
-      display_name,
-      bio: bio || null,
-      phone: phone || null,
+    await db('login_tokens').insert({
       email,
-      password: hashedPassword,
-      role,
-    })
-    .returning([
-      'id',
-      'display_name',
-      'bio',
-      'phone',
-      'email',
-      'role',
-      'created_at',
-      'updated_at',
-    ]);
+      token,
+      expires_at: expiresAt,
+      type: 'confirmation',
+    });
 
-  const token = crypto.randomBytes(32).toString('hex');
-  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const appUrl = process.env.APP_URL || 'http://localhost:5173';
+    await mailer.sendMail({
+      from: process.env.SMTP_FROM || 'noreply@u-club.app',
+      to: email,
+      subject: 'Confirm your email',
+      text: `Click here to confirm your email: ${appUrl}/confirm-email?token=${token}&email=${encodeURIComponent(email)}\n\nThis link expires in 24 hours.`,
+    });
 
-  await db('login_tokens').insert({
-    email,
-    token,
-    expires_at: expiresAt,
-    type: 'confirmation',
-  });
-
-  const appUrl = process.env.APP_URL || 'http://localhost:5173';
-  await mailer.sendMail({
-    from: process.env.SMTP_FROM || 'noreply@u-club.app',
-    to: email,
-    subject: 'Confirm your email',
-    text: `Click here to confirm your email: ${appUrl}/confirm-email?token=${token}&email=${encodeURIComponent(email)}\n\nThis link expires in 24 hours.`,
-  });
-
-  res.status(201).json(user);
-});
+    res.status(201).json(user);
+  },
+);
 
 export default router;

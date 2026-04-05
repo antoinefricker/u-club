@@ -41,7 +41,7 @@ describe('POST /auth/confirm_email', () => {
       .send({ email: 'test@example.com' });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'token is required');
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 400 if email is missing', async () => {
@@ -50,7 +50,7 @@ describe('POST /auth/confirm_email', () => {
       .send({ token: 'valid-token' });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'email is required');
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 401 if token is invalid or expired', async () => {

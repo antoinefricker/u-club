@@ -73,7 +73,7 @@ describe('POST /member-statuses', () => {
       .send({});
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'label is required');
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 409 if label already exists', async () => {
@@ -110,7 +110,7 @@ describe('PUT /member-statuses/:id', () => {
       .send({});
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'no valid fields to update');
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 409 if label already in use', async () => {

@@ -111,7 +111,7 @@ describe('POST /users', () => {
     const res = await request(app).post('/users').send({});
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'display_name is required');
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 400 if email is missing', async () => {
@@ -120,7 +120,7 @@ describe('POST /users', () => {
       .send({ displayName: 'johnd' });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'email is required');
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 400 if password is missing', async () => {
@@ -130,7 +130,7 @@ describe('POST /users', () => {
     });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'password is required');
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 409 if email already exists', async () => {
@@ -190,7 +190,7 @@ describe('PUT /users/:id', () => {
       .send({});
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'no valid fields to update');
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 409 if updated email already in use', async () => {

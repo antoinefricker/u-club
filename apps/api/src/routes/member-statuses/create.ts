@@ -2,6 +2,8 @@ import { Router, Request, Response } from 'express';
 import db from '../../db.js';
 import { requireAuth } from '../../middleware/auth.js';
 import { requireRole } from '../../middleware/requireRole.js';
+import { validate } from '../../middleware/validate.js';
+import { createMemberStatusSchema } from '../../schemas/memberStatus.js';
 
 const router = Router();
 
@@ -45,13 +47,9 @@ router.post(
   '/',
   requireAuth,
   requireRole('admin'),
+  validate(createMemberStatusSchema),
   async (req: Request, res: Response) => {
     const { label } = req.body;
-
-    if (!label || typeof label !== 'string') {
-      res.status(400).json({ error: 'label is required' });
-      return;
-    }
 
     const existing = await db('member_statuses').where({ label }).first();
     if (existing) {

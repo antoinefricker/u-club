@@ -1,6 +1,8 @@
 import { Router, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import db from '../../db.js';
+import { validate } from '../../middleware/validate.js';
+import { confirmEmailSchema } from '../../schemas/auth.js';
 
 const router = Router();
 
@@ -47,56 +49,50 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/confirm_email', async (req: Request, res: Response) => {
-  const { token, email } = req.body;
+router.post(
+  '/confirm_email',
+  validate(confirmEmailSchema),
+  async (req: Request, res: Response) => {
+    const { token, email } = req.body;
 
-  if (!token || typeof token !== 'string') {
-    res.status(400).json({ error: 'token is required' });
-    return;
-  }
+    const loginToken = await db('login_tokens')
+      .where({ token, email, type: 'confirmation' })
+      .where('expires_at', '>', new Date())
+      .first();
 
-  if (!email || typeof email !== 'string') {
-    res.status(400).json({ error: 'email is required' });
-    return;
-  }
+    if (!loginToken) {
+      res.status(401).json({ error: 'invalid or expired token' });
+      return;
+    }
 
-  const loginToken = await db('login_tokens')
-    .where({ token, email, type: 'confirmation' })
-    .where('expires_at', '>', new Date())
-    .first();
+    await db('login_tokens').where({ id: loginToken.id }).del();
 
-  if (!loginToken) {
-    res.status(401).json({ error: 'invalid or expired token' });
-    return;
-  }
+    const user = await db('users').where({ email: loginToken.email }).first();
+    if (!user) {
+      res.status(401).json({ error: 'user not found' });
+      return;
+    }
 
-  await db('login_tokens').where({ id: loginToken.id }).del();
+    await db('users')
+      .where({ id: user.id })
+      .update({ email_verified_at: new Date() });
 
-  const user = await db('users').where({ email: loginToken.email }).first();
-  if (!user) {
-    res.status(401).json({ error: 'user not found' });
-    return;
-  }
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      res.status(500).json({ error: 'server configuration error' });
+      return;
+    }
 
-  await db('users')
-    .where({ id: user.id })
-    .update({ email_verified_at: new Date() });
+    const accessToken = jwt.sign(
+      { sub: user.id, email: user.email, role: user.role },
+      jwtSecret,
+      {
+        expiresIn: '7d',
+      },
+    );
 
-  const jwtSecret = process.env.JWT_SECRET;
-  if (!jwtSecret) {
-    res.status(500).json({ error: 'server configuration error' });
-    return;
-  }
-
-  const accessToken = jwt.sign(
-    { sub: user.id, email: user.email, role: user.role },
-    jwtSecret,
-    {
-      expiresIn: '7d',
-    },
-  );
-
-  res.json({ access_token: accessToken });
-});
+    res.json({ access_token: accessToken });
+  },
+);
 
 export default router;

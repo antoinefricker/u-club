@@ -2,16 +2,8 @@ import { Router, Request, Response } from 'express';
 import db from '../../db.js';
 import { requireAuth } from '../../middleware/auth.js';
 import { requireRole } from '../../middleware/requireRole.js';
-
-const ALLOWED_FIELDS = [
-  'label',
-  'year',
-  'gender',
-  'description',
-  'archived',
-] as const;
-
-const VALID_GENDERS = ['male', 'female', 'both'] as const;
+import { validate } from '../../middleware/validate.js';
+import { updateTeamSchema } from '../../schemas/team.js';
 
 const router = Router();
 
@@ -58,29 +50,11 @@ router.put(
   '/:id',
   requireAuth,
   requireRole('admin', 'manager'),
+  validate(updateTeamSchema),
   async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    const updates: Record<string, unknown> = {};
-    for (const field of ALLOWED_FIELDS) {
-      if (req.body[field] !== undefined) {
-        updates[field] = req.body[field];
-      }
-    }
-
-    if (Object.keys(updates).length === 0) {
-      res.status(400).json({ error: 'no valid fields to update' });
-      return;
-    }
-
-    if (
-      updates.gender &&
-      !VALID_GENDERS.includes(updates.gender as (typeof VALID_GENDERS)[number])
-    ) {
-      res.status(400).json({ error: 'gender must be male, female, or both' });
-      return;
-    }
-
+    const updates = { ...req.body };
     updates.updated_at = new Date().toISOString();
 
     const [team] = await db('teams')

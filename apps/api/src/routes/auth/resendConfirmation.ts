@@ -2,6 +2,8 @@ import { Router, Request, Response } from 'express';
 import crypto from 'node:crypto';
 import db from '../../db.js';
 import mailer from '../../mailer.js';
+import { validate } from '../../middleware/validate.js';
+import { resendConfirmationSchema } from '../../schemas/auth.js';
 
 const router = Router();
 
@@ -40,41 +42,40 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/resend_confirmation', async (req: Request, res: Response) => {
-  const { email } = req.body;
+router.post(
+  '/resend_confirmation',
+  validate(resendConfirmationSchema),
+  async (req: Request, res: Response) => {
+    const { email } = req.body;
 
-  if (!email || typeof email !== 'string') {
-    res.status(400).json({ error: 'email is required' });
-    return;
-  }
+    const user = await db('users').where({ email }).first();
+    if (!user || user.email_verified_at) {
+      res.json({ message: 'confirmation email sent' });
+      return;
+    }
 
-  const user = await db('users').where({ email }).first();
-  if (!user || user.email_verified_at) {
+    await db('login_tokens').where({ email, type: 'confirmation' }).del();
+
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    await db('login_tokens').insert({
+      email,
+      token,
+      expires_at: expiresAt,
+      type: 'confirmation',
+    });
+
+    const appUrl = process.env.APP_URL || 'http://localhost:5173';
+    await mailer.sendMail({
+      from: process.env.SMTP_FROM || 'noreply@u-club.app',
+      to: email,
+      subject: 'Confirm your email',
+      text: `Click here to confirm your email: ${appUrl}/confirm-email?token=${token}&email=${encodeURIComponent(email)}\n\nThis link expires in 24 hours.`,
+    });
+
     res.json({ message: 'confirmation email sent' });
-    return;
-  }
-
-  await db('login_tokens').where({ email, type: 'confirmation' }).del();
-
-  const token = crypto.randomBytes(32).toString('hex');
-  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-  await db('login_tokens').insert({
-    email,
-    token,
-    expires_at: expiresAt,
-    type: 'confirmation',
-  });
-
-  const appUrl = process.env.APP_URL || 'http://localhost:5173';
-  await mailer.sendMail({
-    from: process.env.SMTP_FROM || 'noreply@u-club.app',
-    to: email,
-    subject: 'Confirm your email',
-    text: `Click here to confirm your email: ${appUrl}/confirm-email?token=${token}&email=${encodeURIComponent(email)}\n\nThis link expires in 24 hours.`,
-  });
-
-  res.json({ message: 'confirmation email sent' });
-});
+  },
+);
 
 export default router;

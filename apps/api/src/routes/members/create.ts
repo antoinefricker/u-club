@@ -2,6 +2,8 @@ import { Router, Request, Response } from 'express';
 import db from '../../db.js';
 import { requireAuth } from '../../middleware/auth.js';
 import { requireRole } from '../../middleware/requireRole.js';
+import { validate } from '../../middleware/validate.js';
+import { createMemberSchema } from '../../schemas/member.js';
 
 const router = Router();
 
@@ -35,6 +37,7 @@ router.post(
   '/',
   requireAuth,
   requireRole('admin', 'manager'),
+  validate(createMemberSchema),
   async (req: Request, res: Response) => {
     const {
       first_name,
@@ -46,28 +49,6 @@ router.post(
       birth_date,
       license,
     } = req.body;
-
-    if (!first_name || typeof first_name !== 'string') {
-      res.status(400).json({ error: 'first_name is required' });
-      return;
-    }
-
-    if (!last_name || typeof last_name !== 'string') {
-      res.status(400).json({ error: 'last_name is required' });
-      return;
-    }
-
-    if (!gender || (gender !== 'male' && gender !== 'female')) {
-      res
-        .status(400)
-        .json({ error: "gender is required and must be 'male' or 'female'" });
-      return;
-    }
-
-    if (year === undefined || typeof year !== 'number') {
-      res.status(400).json({ error: 'year is required and must be a number' });
-      return;
-    }
 
     const [member] = await db('members')
       .insert({

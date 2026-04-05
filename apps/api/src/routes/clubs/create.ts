@@ -2,6 +2,8 @@ import { Router, Request, Response } from 'express';
 import db from '../../db.js';
 import { requireAuth } from '../../middleware/auth.js';
 import { requireRole } from '../../middleware/requireRole.js';
+import { validate } from '../../middleware/validate.js';
+import { createClubSchema } from '../../schemas/club.js';
 
 const router = Router();
 
@@ -41,18 +43,9 @@ router.post(
   '/',
   requireAuth,
   requireRole('admin'),
+  validate(createClubSchema),
   async (req: Request, res: Response) => {
     const { name, code, description, media_logo_lg, media_logo_sm } = req.body;
-
-    if (!name || typeof name !== 'string') {
-      res.status(400).json({ error: 'name is required' });
-      return;
-    }
-
-    if (!code || typeof code !== 'string') {
-      res.status(400).json({ error: 'code is required' });
-      return;
-    }
 
     const existing = await db('clubs').where({ code }).first();
     if (existing) {

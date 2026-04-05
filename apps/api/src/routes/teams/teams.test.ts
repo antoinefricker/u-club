@@ -104,7 +104,7 @@ describe('POST /teams', () => {
       .send({ label: 'U15', year: 2026, gender: 'male' });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'club_id is required');
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 400 if label is missing', async () => {
@@ -114,7 +114,7 @@ describe('POST /teams', () => {
       .send({ clubId: 'club-1', year: 2026, gender: 'male' });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'label is required');
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 400 if year is missing', async () => {
@@ -124,7 +124,7 @@ describe('POST /teams', () => {
       .send({ clubId: 'club-1', label: 'U15', gender: 'male' });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'year is required');
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 400 if gender is invalid', async () => {
@@ -134,10 +134,7 @@ describe('POST /teams', () => {
       .send({ clubId: 'club-1', label: 'U15', year: 2026, gender: 'other' });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty(
-      'error',
-      'gender must be male, female, or both',
-    );
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should create a team and return 201', async () => {
@@ -166,7 +163,7 @@ describe('PUT /teams/:id', () => {
       .send({});
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'no valid fields to update');
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 404 if team not found', async () => {
@@ -188,10 +185,7 @@ describe('PUT /teams/:id', () => {
       .send({ gender: 'other' });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty(
-      'error',
-      'gender must be male, female, or both',
-    );
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should update and return the team', async () => {
