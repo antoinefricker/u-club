@@ -3,17 +3,17 @@ import crypto from 'node:crypto';
 import db from '../../db.js';
 import mailer from '../../mailer.js';
 import { validate } from '../../middleware/validate.js';
-import { emailLoginSchema } from '../../schemas/auth.js';
+import { forgotPasswordSchema } from '../../schemas/auth.js';
 
 const router = Router();
 
 /**
  * @openapi
- * /auth/email_login:
+ * /auth/forgot_password:
  *   post:
  *     tags: [Auth]
- *     summary: Request a magic login link
- *     description: Sends a one-time login token to the given email address. Always returns success to prevent email enumeration.
+ *     summary: Request a password reset email
+ *     description: Sends a password reset email. Always returns success to prevent email enumeration.
  *     requestBody:
  *       required: true
  *       content:
@@ -27,7 +27,7 @@ const router = Router();
  *                 format: email
  *     responses:
  *       200:
- *         description: Login email sent (or silently ignored if user does not exist)
+ *         description: Password reset email sent (or silently ignored)
  *         content:
  *           application/json:
  *             schema:
@@ -35,7 +35,6 @@ const router = Router();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: login email sent
  *       400:
  *         description: Missing email
  *         content:
@@ -44,35 +43,38 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.post(
-  '/email_login',
-  validate(emailLoginSchema),
+  '/forgot_password',
+  validate(forgotPasswordSchema),
   async (req: Request, res: Response) => {
     const { email } = req.body;
 
     const user = await db('users').where({ email }).first();
     if (!user) {
-      // Return success even if user doesn't exist to prevent email enumeration
-      res.json({ message: 'login email sent' });
+      res.json({ message: 'password reset email sent' });
       return;
     }
 
-    const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+    await db('auth_tokens').where({ email, type: 'password_reset' }).del();
 
-    await db('login_tokens').insert({
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+    await db('auth_tokens').insert({
       email,
       token,
       expires_at: expiresAt,
+      type: 'password_reset',
     });
 
+    const appUrl = process.env.APP_URL || 'http://localhost:5173';
     await mailer.sendMail({
       from: process.env.SMTP_FROM || 'noreply@u-club.app',
       to: email,
-      subject: 'Your login code',
-      text: `Your login link is: ${token}\n\nThis token expires in 15 minutes.`,
+      subject: 'Reset your password',
+      text: `Click here to reset your password: ${appUrl}/reset-password?token=${token}&email=${encodeURIComponent(email)}\n\nThis link expires in 1 hour.`,
     });
 
-    res.json({ message: 'login email sent' });
+    res.json({ message: 'password reset email sent' });
   },
 );
 

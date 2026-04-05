@@ -80,7 +80,7 @@ router.post(
     const token = crypto.randomBytes(32).toString('hex');
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    await db('login_tokens').insert({
+    await db('auth_tokens').insert({
       email,
       token,
       expires_at: expiresAt,
@@ -91,8 +91,8 @@ router.post(
     await mailer.sendMail({
       from: process.env.SMTP_FROM || 'noreply@u-club.app',
       to: email,
-      subject: 'Confirm your email',
-      text: `Click here to confirm your email: ${appUrl}/confirm-email?token=${token}&email=${encodeURIComponent(email)}\n\nThis link expires in 24 hours.`,
+      subject: 'Verify your email',
+      text: `Click here to verify your email: ${appUrl}/verify-email?token=${token}&email=${encodeURIComponent(email)}\n\nThis link expires in 24 hours.`,
     });
 
     res.status(201).json(user);

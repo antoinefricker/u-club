@@ -3,7 +3,6 @@ import request from 'supertest';
 
 const mockFirst = vi.fn();
 const mockDel = vi.fn().mockResolvedValue(1);
-
 const mockUpdate = vi.fn().mockResolvedValue(1);
 
 vi.mock('../../db.js', () => {
@@ -30,70 +29,96 @@ vi.mock('../../password.js', () => ({
 
 const { default: app } = await import('../../app.js');
 
-describe('POST /auth/email_token', () => {
+describe('POST /auth/reset_password', () => {
   beforeEach(() => {
     process.env.JWT_SECRET = 'test-secret';
     vi.clearAllMocks();
   });
 
   it('should return 400 if token is missing', async () => {
-    const res = await request(app).post('/auth/email_token').send({});
+    const res = await request(app)
+      .post('/auth/reset_password')
+      .send({ email: 'test@example.com', password: 'newpassword123' });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'token is required');
+    expect(res.body).toHaveProperty('error', 'validation error');
+  });
+
+  it('should return 400 if email is missing', async () => {
+    const res = await request(app)
+      .post('/auth/reset_password')
+      .send({ token: 'valid-token', password: 'newpassword123' });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'validation error');
+  });
+
+  it('should return 400 if password is missing', async () => {
+    const res = await request(app)
+      .post('/auth/reset_password')
+      .send({ token: 'valid-token', email: 'test@example.com' });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 
   it('should return 401 if token is invalid or expired', async () => {
     mockFirst.mockResolvedValueOnce(undefined);
 
-    const res = await request(app)
-      .post('/auth/email_token')
-      .send({ token: 'invalid-token' });
+    const res = await request(app).post('/auth/reset_password').send({
+      token: 'invalid-token',
+      email: 'test@example.com',
+      password: 'newpassword123',
+    });
 
     expect(res.status).toBe(401);
     expect(res.body).toHaveProperty('error', 'invalid or expired token');
   });
 
-  it('should return 401 if user no longer exists', async () => {
-    // First call: login_tokens lookup returns a valid token
+  it('should return 401 if user not found', async () => {
     mockFirst.mockResolvedValueOnce({
       id: '123',
       email: 'deleted@example.com',
       token: 'valid-token',
+      type: 'password_reset',
       expires_at: new Date(Date.now() + 60000),
     });
-    // Second call: users lookup returns nothing
     mockFirst.mockResolvedValueOnce(undefined);
 
-    const res = await request(app)
-      .post('/auth/email_token')
-      .send({ token: 'valid-token' });
+    const res = await request(app).post('/auth/reset_password').send({
+      token: 'valid-token',
+      email: 'deleted@example.com',
+      password: 'newpassword123',
+    });
 
     expect(res.status).toBe(401);
     expect(res.body).toHaveProperty('error', 'user not found');
   });
 
-  it('should return a JWT with sub and email for a valid token', async () => {
-    // First call: login_tokens lookup
+  it('should reset password and return a JWT for a valid token', async () => {
     mockFirst.mockResolvedValueOnce({
       id: '123',
       email: 'test@example.com',
       token: 'valid-token',
+      type: 'password_reset',
       expires_at: new Date(Date.now() + 60000),
     });
-    // Second call: users lookup
     mockFirst.mockResolvedValueOnce({
       id: 'user-uuid-1',
       email: 'test@example.com',
-      email_verified_at: null,
+      role: 'member',
     });
 
-    const res = await request(app)
-      .post('/auth/email_token')
-      .send({ token: 'valid-token' });
+    const res = await request(app).post('/auth/reset_password').send({
+      token: 'valid-token',
+      email: 'test@example.com',
+      password: 'newpassword123',
+    });
 
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('accessToken');
     expect(typeof res.body.accessToken).toBe('string');
+    expect(mockDel).toHaveBeenCalled();
+    expect(mockUpdate).toHaveBeenCalled();
   });
 });

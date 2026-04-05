@@ -2,33 +2,36 @@ import { Router, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import db from '../../db.js';
 import { validate } from '../../middleware/validate.js';
-import { confirmEmailSchema } from '../../schemas/auth.js';
+import { resetPasswordSchema } from '../../schemas/auth.js';
+import { hashPassword } from '../../password.js';
 
 const router = Router();
 
 /**
  * @openapi
- * /auth/confirm_email:
+ * /auth/reset_password:
  *   post:
  *     tags: [Auth]
- *     summary: Confirm email address
- *     description: Validates the confirmation token, marks the email as verified, and returns a JWT access token.
+ *     summary: Reset password using token
+ *     description: Validates the password reset token, updates the user's password, and returns a JWT access token.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required: [token, email]
+ *             required: [token, email, password]
  *             properties:
  *               token:
  *                 type: string
  *               email:
  *                 type: string
  *                 format: email
+ *               password:
+ *                 type: string
  *     responses:
  *       200:
- *         description: Email confirmed and JWT returned
+ *         description: Password reset and JWT returned
  *         content:
  *           application/json:
  *             schema:
@@ -37,7 +40,7 @@ const router = Router();
  *                 access_token:
  *                   type: string
  *       400:
- *         description: Missing token
+ *         description: Missing required fields
  *         content:
  *           application/json:
  *             schema:
@@ -50,32 +53,34 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.post(
-  '/confirm_email',
-  validate(confirmEmailSchema),
+  '/reset_password',
+  validate(resetPasswordSchema),
   async (req: Request, res: Response) => {
-    const { token, email } = req.body;
+    const { token, email, password } = req.body;
 
-    const loginToken = await db('login_tokens')
-      .where({ token, email, type: 'confirmation' })
+    const resetToken = await db('auth_tokens')
+      .where({ token, email, type: 'password_reset' })
       .where('expires_at', '>', new Date())
       .first();
 
-    if (!loginToken) {
+    if (!resetToken) {
       res.status(401).json({ error: 'invalid or expired token' });
       return;
     }
 
-    await db('login_tokens').where({ id: loginToken.id }).del();
+    await db('auth_tokens').where({ id: resetToken.id }).del();
 
-    const user = await db('users').where({ email: loginToken.email }).first();
+    const user = await db('users').where({ email: resetToken.email }).first();
     if (!user) {
       res.status(401).json({ error: 'user not found' });
       return;
     }
 
+    const hashedPassword = await hashPassword(password);
+
     await db('users')
       .where({ id: user.id })
-      .update({ email_verified_at: new Date() });
+      .update({ password: hashedPassword, updated_at: new Date() });
 
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {

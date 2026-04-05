@@ -3,17 +3,17 @@ import crypto from 'node:crypto';
 import db from '../../db.js';
 import mailer from '../../mailer.js';
 import { validate } from '../../middleware/validate.js';
-import { resendConfirmationSchema } from '../../schemas/auth.js';
+import { magicLinkSchema } from '../../schemas/auth.js';
 
 const router = Router();
 
 /**
  * @openapi
- * /auth/resend_confirmation:
+ * /auth/magic_link:
  *   post:
  *     tags: [Auth]
- *     summary: Resend confirmation email
- *     description: Sends a new confirmation email. Always returns success to prevent email enumeration.
+ *     summary: Request a magic login link
+ *     description: Sends a one-time login token to the given email address. Always returns success to prevent email enumeration.
  *     requestBody:
  *       required: true
  *       content:
@@ -27,7 +27,7 @@ const router = Router();
  *                 format: email
  *     responses:
  *       200:
- *         description: Confirmation email sent (or silently ignored)
+ *         description: Login email sent (or silently ignored if user does not exist)
  *         content:
  *           application/json:
  *             schema:
@@ -35,6 +35,7 @@ const router = Router();
  *               properties:
  *                 message:
  *                   type: string
+ *                   example: login email sent
  *       400:
  *         description: Missing email
  *         content:
@@ -43,38 +44,35 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.post(
-  '/resend_confirmation',
-  validate(resendConfirmationSchema),
+  '/magic_link',
+  validate(magicLinkSchema),
   async (req: Request, res: Response) => {
     const { email } = req.body;
 
     const user = await db('users').where({ email }).first();
-    if (!user || user.email_verified_at) {
-      res.json({ message: 'confirmation email sent' });
+    if (!user) {
+      // Return success even if user doesn't exist to prevent email enumeration
+      res.json({ message: 'login email sent' });
       return;
     }
 
-    await db('login_tokens').where({ email, type: 'confirmation' }).del();
-
     const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
-    await db('login_tokens').insert({
+    await db('auth_tokens').insert({
       email,
       token,
       expires_at: expiresAt,
-      type: 'confirmation',
     });
 
-    const appUrl = process.env.APP_URL || 'http://localhost:5173';
     await mailer.sendMail({
       from: process.env.SMTP_FROM || 'noreply@u-club.app',
       to: email,
-      subject: 'Confirm your email',
-      text: `Click here to confirm your email: ${appUrl}/confirm-email?token=${token}&email=${encodeURIComponent(email)}\n\nThis link expires in 24 hours.`,
+      subject: 'Your login code',
+      text: `Your login link is: ${token}\n\nThis token expires in 15 minutes.`,
     });
 
-    res.json({ message: 'confirmation email sent' });
+    res.json({ message: 'login email sent' });
   },
 );
 

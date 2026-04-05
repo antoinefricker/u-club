@@ -9,7 +9,7 @@ const tables = [
   'member_statuses',
   'teams',
   'clubs',
-  'login_tokens',
+  'auth_tokens',
   'revoked_tokens',
   'users',
 ];

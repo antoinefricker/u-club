@@ -30,13 +30,13 @@ vi.mock('../../password.js', () => ({
 const { default: app } = await import('../../app.js');
 const { default: mailer } = await import('../../mailer.js');
 
-describe('POST /auth/email_login', () => {
+describe('POST /auth/magic_link', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('should return 400 if email is missing', async () => {
-    const res = await request(app).post('/auth/email_login').send({});
+    const res = await request(app).post('/auth/magic_link').send({});
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'validation error');
@@ -46,7 +46,7 @@ describe('POST /auth/email_login', () => {
     mockFirst.mockResolvedValueOnce(undefined);
 
     const res = await request(app)
-      .post('/auth/email_login')
+      .post('/auth/magic_link')
       .send({ email: 'unknown@example.com' });
 
     expect(res.status).toBe(200);
@@ -61,7 +61,7 @@ describe('POST /auth/email_login', () => {
     });
 
     const res = await request(app)
-      .post('/auth/email_login')
+      .post('/auth/magic_link')
       .send({ email: 'test@example.com' });
 
     expect(res.status).toBe(200);

@@ -15,9 +15,10 @@ import { useAuth } from '../auth/useAuth';
 
 interface LoginFormProps {
   onSwitchMode: () => void;
+  onForgotPassword: () => void;
 }
 
-export function LoginForm({ onSwitchMode }: LoginFormProps) {
+export function LoginForm({ onSwitchMode, onForgotPassword }: LoginFormProps) {
   const { login } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -58,7 +59,7 @@ export function LoginForm({ onSwitchMode }: LoginFormProps) {
     if (!unverifiedEmail) return;
     setResending(true);
     try {
-      await fetch('/api/auth/resend_confirmation', {
+      await fetch('/api/auth/verify_email_resend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: unverifiedEmail }),
@@ -114,6 +115,16 @@ export function LoginForm({ onSwitchMode }: LoginFormProps) {
               required
               {...form.getInputProps('password')}
             />
+
+            <Text size="sm" ta="right">
+              <Anchor
+                component="button"
+                type="button"
+                onClick={onForgotPassword}
+              >
+                Forgot password?
+              </Anchor>
+            </Text>
 
             <Button type="submit" fullWidth loading={loading}>
               Connect

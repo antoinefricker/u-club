@@ -3,6 +3,7 @@ import request from 'supertest';
 
 const mockFirst = vi.fn();
 const mockDel = vi.fn().mockResolvedValue(1);
+
 const mockUpdate = vi.fn().mockResolvedValue(1);
 
 vi.mock('../../db.js', () => {
@@ -29,67 +30,58 @@ vi.mock('../../password.js', () => ({
 
 const { default: app } = await import('../../app.js');
 
-describe('POST /auth/confirm_email', () => {
+describe('POST /auth/magic_link_verify', () => {
   beforeEach(() => {
     process.env.JWT_SECRET = 'test-secret';
     vi.clearAllMocks();
   });
 
   it('should return 400 if token is missing', async () => {
-    const res = await request(app)
-      .post('/auth/confirm_email')
-      .send({ email: 'test@example.com' });
+    const res = await request(app).post('/auth/magic_link_verify').send({});
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'validation error');
-  });
-
-  it('should return 400 if email is missing', async () => {
-    const res = await request(app)
-      .post('/auth/confirm_email')
-      .send({ token: 'valid-token' });
-
-    expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'validation error');
+    expect(res.body).toHaveProperty('error', 'token is required');
   });
 
   it('should return 401 if token is invalid or expired', async () => {
     mockFirst.mockResolvedValueOnce(undefined);
 
     const res = await request(app)
-      .post('/auth/confirm_email')
-      .send({ token: 'invalid-token', email: 'test@example.com' });
+      .post('/auth/magic_link_verify')
+      .send({ token: 'invalid-token' });
 
     expect(res.status).toBe(401);
     expect(res.body).toHaveProperty('error', 'invalid or expired token');
   });
 
-  it('should return 401 if user not found', async () => {
+  it('should return 401 if user no longer exists', async () => {
+    // First call: login_tokens lookup returns a valid token
     mockFirst.mockResolvedValueOnce({
       id: '123',
       email: 'deleted@example.com',
       token: 'valid-token',
-      type: 'confirmation',
       expires_at: new Date(Date.now() + 60000),
     });
+    // Second call: users lookup returns nothing
     mockFirst.mockResolvedValueOnce(undefined);
 
     const res = await request(app)
-      .post('/auth/confirm_email')
-      .send({ token: 'valid-token', email: 'deleted@example.com' });
+      .post('/auth/magic_link_verify')
+      .send({ token: 'valid-token' });
 
     expect(res.status).toBe(401);
     expect(res.body).toHaveProperty('error', 'user not found');
   });
 
-  it('should confirm email and return a JWT for a valid token', async () => {
+  it('should return a JWT with sub and email for a valid token', async () => {
+    // First call: login_tokens lookup
     mockFirst.mockResolvedValueOnce({
       id: '123',
       email: 'test@example.com',
       token: 'valid-token',
-      type: 'confirmation',
       expires_at: new Date(Date.now() + 60000),
     });
+    // Second call: users lookup
     mockFirst.mockResolvedValueOnce({
       id: 'user-uuid-1',
       email: 'test@example.com',
@@ -97,13 +89,11 @@ describe('POST /auth/confirm_email', () => {
     });
 
     const res = await request(app)
-      .post('/auth/confirm_email')
-      .send({ token: 'valid-token', email: 'test@example.com' });
+      .post('/auth/magic_link_verify')
+      .send({ token: 'valid-token' });
 
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('accessToken');
     expect(typeof res.body.accessToken).toBe('string');
-    expect(mockUpdate).toHaveBeenCalled();
-    expect(mockDel).toHaveBeenCalled();
   });
 });
