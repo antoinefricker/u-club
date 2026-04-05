@@ -44,6 +44,33 @@ erDiagram
         timestamp updated_at
     }
 
+    MEMBER_STATUS {
+        uuid id PK
+        string label UK
+    }
+
+    MEMBER {
+        uuid id PK
+        uuid user_id FK
+        uuid status_id FK
+        string first_name
+        string last_name
+        date birth_date
+        string license
+        enum gender
+        integer year
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    TEAM_ASSIGNMENT {
+        uuid id PK
+        uuid team_id FK
+        uuid member_id FK
+        enum role
+        timestamp created_at
+    }
+
     REVOKED_TOKEN {
         uuid id PK
         text token UK
@@ -56,3 +83,7 @@ erDiagram
     USER          ||--o{ LOGIN_TOKEN        : "requests"
     USER          ||--o{ REVOKED_TOKEN      : "revokes"
     CLUB          ||--o{ TEAM               : "has"
+    USER          ||--o{ MEMBER             : "is"
+    MEMBER_STATUS ||--o{ MEMBER             : "describes"
+    MEMBER        ||--o{ TEAM_ASSIGNMENT    : "assigned"
+    TEAM          ||--o{ TEAM_ASSIGNMENT    : "includes"

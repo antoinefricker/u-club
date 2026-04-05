@@ -126,6 +126,69 @@ const options: swaggerJsdoc.Options = {
             archived: { type: 'boolean' },
           },
         },
+        MemberStatus: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            label: { type: 'string' },
+          },
+        },
+        Member: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            userId: { type: 'string', format: 'uuid', nullable: true },
+            statusId: { type: 'string', format: 'uuid', nullable: true },
+            firstName: { type: 'string' },
+            lastName: { type: 'string' },
+            birthDate: { type: 'string', format: 'date', nullable: true },
+            license: { type: 'string', nullable: true },
+            gender: { type: 'string', enum: ['male', 'female'] },
+            year: { type: 'integer' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        CreateMemberRequest: {
+          type: 'object',
+          required: ['firstName', 'lastName', 'gender', 'year'],
+          properties: {
+            userId: { type: 'string', format: 'uuid', nullable: true },
+            statusId: { type: 'string', format: 'uuid', nullable: true },
+            firstName: { type: 'string' },
+            lastName: { type: 'string' },
+            birthDate: { type: 'string', format: 'date', nullable: true },
+            license: { type: 'string', nullable: true },
+            gender: { type: 'string', enum: ['male', 'female'] },
+            year: { type: 'integer' },
+          },
+        },
+        UpdateMemberRequest: {
+          type: 'object',
+          properties: {
+            userId: { type: 'string', format: 'uuid', nullable: true },
+            statusId: { type: 'string', format: 'uuid', nullable: true },
+            firstName: { type: 'string' },
+            lastName: { type: 'string' },
+            birthDate: { type: 'string', format: 'date', nullable: true },
+            license: { type: 'string', nullable: true },
+            gender: { type: 'string', enum: ['male', 'female'] },
+            year: { type: 'integer' },
+          },
+        },
+        TeamAssignment: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            teamId: { type: 'string', format: 'uuid' },
+            memberId: { type: 'string', format: 'uuid' },
+            role: {
+              type: 'string',
+              enum: ['player', 'coach', 'assistant', 'sparring'],
+            },
+            createdAt: { type: 'string', format: 'date-time' },
+          },
+        },
         Error: {
           type: 'object',
           properties: {

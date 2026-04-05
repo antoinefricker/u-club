@@ -68,9 +68,13 @@ migrate-make:
 
 ## dev-stop: Stop dev services
 dev-stop:
+	-lsof -ti:4000 | xargs kill 2>/dev/null
+	-lsof -ti:5173 | xargs kill 2>/dev/null
 	docker compose stop postgres mailpit
 
 ## dev-start: Start postgres, mailpit, api and pwa in dev mode
 dev-start:
+	@lsof -ti:4000 > /dev/null 2>&1 && echo "Error: port 4000 already in use (API). Run 'make dev-stop' first." && exit 1 || true
+	@lsof -ti:5173 > /dev/null 2>&1 && echo "Error: port 5173 already in use (PWA). Run 'make dev-stop' first." && exit 1 || true
 	docker compose up -d postgres mailpit
 	pnpm dev:api & pnpm dev:pwa
