@@ -5,7 +5,7 @@ export const loginSchema = z.object({
   password: z.string({ error: 'password is required' }),
 });
 
-export const emailLoginSchema = z.object({
+export const magicLinkSchema = z.object({
   email: z.string({ error: 'email is required' }),
 });
 

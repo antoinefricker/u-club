@@ -3,13 +3,13 @@ import crypto from 'node:crypto';
 import db from '../../db.js';
 import mailer from '../../mailer.js';
 import { validate } from '../../middleware/validate.js';
-import { emailLoginSchema } from '../../schemas/auth.js';
+import { magicLinkSchema } from '../../schemas/auth.js';
 
 const router = Router();
 
 /**
  * @openapi
- * /auth/email_login:
+ * /auth/magic_link:
  *   post:
  *     tags: [Auth]
  *     summary: Request a magic login link
@@ -44,8 +44,8 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.post(
-  '/email_login',
-  validate(emailLoginSchema),
+  '/magic_link',
+  validate(magicLinkSchema),
   async (req: Request, res: Response) => {
     const { email } = req.body;
 

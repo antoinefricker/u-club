@@ -6,7 +6,7 @@ const router = Router();
 
 /**
  * @openapi
- * /auth/email_token:
+ * /auth/magic_link_verify:
  *   post:
  *     tags: [Auth]
  *     summary: Exchange a magic link token for a JWT
@@ -44,7 +44,7 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/email_token', async (req: Request, res: Response) => {
+router.post('/magic_link_verify', async (req: Request, res: Response) => {
   const { token } = req.body;
 
   if (!token || typeof token !== 'string') {

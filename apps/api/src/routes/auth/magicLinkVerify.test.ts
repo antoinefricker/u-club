@@ -30,14 +30,14 @@ vi.mock('../../password.js', () => ({
 
 const { default: app } = await import('../../app.js');
 
-describe('POST /auth/email_token', () => {
+describe('POST /auth/magic_link_verify', () => {
   beforeEach(() => {
     process.env.JWT_SECRET = 'test-secret';
     vi.clearAllMocks();
   });
 
   it('should return 400 if token is missing', async () => {
-    const res = await request(app).post('/auth/email_token').send({});
+    const res = await request(app).post('/auth/magic_link_verify').send({});
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'token is required');
@@ -47,7 +47,7 @@ describe('POST /auth/email_token', () => {
     mockFirst.mockResolvedValueOnce(undefined);
 
     const res = await request(app)
-      .post('/auth/email_token')
+      .post('/auth/magic_link_verify')
       .send({ token: 'invalid-token' });
 
     expect(res.status).toBe(401);
@@ -66,7 +66,7 @@ describe('POST /auth/email_token', () => {
     mockFirst.mockResolvedValueOnce(undefined);
 
     const res = await request(app)
-      .post('/auth/email_token')
+      .post('/auth/magic_link_verify')
       .send({ token: 'valid-token' });
 
     expect(res.status).toBe(401);
@@ -89,7 +89,7 @@ describe('POST /auth/email_token', () => {
     });
 
     const res = await request(app)
-      .post('/auth/email_token')
+      .post('/auth/magic_link_verify')
       .send({ token: 'valid-token' });
 
     expect(res.status).toBe(200);
