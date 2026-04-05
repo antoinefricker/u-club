@@ -19,13 +19,6 @@
   - with categories of todos (availables/selected/referee/lunch/transport/table)
   - selectable in a date range
 - **Event announcements** — publishable posts linked to events, shared with club/team members
-- **Seed database**
-  - 2 clubs
-  - 45 teams in each club
-  - 25 members each
-  - related user
-  - admin
-  - allow to clear all data
 - **Team chat link** — add `chat_link` field on teams for external group chat URLs (WhatsApp/Telegram)
 - **In-app messaging** — WebSocket-based team/club messaging with stored history (future)
 - **FFBB integration** — connect to FFBB APIs to import competition calendars, results, club/team data
@@ -44,12 +37,10 @@
 ## Developer experience
 
 - **API client generation** — Auto-generate a typed API client from Swagger spec for the PWA
-- **Database seeding script** — `make seed` command to populate dev data (admin user, sample club, teams)
 
 ## PWA
 
-- **Lost password**
-- **One timepassword**
+- **One time password**
 - **PWA polish**
   - app icons (192x192, 512x512)
   - offline fallback page
