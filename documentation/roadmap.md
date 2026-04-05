@@ -28,6 +28,10 @@
   - allow to clear all data
 - **Team chat link** — add `chat_link` field on teams for external group chat URLs (WhatsApp/Telegram)
 - **In-app messaging** — WebSocket-based team/club messaging with stored history (future)
+- **FFBB integration** — connect to FFBB APIs to import competition calendars, results, club/team data
+  - Explore `ffbb-api-client-v2` Python client or build a Node equivalent
+  - Import match schedules and results
+  - Sync member licenses
 - **Protected route wrapper (PWA)**
   — Redirect unauthenticated users on the React side instead of relying on API 401s
 
@@ -68,5 +72,6 @@
   - teams management (CRUD)
   - members management (CRUD)
 - **Route guards** — Role-based UI: hide admin-only nav items from regular users
+- **i18n** — Internationalization with react-i18next (French/English)
 - **Loading/error states** — Add loading skeletons and error boundaries to pages
 - **Pagination** — Cursor or offset pagination on list endpoints as data grows
