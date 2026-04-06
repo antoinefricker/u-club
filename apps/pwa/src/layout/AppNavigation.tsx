@@ -31,10 +31,10 @@ export function AppNavigation() {
     <nav className={classes.navbar}>
       <div className={classes.navbarMain}>
         <Group className={classes.header} justify="space-between">
-          <div style={{ color: 'white', fontWeight: 700, fontSize: 28 }}>
-            Eggplant
-          </div>
+          🍆 Eggplant
         </Group>
+
+        <div className={classes.separator} />
 
         <a href="#" className={classes.link} onClick={navigateSection('')}>
           <IconLayoutDashboard className={classes.linkIcon} stroke={1.5} />
@@ -73,27 +73,24 @@ export function AppNavigation() {
             </a>
             <a
               href="#"
-              className={classes.link}
+              className={[classes.link, classes.subLink].join(' ')}
               onClick={navigateSection('admin/clubs')}
-              style={{ paddingLeft: 36 }}
             >
               <IconShieldHalf className={classes.linkIcon} stroke={1.5} />
               <span>Clubs</span>
             </a>
             <a
               href="#"
-              className={classes.link}
+              className={[classes.link, classes.subLink].join(' ')}
               onClick={navigateSection('admin/teams')}
-              style={{ paddingLeft: 36 }}
             >
               <IconShirtSport className={classes.linkIcon} stroke={1.5} />
               <span>Teams</span>
             </a>
             <a
               href="#"
-              className={classes.link}
+              className={[classes.link, classes.subLink].join(' ')}
               onClick={navigateSection('admin/members')}
-              style={{ paddingLeft: 36 }}
             >
               <IconUsers className={classes.linkIcon} stroke={1.5} />
               <span>Members</span>
@@ -102,8 +99,12 @@ export function AppNavigation() {
         )}
       </div>
 
-      <div className={classes.footer}>
-        <Group justify="space-between" align="center">
+      <div className={[classes.footer, classes.separator].join(' ')}>
+        <Group
+          className={classes.userIdentity}
+          justify="space-between"
+          align="center"
+        >
           <Title order={5} c="white">
             Hello {user?.displayName}!
           </Title>
