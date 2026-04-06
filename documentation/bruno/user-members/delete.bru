@@ -1,0 +1,19 @@
+meta {
+  name: Delete User Member
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/user-members/:id
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+params:path {
+  id: paste-user-member-id-here
+}
