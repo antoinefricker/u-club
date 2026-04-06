@@ -1,4 +1,5 @@
-import { SimpleGrid, Paper, Stack, Title, Text } from '@mantine/core';
+import { SimpleGrid, Paper, Stack, Text } from '@mantine/core';
+import { PageTitle } from '../../layout/PageTitle';
 import { IconShieldHalf, IconUsers, IconShirtSport } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
 
@@ -12,9 +13,8 @@ export function AdminDashboardPage() {
   const navigate = useNavigate();
 
   return (
-    <Stack>
-      <Title order={2}>Administration</Title>
-
+    <>
+      <PageTitle label="Administration" />
       <SimpleGrid cols={{ base: 1, sm: 3 }}>
         {cards.map((card) => (
           <Paper
@@ -34,6 +34,6 @@ export function AdminDashboardPage() {
           </Paper>
         ))}
       </SimpleGrid>
-    </Stack>
+    </>
   );
 }

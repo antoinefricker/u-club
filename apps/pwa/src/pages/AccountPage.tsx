@@ -2,16 +2,15 @@ import { useState } from 'react';
 import {
   Alert,
   Button,
-  Paper,
   PasswordInput,
   Stack,
   TextInput,
   Textarea,
-  Title,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useAuth } from '../auth/useAuth';
+import { PageTitle } from '../layout/PageTitle';
 import { useUserUpdate, type UpdateUserPayload } from '../hooks/useUserUpdate';
 
 type AccountFormValues = UpdateUserPayload & { password: string };
@@ -55,55 +54,50 @@ export function AccountPage() {
   };
 
   return (
-    <Stack align="center">
-      <Paper shadow="sm" p="xl" radius="md" w="100%" maw={500}>
-        <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
-          <Stack>
-            <Title order={2} ta="center">
-              My Account
-            </Title>
+    <>
+      <PageTitle label="My account" />
+      <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
+        <Stack>
+          {error && (
+            <Alert color="red" variant="light">
+              {error}
+            </Alert>
+          )}
 
-            {error && (
-              <Alert color="red" variant="light">
-                {error}
-              </Alert>
-            )}
+          <TextInput
+            label="Display name"
+            required
+            {...form.getInputProps('displayName')}
+          />
 
-            <TextInput
-              label="Display name"
-              required
-              {...form.getInputProps('displayName')}
-            />
+          <TextInput
+            label="Email"
+            type="email"
+            required
+            {...form.getInputProps('email')}
+          />
 
-            <TextInput
-              label="Email"
-              type="email"
-              required
-              {...form.getInputProps('email')}
-            />
+          <TextInput label="Phone" {...form.getInputProps('phone')} />
 
-            <TextInput label="Phone" {...form.getInputProps('phone')} />
+          <Textarea
+            label="Bio"
+            autosize
+            minRows={2}
+            maxRows={5}
+            {...form.getInputProps('bio')}
+          />
 
-            <Textarea
-              label="Bio"
-              autosize
-              minRows={2}
-              maxRows={5}
-              {...form.getInputProps('bio')}
-            />
+          <PasswordInput
+            label="New password"
+            description="Leave blank to keep current password"
+            {...form.getInputProps('password')}
+          />
 
-            <PasswordInput
-              label="New password"
-              description="Leave blank to keep current password"
-              {...form.getInputProps('password')}
-            />
-
-            <Button type="submit" fullWidth loading={mutation.isPending}>
-              Save changes
-            </Button>
-          </Stack>
-        </form>
-      </Paper>
-    </Stack>
+          <Button type="submit" fullWidth loading={mutation.isPending}>
+            Save changes
+          </Button>
+        </Stack>
+      </form>
+    </>
   );
 }

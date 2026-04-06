@@ -1,7 +1,7 @@
 .navbar {
   height: 100%;
   width: 300px;
-  padding: var(--mantine-spacing-md);
+  padding: var(--mantine-spacing-xs);
   display: flex;
   flex-direction: column;
   background-color: var(--mantine-primary-color-5);
@@ -12,21 +12,21 @@
 }
 
 .header {
-  padding-bottom: var(--mantine-spacing-md);
-  margin-bottom: calc(var(--mantine-spacing-md) * 1.5);
-  border-bottom: 1px solid var(--mantine-primary-color-7);
+  color: var(--mantine-color-white);
+  font-weight: 700;
+  font-size: 28px;
 }
 
 .footer {
-  padding-top: var(--mantine-spacing-md);
-  margin-top: var(--mantine-spacing-md);
-  border-top: 1px solid var(--mantine-primary-color-7);
+  .userIdentity {
+    padding-bottom: var(--mantine-spacing-md);
+  }
 }
 
 .separator {
   padding-top: var(--mantine-spacing-md);
   margin-top: var(--mantine-spacing-md);
-  border-top: 1px solid var(--mantine-primary-color-7);
+  border-top: 1px solid var(--mantine-primary-color-6);
 }
 
 .version {
@@ -40,11 +40,10 @@
   text-decoration: none;
   font-size: var(--mantine-font-size-sm);
   color: var(--mantine-color-white);
-  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+  padding: var(--mantine-spacing-xs);
   border-radius: var(--mantine-radius-sm);
-  font-weight: 500;
-
-  @mixin hover {
+  font-weight: 700;
+  &:hover {
     background-color: var(--mantine-primary-color-7);
     color: var(--mantine-color-white);
 
@@ -65,11 +64,17 @@
       }
     }
   }
+
+  &.subLink {
+    font-weight: 500;
+    color: var(--mantine-primary-color-1);
+    padding-left: var(--mantine-spacing-lg);
+  }
 }
 
 .linkIcon {
   color: var(--mantine-primary-color-1);
-  margin-right: var(--mantine-spacing-sm);
-  width: 25px;
-  height: 25px;
+  margin-right: var(--mantine-spacing-xs);
+  width: 24px;
+  height: 24px;
 }

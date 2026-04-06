@@ -7,11 +7,10 @@ import {
   Group,
   Loader,
   Select,
-  Stack,
   Table,
-  Title,
 } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
+import { PageTitle } from '../../layout/PageTitle';
 import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import { useTeams, useDeleteTeam } from '../../hooks/useTeams';
@@ -45,11 +44,10 @@ export function TeamsListPage() {
   if (error) return <Alert color="red">{String(error)}</Alert>;
 
   return (
-    <Stack>
-      <Group justify="space-between">
-        <Title order={2}>Teams</Title>
+    <>
+      <PageTitle label="Teams">
         <Button onClick={() => navigate('/admin/teams/new')}>New team</Button>
-      </Group>
+      </PageTitle>
 
       <Select
         label="Filter by club"
@@ -109,6 +107,6 @@ export function TeamsListPage() {
           ))}
         </Table.Tbody>
       </Table>
-    </Stack>
+    </>
   );
 }

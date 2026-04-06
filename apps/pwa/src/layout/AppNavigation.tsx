@@ -3,18 +3,25 @@ import {
   IconLayoutDashboard,
   IconLogout,
   IconShieldHalf,
+  IconCrown,
   IconSettings,
+  IconUser,
+  IconUserStar,
   IconShirtSport,
   IconUserCog,
   IconUsers,
 } from '@tabler/icons-react';
-import { Group, Title } from '@mantine/core';
+import { Box, Title } from '@mantine/core';
 import classes from './AppNavigation.module.css';
 import { useAuth } from '../auth/useAuth';
 import { useNavigate } from 'react-router';
 import type { MouseEvent } from 'react';
 
-export function AppNavigation() {
+interface AppNavigationProps {
+  onNavigate?: () => void;
+}
+
+export function AppNavigation({ onNavigate }: AppNavigationProps) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -22,30 +29,41 @@ export function AppNavigation() {
     (section: string) => (event: MouseEvent<HTMLAnchorElement>) => {
       event.preventDefault();
       navigate(section);
+      onNavigate?.();
     };
 
   return (
     <nav className={classes.navbar}>
       <div className={classes.navbarMain}>
-        <Group className={classes.header} justify="space-between">
-          <div style={{ color: 'white', fontWeight: 700, fontSize: 28 }}>
-            Eggplant
+        <Box visibleFrom="sm">
+          <div className={classes.header}>
+            <Title order={2} c="white">
+              🍆 eggplant
+            </Title>
           </div>
-        </Group>
+
+          <div className={classes.separator} />
+        </Box>
 
         <a href="#" className={classes.link} onClick={navigateSection('')}>
           <IconLayoutDashboard className={classes.linkIcon} stroke={1.5} />
-          <span>Dashboard</span>
+          <Title order={3} size="sm">
+            Dashboard
+          </Title>
         </a>
 
         <a href="#" className={classes.link} onClick={navigateSection('club')}>
           <IconShieldHalf className={classes.linkIcon} stroke={1.5} />
-          <span>My club</span>
+          <Title order={3} size="sm">
+            My clubs
+          </Title>
         </a>
 
         <a href="#" className={classes.link} onClick={navigateSection('teams')}>
           <IconShirtSport className={classes.linkIcon} stroke={1.5} />
-          <span>My teams</span>
+          <Title order={3} size="sm">
+            My teams
+          </Title>
         </a>
 
         <a
@@ -54,7 +72,9 @@ export function AppNavigation() {
           onClick={navigateSection('agenda')}
         >
           <IconCalendarWeek className={classes.linkIcon} stroke={1.5} />
-          <span>Agenda</span>
+          <Title order={3} size="sm">
+            Agenda
+          </Title>
         </a>
 
         {user?.role === 'admin' && (
@@ -66,31 +86,30 @@ export function AppNavigation() {
               onClick={navigateSection('admin')}
             >
               <IconSettings className={classes.linkIcon} stroke={1.5} />
-              <span>Administration</span>
+              <Title order={3} size="sm">
+                Administration
+              </Title>
             </a>
             <a
               href="#"
-              className={classes.link}
+              className={[classes.link, classes.subLink].join(' ')}
               onClick={navigateSection('admin/clubs')}
-              style={{ paddingLeft: 36 }}
             >
               <IconShieldHalf className={classes.linkIcon} stroke={1.5} />
               <span>Clubs</span>
             </a>
             <a
               href="#"
-              className={classes.link}
+              className={[classes.link, classes.subLink].join(' ')}
               onClick={navigateSection('admin/teams')}
-              style={{ paddingLeft: 36 }}
             >
               <IconShirtSport className={classes.linkIcon} stroke={1.5} />
               <span>Teams</span>
             </a>
             <a
               href="#"
-              className={classes.link}
+              className={[classes.link, classes.subLink].join(' ')}
               onClick={navigateSection('admin/members')}
-              style={{ paddingLeft: 36 }}
             >
               <IconUsers className={classes.linkIcon} stroke={1.5} />
               <span>Members</span>
@@ -99,21 +118,34 @@ export function AppNavigation() {
         )}
       </div>
 
-      <div className={classes.footer}>
-        <Title order={6} c="white">
-          {user?.displayName}
-        </Title>
+      <div className={[classes.footer, classes.separator].join(' ')}>
+        <div className={classes.link}>
+          {user?.role === 'admin' ? (
+            <IconCrown className={classes.linkIcon} stroke={1.5} />
+          ) : user?.role === 'manager' ? (
+            <IconUserStar className={classes.linkIcon} stroke={1.5} />
+          ) : (
+            <IconUser className={classes.linkIcon} stroke={1.5} />
+          )}
+          <Title order={3} size="sm">
+            Hello {user?.displayName}!
+          </Title>
+        </div>
 
         <a
           href="#"
-          className={classes.link}
+          className={[classes.link, classes.subLink].join(' ')}
           onClick={navigateSection('account')}
         >
           <IconUserCog className={classes.linkIcon} stroke={1.5} />
           <span>Edit account</span>
         </a>
 
-        <a href="#" className={classes.link} onClick={logout}>
+        <a
+          href="#"
+          className={[classes.link, classes.subLink].join(' ')}
+          onClick={logout}
+        >
           <IconLogout className={classes.linkIcon} stroke={1.5} />
           <span>Logout</span>
         </a>
