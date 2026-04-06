@@ -2,6 +2,7 @@ import {
   IconCalendarWeek,
   IconLayoutDashboard,
   IconLogout,
+  IconSettings,
   IconSmartHome,
   IconUserCog,
   IconUsersGroup,
@@ -60,6 +61,18 @@ export function AppNavigation() {
         <Title order={6} c="white">
           {user?.displayName}
         </Title>
+
+        {user?.role === 'admin' && (
+          <a
+            href="#"
+            className={classes.link}
+            onClick={navigateSection('admin')}
+          >
+            <IconSettings className={classes.linkIcon} stroke={1.5} />
+            <span>Administration</span>
+          </a>
+        )}
+
         <a
           href="#"
           className={classes.link}
