@@ -3,12 +3,15 @@ import {
   IconLayoutDashboard,
   IconLogout,
   IconShieldHalf,
+  IconCrown,
   IconSettings,
+  IconUser,
+  IconUserStar,
   IconShirtSport,
   IconUserCog,
   IconUsers,
 } from '@tabler/icons-react';
-import { Group, Title } from '@mantine/core';
+import { Group, Title, Tooltip } from '@mantine/core';
 import classes from './AppNavigation.module.css';
 import { useAuth } from '../auth/useAuth';
 import { useNavigate } from 'react-router';
@@ -100,9 +103,25 @@ export function AppNavigation() {
       </div>
 
       <div className={classes.footer}>
-        <Title order={6} c="white">
-          {user?.displayName}
-        </Title>
+        <Group justify="space-between" align="center">
+          <Title order={5} c="white">
+            Hello {user?.displayName}!
+          </Title>
+          <Tooltip label={user?.role}>
+            {user?.role === 'admin' ? (
+              <IconCrown size={18} color="white" stroke={1.5} opacity={0.5} />
+            ) : user?.role === 'manager' ? (
+              <IconUserStar
+                size={18}
+                color="white"
+                stroke={1.5}
+                opacity={0.5}
+              />
+            ) : (
+              <IconUser size={18} color="white" stroke={1.5} opacity={0.5} />
+            )}
+          </Tooltip>
+        </Group>
 
         <a
           href="#"
