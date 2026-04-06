@@ -5,6 +5,14 @@ import { MantineProvider, createTheme } from '@mantine/core';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const theme = createTheme({
+  fontFamily: 'Roboto, sans-serif',
+  headings: {
+    fontFamily: 'Poppins, sans-serif',
+    sizes: {
+      h2: { fontWeight: '500' },
+      h3: { fontWeight: '500' },
+    },
+  },
   primaryColor: 'brand',
   colors: {
     brand: [

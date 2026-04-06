@@ -41,7 +41,7 @@ export function PageLayout({ children }: PageLayoutProps) {
         <AppNavigation onNavigate={close} />
       </AppShell.Navbar>
 
-      <AppShell.Main>{children}</AppShell.Main>
+      <AppShell.Main py="xs">{children}</AppShell.Main>
     </AppShell>
   );
 }
