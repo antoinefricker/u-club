@@ -2,7 +2,10 @@ import { useMutation, type UseMutationResult } from '@tanstack/react-query';
 import type { User } from '../types/User';
 import { useAuth } from '../auth/useAuth';
 
-export type UpdateUserPayload = Omit<User, 'id' | 'createdAt' | 'updatedAt'> & {
+export type UpdateUserPayload = Omit<
+  User,
+  'id' | 'createdAt' | 'role' | 'updatedAt'
+> & {
   password?: string;
 };
 
