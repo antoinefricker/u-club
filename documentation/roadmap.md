@@ -12,13 +12,21 @@
     - label
     - date
     - place
-  - out of scope: recurring events, events models
+  - out of scope
+    - recurring events
+    - events templates
 - **Recurring events**
   — deal with weekly trainings
-- **Events model**
-  — a to-do-list for each event
-  - with categories of todos (availables/selected/referee/lunch/transport/table)
-  - selectable in a date range
+- **Events templates**
+  — allow to define a list of events plugins associated with the event
+  - player participation poll
+  - coach player selection
+  - volontary help poll with roles
+  - additional dataset
+  - display template
+  - ...
+  - each plugin will be implemented in a specific pull request
+  - at first only implement the system
 - **Event announcements** — publishable posts linked to events, shared with club/team members
 - **Team chat link** — add `chat_link` field on teams for external group chat URLs (WhatsApp/Telegram)
 - **In-app messaging** — WebSocket-based team/club messaging with stored history (future)
@@ -32,6 +40,7 @@
 ## Testing
 
 - **E2e auth tests** — Cover email confirmation flow and role-based access denial in Playwright
+- **E2e registration & invitation tests** — Full registration flow (register → verify email → login) and invitation flow (send invite → accept → relationship created) in Playwright
 - **Integration test suite** — Tests hitting a real test database to complement unit tests with mocks
 - **Database seeding for tests** — Shared fixtures for consistent test data
 
