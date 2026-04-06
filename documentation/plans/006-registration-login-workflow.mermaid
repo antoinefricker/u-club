@@ -1,0 +1,23 @@
+flowchart TD
+    A[User visits app] --> B{Has an account?}
+
+    B -->|No| C[Register]
+    C --> D[Verification email sent]
+    D --> E[Click verify link]
+    E --> F[Dashboard]
+
+    B -->|Yes| G[Login]
+    G --> H{Email verified?}
+
+    H -->|No| I[403 - email not verified]
+    I --> J[Resend verification email]
+    J --> E
+
+    H -->|Yes| F
+
+    G --> K[Forgot password?]
+    K --> L[Enter email]
+    L --> M[Reset email sent]
+    M --> N[Click reset link]
+    N --> O[Set new password]
+    O -->|auto-login| F

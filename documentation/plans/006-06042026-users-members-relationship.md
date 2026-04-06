@@ -13,14 +13,14 @@ Currently a member has a single optional `user_id` FK (1:1). We need a many-to-m
 
 ### `user_members` join table
 
-| Column      | Type      | Constraints                                    |
-| ----------- | --------- | ---------------------------------------------- |
-| id          | uuid      | PK, auto                                       |
-| user_id     | uuid      | FK → users, required                           |
-| member_id   | uuid      | FK → members, required                         |
-| type        | enum      | required (self, relative)                      |
-| description | string    | nullable (e.g. "father", "guardian", "uncle")  |
-| created_at  | timestamp | auto                                           |
+| Column      | Type      | Constraints                                   |
+| ----------- | --------- | --------------------------------------------- |
+| id          | uuid      | PK, auto                                      |
+| user_id     | uuid      | FK → users, required                          |
+| member_id   | uuid      | FK → members, required                        |
+| type        | enum      | required (self, relative)                     |
+| description | string    | nullable (e.g. "father", "guardian", "uncle") |
+| created_at  | timestamp | auto                                          |
 
 Unique constraint on (user_id, member_id) — one relationship per user-member pair.
 
@@ -60,12 +60,14 @@ Flow:
 | Create/edit/delete own relationships | ✅                     | ✅      | ✅                    |
 | List any user's relationships        | ✅                     | ✅      | ✅                    |
 | Create/edit/delete for other users   | ✅                     | ✅      | ❌                    |
-| Invite someone to a linked member    | ✅                     | ✅      | ✅ (own members only) |
+| Invite to a linked member            | ✅                     | ✅      | ✅ (own members only) |
+| Invite to any member                 | ✅                     | ✅      | ❌                    |
 | Accept invitation                    | any authenticated user |         |                       |
 
 ## Workflows
 
-- [Invitation workflow (Excalidraw)](https://excalidraw.com/#json=ivH12Z6a9zARjh8__Sfxr,mZjuv4yQPMP7pa4prrEkxg)
+- [Registration & login flow](006-registration-login-workflow.mermaid)
+- [Invitation flow](006-invitation-workflow.mermaid)
 
 ## Plan
 
