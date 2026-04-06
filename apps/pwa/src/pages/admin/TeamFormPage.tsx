@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 import {
   Button,
+  Grid,
   Group,
   Loader,
   NumberInput,
   Select,
-  Stack,
   TextInput,
   Textarea,
 } from '@mantine/core';
@@ -100,54 +100,69 @@ export function TeamFormPage() {
 
       <FormWrapper>
         <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
-          <Stack>
-            <TextInput
-              label="Label"
-              placeholder="Team label"
-              required
-              {...form.getInputProps('label')}
-            />
-            <Select
-              label="Club"
-              placeholder="Select a club"
-              data={clubOptions}
-              required
-              {...form.getInputProps('clubId')}
-            />
-            <NumberInput
-              label="Year"
-              placeholder="e.g. 2026"
-              required
-              {...form.getInputProps('year')}
-            />
-            <Select
-              label="Gender"
-              placeholder="Select gender"
-              data={[
-                { value: 'male', label: 'Male' },
-                { value: 'female', label: 'Female' },
-                { value: 'both', label: 'Both' },
-              ]}
-              required
-              {...form.getInputProps('gender')}
-            />
-            <Textarea
-              label="Description"
-              placeholder="Optional description"
-              {...form.getInputProps('description')}
-            />
-            <Group>
-              <Button
-                type="submit"
-                loading={createTeam.isPending || updateTeam.isPending}
-              >
-                {isEdit ? 'Update' : 'Create'}
-              </Button>
-              <Button variant="subtle" onClick={() => navigate('/admin/teams')}>
-                Cancel
-              </Button>
-            </Group>
-          </Stack>
+          <Grid gutter="md">
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <TextInput
+                label="Label"
+                placeholder="Team label"
+                required
+                {...form.getInputProps('label')}
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <Select
+                label="Club"
+                placeholder="Select a club"
+                data={clubOptions}
+                required
+                {...form.getInputProps('clubId')}
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <NumberInput
+                label="Year"
+                placeholder="e.g. 2026"
+                required
+                {...form.getInputProps('year')}
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <Select
+                label="Gender"
+                placeholder="Select gender"
+                data={[
+                  { value: 'male', label: 'Male' },
+                  { value: 'female', label: 'Female' },
+                  { value: 'both', label: 'Both' },
+                ]}
+                required
+                {...form.getInputProps('gender')}
+              />
+            </Grid.Col>
+            <Grid.Col span={12}>
+              <Textarea
+                label="Description"
+                placeholder="Optional description"
+                {...form.getInputProps('description')}
+              />
+            </Grid.Col>
+            <Grid.Col span={12}>
+              <Group>
+                <Button
+                  type="submit"
+                  loading={createTeam.isPending || updateTeam.isPending}
+                >
+                  {isEdit ? 'Update' : 'Create'}
+                </Button>
+                <Button
+                  variant="subtle"
+                  onClick={() => navigate('/admin/teams')}
+                >
+                  Cancel
+                </Button>
+              </Group>
+            </Grid.Col>
+          </Grid>
         </form>
       </FormWrapper>
     </>

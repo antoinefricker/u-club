@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import {
   Button,
+  Grid,
   Group,
   Loader,
-  Stack,
   TextInput,
   Textarea,
 } from '@mantine/core';
@@ -87,36 +87,47 @@ export function ClubFormPage() {
       <PageTitle label={isEdit ? 'Edit club' : 'New club'} />
       <FormWrapper>
         <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
-          <Stack>
-            <TextInput
-              label="Name"
-              placeholder="Club name"
-              required
-              {...form.getInputProps('name')}
-            />
-            <TextInput
-              label="Code"
-              placeholder="Club code"
-              required
-              {...form.getInputProps('code')}
-            />
-            <Textarea
-              label="Description"
-              placeholder="Optional description"
-              {...form.getInputProps('description')}
-            />
-            <Group>
-              <Button
-                type="submit"
-                loading={createClub.isPending || updateClub.isPending}
-              >
-                {isEdit ? 'Update' : 'Create'}
-              </Button>
-              <Button variant="subtle" onClick={() => navigate('/admin/clubs')}>
-                Cancel
-              </Button>
-            </Group>
-          </Stack>
+          <Grid gutter="md">
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <TextInput
+                label="Name"
+                placeholder="Club name"
+                required
+                {...form.getInputProps('name')}
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <TextInput
+                label="Code"
+                placeholder="Club code"
+                required
+                {...form.getInputProps('code')}
+              />
+            </Grid.Col>
+            <Grid.Col span={12}>
+              <Textarea
+                label="Description"
+                placeholder="Optional description"
+                {...form.getInputProps('description')}
+              />
+            </Grid.Col>
+            <Grid.Col span={12}>
+              <Group>
+                <Button
+                  type="submit"
+                  loading={createClub.isPending || updateClub.isPending}
+                >
+                  {isEdit ? 'Update' : 'Create'}
+                </Button>
+                <Button
+                  variant="subtle"
+                  onClick={() => navigate('/admin/clubs')}
+                >
+                  Cancel
+                </Button>
+              </Group>
+            </Grid.Col>
+          </Grid>
         </form>
       </FormWrapper>
     </>

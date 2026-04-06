@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 import {
   Button,
+  Grid,
   Group,
   Loader,
   NumberInput,
   Select,
-  Stack,
   TextInput,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
@@ -102,60 +102,74 @@ export function MemberFormPage() {
 
       <FormWrapper>
         <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
-          <Stack>
-            <TextInput
-              label="First name"
-              placeholder="First name"
-              required
-              {...form.getInputProps('firstName')}
-            />
-            <TextInput
-              label="Last name"
-              placeholder="Last name"
-              required
-              {...form.getInputProps('lastName')}
-            />
-            <Select
-              label="Gender"
-              placeholder="Select gender"
-              data={[
-                { value: 'male', label: 'Male' },
-                { value: 'female', label: 'Female' },
-              ]}
-              required
-              {...form.getInputProps('gender')}
-            />
-            <NumberInput
-              label="Year"
-              placeholder="e.g. 2026"
-              required
-              {...form.getInputProps('year')}
-            />
-            <TextInput
-              label="Birth date"
-              type="date"
-              {...form.getInputProps('birthDate')}
-            />
-            <TextInput
-              label="License"
-              placeholder="Optional license number"
-              {...form.getInputProps('license')}
-            />
-            <Group>
-              <Button
-                type="submit"
-                loading={createMember.isPending || updateMember.isPending}
-              >
-                {isEdit ? 'Update' : 'Create'}
-              </Button>
-              <Button
-                variant="subtle"
-                onClick={() => navigate('/admin/members')}
-              >
-                Cancel
-              </Button>
-            </Group>
-          </Stack>
+          <Grid gutter="md">
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <TextInput
+                label="First name"
+                placeholder="First name"
+                required
+                {...form.getInputProps('firstName')}
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <TextInput
+                label="Last name"
+                placeholder="Last name"
+                required
+                {...form.getInputProps('lastName')}
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <Select
+                label="Gender"
+                placeholder="Select gender"
+                data={[
+                  { value: 'male', label: 'Male' },
+                  { value: 'female', label: 'Female' },
+                ]}
+                required
+                {...form.getInputProps('gender')}
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <NumberInput
+                label="Year"
+                placeholder="e.g. 2026"
+                required
+                {...form.getInputProps('year')}
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <TextInput
+                label="Birth date"
+                type="date"
+                {...form.getInputProps('birthDate')}
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <TextInput
+                label="License"
+                placeholder="Optional license number"
+                {...form.getInputProps('license')}
+              />
+            </Grid.Col>
+            <Grid.Col span={12}>
+              <Group>
+                <Button
+                  type="submit"
+                  loading={createMember.isPending || updateMember.isPending}
+                >
+                  {isEdit ? 'Update' : 'Create'}
+                </Button>
+                <Button
+                  variant="subtle"
+                  onClick={() => navigate('/admin/members')}
+                >
+                  Cancel
+                </Button>
+              </Group>
+            </Grid.Col>
+          </Grid>
         </form>
       </FormWrapper>
     </>

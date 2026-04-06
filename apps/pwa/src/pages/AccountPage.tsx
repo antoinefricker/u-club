@@ -2,8 +2,8 @@ import { useState } from 'react';
 import {
   Alert,
   Button,
+  Grid,
   PasswordInput,
-  Stack,
   TextInput,
   Textarea,
 } from '@mantine/core';
@@ -59,46 +59,60 @@ export function AccountPage() {
       <PageTitle label="My account" />
       <FormWrapper>
         <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
-          <Stack>
+          <Grid gutter="md">
             {error && (
-              <Alert color="red" variant="light">
-                {error}
-              </Alert>
+              <Grid.Col span={12}>
+                <Alert color="red" variant="light">
+                  {error}
+                </Alert>
+              </Grid.Col>
             )}
 
-            <TextInput
-              label="Display name"
-              required
-              {...form.getInputProps('displayName')}
-            />
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <TextInput
+                label="Display name"
+                required
+                {...form.getInputProps('displayName')}
+              />
+            </Grid.Col>
 
-            <TextInput
-              label="Email"
-              type="email"
-              required
-              {...form.getInputProps('email')}
-            />
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <TextInput
+                label="Email"
+                type="email"
+                required
+                {...form.getInputProps('email')}
+              />
+            </Grid.Col>
 
-            <TextInput label="Phone" {...form.getInputProps('phone')} />
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <TextInput label="Phone" {...form.getInputProps('phone')} />
+            </Grid.Col>
 
-            <Textarea
-              label="Bio"
-              autosize
-              minRows={2}
-              maxRows={5}
-              {...form.getInputProps('bio')}
-            />
+            <Grid.Col span={12}>
+              <Textarea
+                label="Bio"
+                autosize
+                minRows={2}
+                maxRows={5}
+                {...form.getInputProps('bio')}
+              />
+            </Grid.Col>
 
-            <PasswordInput
-              label="New password"
-              description="Leave blank to keep current password"
-              {...form.getInputProps('password')}
-            />
+            <Grid.Col span={12}>
+              <PasswordInput
+                label="New password"
+                description="Leave blank to keep current password"
+                {...form.getInputProps('password')}
+              />
+            </Grid.Col>
 
-            <Button type="submit" fullWidth loading={mutation.isPending}>
-              Save changes
-            </Button>
-          </Stack>
+            <Grid.Col span={12}>
+              <Button type="submit" fullWidth loading={mutation.isPending}>
+                Save changes
+              </Button>
+            </Grid.Col>
+          </Grid>
         </form>
       </FormWrapper>
     </>
