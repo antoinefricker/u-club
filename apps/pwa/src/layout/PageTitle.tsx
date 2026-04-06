@@ -10,9 +10,7 @@ export function PageTitle({ children, label }: PageTitleProps) {
   return (
     <div>
       <Group justify="space-between">
-        <Title order={2} mb="md">
-          {label}
-        </Title>
+        <Title order={2}>{label}</Title>
         <div>{children}</div>
       </Group>
     </div>
