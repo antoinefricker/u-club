@@ -27,6 +27,18 @@ const theme = createTheme({
       '#5d4061',
       '#49324c',
     ],
+    success: [
+      '#f5f9ec',
+      '#e8f0d4',
+      '#d5e4b5',
+      '#c1d896',
+      '#b2cf79',
+      '#a3c65b',
+      '#93b252',
+      '#7a9544',
+      '#627836',
+      '#4a5b29',
+    ],
   },
 });
 import { Notifications } from '@mantine/notifications';

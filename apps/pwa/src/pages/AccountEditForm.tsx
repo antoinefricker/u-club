@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import {
   Alert,
+  Anchor,
   Button,
   Grid,
   PasswordInput,
+  Text,
   TextInput,
   Textarea,
 } from '@mantine/core';
@@ -113,30 +115,47 @@ export function AccountEditForm() {
         </Grid.Col>
 
         <Grid.Col span={12}>
-          {showPassword ? (
-            <Grid gutter="md">
-              <Grid.Col span={{ base: 12, sm: 6 }}>
-                <PasswordInput
-                  label="New password"
-                  {...form.getInputProps('password')}
-                />
-              </Grid.Col>
-              <Grid.Col span={{ base: 12, sm: 6 }}>
-                <PasswordInput
-                  label="Confirm password"
-                  {...form.getInputProps('confirmPassword')}
-                />
-              </Grid.Col>
-            </Grid>
-          ) : (
-            <Button variant="light" onClick={() => setShowPassword(true)}>
-              Change password
-            </Button>
+          <Anchor
+            component="button"
+            type="button"
+            size="sm"
+            mb="xs"
+            c="dark"
+            fw="bold"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? 'Cancel password change' : 'Change password'}
+          </Anchor>
+          {showPassword && (
+            <Text size="sm" c="dimmed" mt={-10}>
+              Leave blank to keep current password
+            </Text>
           )}
         </Grid.Col>
+        {showPassword && (
+          <>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <PasswordInput
+                label="New password"
+                {...form.getInputProps('password')}
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <PasswordInput
+                label="Confirm password"
+                {...form.getInputProps('confirmPassword')}
+              />
+            </Grid.Col>
+          </>
+        )}
 
         <Grid.Col span={12}>
-          <Button type="submit" fullWidth loading={mutation.isPending}>
+          <Button
+            type="submit"
+            fullWidth
+            color="success"
+            loading={mutation.isPending}
+          >
             Save changes
           </Button>
         </Grid.Col>
