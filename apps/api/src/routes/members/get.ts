@@ -42,7 +42,6 @@ router.get(
     const member = await db('members')
       .select(
         'id',
-        'user_id',
         'status_id',
         'first_name',
         'last_name',

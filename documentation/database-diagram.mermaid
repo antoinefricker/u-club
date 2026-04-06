@@ -71,6 +71,28 @@ erDiagram
         timestamp created_at
     }
 
+    USER_MEMBER {
+        uuid id PK
+        uuid user_id FK
+        uuid member_id FK
+        enum type
+        string description
+        timestamp created_at
+    }
+
+    MEMBER_INVITATION {
+        uuid id PK
+        uuid member_id FK
+        uuid invited_by FK
+        string email
+        enum type
+        string description
+        string token UK
+        timestamp expires_at
+        timestamp accepted_at
+        timestamp created_at
+    }
+
     REVOKED_TOKEN {
         uuid id PK
         text token UK
@@ -83,7 +105,10 @@ erDiagram
     USER          ||--o{ AUTH_TOKEN        : "requests"
     USER          ||--o{ REVOKED_TOKEN      : "revokes"
     CLUB          ||--o{ TEAM               : "has"
-    USER          ||--o{ MEMBER             : "is"
+    USER          ||--o{ USER_MEMBER         : "linked"
+    MEMBER        ||--o{ USER_MEMBER         : "linked"
+    USER          ||--o{ MEMBER_INVITATION   : "invites"
+    MEMBER        ||--o{ MEMBER_INVITATION   : "invited for"
     MEMBER_STATUS ||--o{ MEMBER             : "describes"
     MEMBER        ||--o{ TEAM_ASSIGNMENT    : "assigned"
     TEAM          ||--o{ TEAM_ASSIGNMENT    : "includes"

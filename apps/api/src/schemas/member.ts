@@ -9,7 +9,6 @@ export const createMemberSchema = z.object({
   year: z.number({
     error: 'year is required',
   }),
-  user_id: z.string().nullable().optional(),
   status_id: z.string().nullable().optional(),
   birth_date: z.string().nullable().optional(),
   license: z.string().nullable().optional(),
@@ -25,7 +24,6 @@ export const updateMemberSchema = z
       })
       .optional(),
     year: z.number().optional(),
-    user_id: z.string().nullable().optional(),
     status_id: z.string().nullable().optional(),
     birth_date: z.string().nullable().optional(),
     license: z.string().nullable().optional(),

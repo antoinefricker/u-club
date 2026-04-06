@@ -5,3 +5,4 @@
 - [003 - 05/04/2026 - Zod Validation](003-05042026-zod-validation.md) — Replace inline validation with Zod schemas
 - [004 - 05/04/2026 - Seed Database](004-05042026-seed-database.md) — Seed script with realistic dev data and clear command
 - [005 - 05/04/2026 - Lost Password](005-05042026-lost-password.md) — Password reset flow via email
+- [006 - 06/04/2026 - Users-Members Relationship](006-06042026-users-members-relationship.md) — Many-to-many user-member links with custom descriptions

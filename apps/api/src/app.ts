@@ -9,6 +9,8 @@ import clubsRouter from './routes/clubs/index.js';
 import teamsRouter from './routes/teams/index.js';
 import memberStatusesRouter from './routes/member-statuses/index.js';
 import membersRouter from './routes/members/index.js';
+import userMembersRouter from './routes/user-members/index.js';
+import invitationsRouter from './routes/invitations/index.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -26,6 +28,8 @@ app.use('/clubs', clubsRouter);
 app.use('/teams', teamsRouter);
 app.use('/member-statuses', memberStatusesRouter);
 app.use('/members', membersRouter);
+app.use('/user-members', userMembersRouter);
+app.use('/invitations', invitationsRouter);
 
 app.use(errorHandler);
 

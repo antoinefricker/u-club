@@ -6,21 +6,23 @@
 
 Basketball club management platform designed for medium-sized organisations. Manage clubs, teams, members, events, and game-day assignments — from roster planning to match logistics.
 
-## Tech stack
+## Getting started
+
+### Summary
 
 - **Frontend**: React 19, Mantine, TanStack Query, Vite (PWA)
 - **Backend**: Express 5, Knex, PostgreSQL, Zod, JWT auth
 - **Testing**: Vitest, Playwright, Supertest
 - **Tooling**: GitHub Actions, Husky, lint-staged, Docker
 
-## Prerequisites
+### Prerequisites
 
 - [Node.js](https://nodejs.org/) >= 22
 - [pnpm](https://pnpm.io/) >= 10
 - [Docker](https://www.docker.com/)
 - [direnv](https://direnv.net/)
 
-## Getting started
+### Installation
 
 ```bash
 # Clone the repo
@@ -85,13 +87,16 @@ dev-stop       Stop dev services (node servers + docker)
 
 ### Dependencies
 
-- Frontend
-  - [Mantine](https://mantine.dev/core/package/)
-  - [TanStack Query](https://tanstack.com/query/latest)
-  - [TanStack Router](https://tanstack.com/router/latest)
-  - [Tabler Icons](https://tabler.io/icons)
-- Backend
-  - [Express](https://expressjs.com/en/5x/api.html)
-  - [Knex](https://knexjs.org/guide/)
-  - [Zod](https://zod.dev)
-  - [Swagger-JSDoc](https://github.com/Surnet/swagger-jsdoc/tree/v6/docs)
+#### Frontend
+
+- [Mantine](https://mantine.dev/core/package/)
+- [TanStack Query](https://tanstack.com/query/latest)
+- [TanStack Router](https://tanstack.com/router/latest)
+- [Tabler Icons](https://tabler.io/icons)
+
+#### Backend
+
+- [Express](https://expressjs.com/en/5x/api.html)
+- [Knex](https://knexjs.org/guide/)
+- [Zod](https://zod.dev)
+- [Swagger-JSDoc](https://github.com/Surnet/swagger-jsdoc/tree/v6/docs)

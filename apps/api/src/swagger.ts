@@ -137,7 +137,6 @@ const options: swaggerJsdoc.Options = {
           type: 'object',
           properties: {
             id: { type: 'string', format: 'uuid' },
-            userId: { type: 'string', format: 'uuid', nullable: true },
             statusId: { type: 'string', format: 'uuid', nullable: true },
             firstName: { type: 'string' },
             lastName: { type: 'string' },
@@ -153,7 +152,6 @@ const options: swaggerJsdoc.Options = {
           type: 'object',
           required: ['firstName', 'lastName', 'gender', 'year'],
           properties: {
-            userId: { type: 'string', format: 'uuid', nullable: true },
             statusId: { type: 'string', format: 'uuid', nullable: true },
             firstName: { type: 'string' },
             lastName: { type: 'string' },
@@ -166,7 +164,6 @@ const options: swaggerJsdoc.Options = {
         UpdateMemberRequest: {
           type: 'object',
           properties: {
-            userId: { type: 'string', format: 'uuid', nullable: true },
             statusId: { type: 'string', format: 'uuid', nullable: true },
             firstName: { type: 'string' },
             lastName: { type: 'string' },
@@ -186,6 +183,31 @@ const options: swaggerJsdoc.Options = {
               type: 'string',
               enum: ['player', 'coach', 'assistant', 'sparring'],
             },
+            createdAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        UserMember: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            userId: { type: 'string', format: 'uuid' },
+            memberId: { type: 'string', format: 'uuid' },
+            type: { type: 'string', enum: ['self', 'relative'] },
+            description: { type: 'string', nullable: true },
+            createdAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        MemberInvitation: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            memberId: { type: 'string', format: 'uuid' },
+            invitedBy: { type: 'string', format: 'uuid' },
+            email: { type: 'string', format: 'email' },
+            type: { type: 'string', enum: ['self', 'relative'] },
+            description: { type: 'string', nullable: true },
+            expiresAt: { type: 'string', format: 'date-time' },
+            acceptedAt: { type: 'string', format: 'date-time', nullable: true },
             createdAt: { type: 'string', format: 'date-time' },
           },
         },

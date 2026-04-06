@@ -44,7 +44,6 @@ router.post(
       last_name,
       gender,
       year,
-      user_id,
       status_id,
       birth_date,
       license,
@@ -56,14 +55,12 @@ router.post(
         last_name,
         gender,
         year,
-        user_id: user_id || null,
         status_id: status_id || null,
         birth_date: birth_date || null,
         license: license || null,
       })
       .returning([
         'id',
-        'user_id',
         'status_id',
         'first_name',
         'last_name',

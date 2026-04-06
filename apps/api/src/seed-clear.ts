@@ -4,6 +4,8 @@ import db from './db.js';
 const force = process.argv.includes('--force');
 
 const tables = [
+  'member_invitations',
+  'user_members',
   'team_assignments',
   'members',
   'member_statuses',

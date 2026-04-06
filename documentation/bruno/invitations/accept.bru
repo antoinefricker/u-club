@@ -1,0 +1,26 @@
+meta {
+  name: Accept Invitation
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/invitations/:id/accept
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+params:path {
+  id: paste-invitation-id-here
+}
+
+body:json {
+  {
+    "type": "relative",
+    "description": "mother"
+  }
+}

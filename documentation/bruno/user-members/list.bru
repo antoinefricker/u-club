@@ -1,0 +1,15 @@
+meta {
+  name: List User Members
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/user-members
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
