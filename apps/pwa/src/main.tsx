@@ -35,6 +35,7 @@ import { AccountPage } from './pages/AccountPage.tsx';
 import { AgendaPage } from './pages/AgendaPage.tsx';
 import { ConfirmEmailPage } from './pages/ConfirmEmailPage.tsx';
 import { ResetPasswordPage } from './pages/ResetPasswordPage.tsx';
+import { InvitationPage } from './pages/InvitationPage.tsx';
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,7 @@ createRoot(document.getElementById('root')!).render(
             <Routes>
               <Route path="verify-email" element={<ConfirmEmailPage />} />
               <Route path="reset-password" element={<ResetPasswordPage />} />
+              <Route path="invitation" element={<InvitationPage />} />
               <Route element={<App />}>
                 <Route index element={<DashboardPage />} />
                 <Route path="club" element={<ClubPage />} />
