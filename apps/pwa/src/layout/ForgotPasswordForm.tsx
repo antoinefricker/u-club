@@ -10,6 +10,7 @@ import {
   Text,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { emailValidation } from '../forms/validations/emailValidation';
 
 interface ForgotPasswordFormProps {
   onSwitchMode: () => void;
@@ -25,7 +26,7 @@ export function ForgotPasswordForm({ onSwitchMode }: ForgotPasswordFormProps) {
       email: '',
     },
     validate: {
-      email: (v) => (/^\S+@\S+\.\S+$/.test(v) ? null : 'Invalid email'),
+      email: emailValidation,
     },
   });
 

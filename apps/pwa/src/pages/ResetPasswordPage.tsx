@@ -9,6 +9,7 @@ import {
   Paper,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { confirmPasswordValidation } from '../forms/validations/passwordValidation';
 
 export function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
@@ -28,8 +29,7 @@ export function ResetPasswordPage() {
     validate: {
       password: (v) =>
         v.length >= 6 ? null : 'Password must be at least 6 characters',
-      confirmPassword: (v, values) =>
-        v === values.password ? null : 'Passwords do not match',
+      confirmPassword: confirmPasswordValidation,
     },
   });
 

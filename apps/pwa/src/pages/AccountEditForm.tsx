@@ -11,12 +11,21 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useAuth } from '../auth/useAuth';
 import { useUserUpdate, type UpdateUserPayload } from '../hooks/useUserUpdate';
+import { emailValidation } from '../forms/validations/emailValidation';
+import {
+  passwordValidation,
+  confirmPasswordValidation,
+} from '../forms/validations/passwordValidation';
 
-type AccountFormValues = UpdateUserPayload & { password: string };
+type AccountFormValues = UpdateUserPayload & {
+  password: string;
+  confirmPassword: string;
+};
 
 export function AccountEditForm() {
   const { user, updateUser } = useAuth();
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   const mutation = useUserUpdate();
 
   const form = useForm<AccountFormValues>({
@@ -26,11 +35,14 @@ export function AccountEditForm() {
       phone: user?.phone ?? '',
       bio: user?.bio ?? '',
       password: '',
+      confirmPassword: '',
     },
     validate: {
       displayName: (v) =>
         v.trim().length > 0 ? null : 'Display name is required',
-      email: (v) => (/^\S+@\S+\.\S+$/.test(v) ? null : 'Invalid email'),
+      email: emailValidation,
+      password: passwordValidation,
+      confirmPassword: confirmPasswordValidation,
     },
   });
 
@@ -40,6 +52,8 @@ export function AccountEditForm() {
       onSuccess: (updatedUser) => {
         updateUser(updatedUser);
         form.setFieldValue('password', '');
+        form.setFieldValue('confirmPassword', '');
+        setShowPassword(false);
         notifications.show({
           title: 'Account updated',
           message: 'Your changes have been saved.',
@@ -70,6 +84,7 @@ export function AccountEditForm() {
             {...form.getInputProps('displayName')}
           />
         </Grid.Col>
+        <Grid.Col span={{ base: 12, sm: 6 }}></Grid.Col>
 
         <Grid.Col span={{ base: 12, sm: 6 }}>
           <TextInput
@@ -87,19 +102,33 @@ export function AccountEditForm() {
         <Grid.Col span={12}>
           <Textarea
             label="Bio"
-            autosize
-            minRows={2}
-            maxRows={5}
+            rows={3}
+            resize="vertical"
             {...form.getInputProps('bio')}
           />
         </Grid.Col>
 
         <Grid.Col span={12}>
-          <PasswordInput
-            label="New password"
-            description="Leave blank to keep current password"
-            {...form.getInputProps('password')}
-          />
+          {showPassword ? (
+            <Grid gutter="md">
+              <Grid.Col span={{ base: 12, sm: 6 }}>
+                <PasswordInput
+                  label="New password"
+                  {...form.getInputProps('password')}
+                />
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 6 }}>
+                <PasswordInput
+                  label="Confirm password"
+                  {...form.getInputProps('confirmPassword')}
+                />
+              </Grid.Col>
+            </Grid>
+          ) : (
+            <Button variant="light" onClick={() => setShowPassword(true)}>
+              Change password
+            </Button>
+          )}
         </Grid.Col>
 
         <Grid.Col span={12}>
