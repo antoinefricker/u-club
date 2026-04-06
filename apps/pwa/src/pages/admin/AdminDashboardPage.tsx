@@ -1,14 +1,10 @@
 import { SimpleGrid, Paper, Stack, Title, Text } from '@mantine/core';
-import {
-  IconBuildingCommunity,
-  IconUsers,
-  IconUsersGroup,
-} from '@tabler/icons-react';
+import { IconShieldHalf, IconUsers, IconShirtSport } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
 
 const cards = [
-  { label: 'Clubs', icon: IconBuildingCommunity, path: '/admin/clubs' },
-  { label: 'Teams', icon: IconUsersGroup, path: '/admin/teams' },
+  { label: 'Clubs', icon: IconShieldHalf, path: '/admin/clubs' },
+  { label: 'Teams', icon: IconShirtSport, path: '/admin/teams' },
   { label: 'Members', icon: IconUsers, path: '/admin/members' },
 ];
 

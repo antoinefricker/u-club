@@ -37,7 +37,6 @@ import { ConfirmEmailPage } from './pages/ConfirmEmailPage.tsx';
 import { ResetPasswordPage } from './pages/ResetPasswordPage.tsx';
 import { InvitationPage } from './pages/InvitationPage.tsx';
 import { AdminGuard } from './layout/AdminGuard.tsx';
-import { AdminLayout } from './layout/AdminLayout.tsx';
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage.tsx';
 import { ClubsListPage } from './pages/admin/ClubsListPage.tsx';
 import { ClubFormPage } from './pages/admin/ClubFormPage.tsx';
@@ -65,9 +64,7 @@ createRoot(document.getElementById('root')!).render(
                 <Route path="teams" element={<TeamsPage />} />
                 <Route path="account" element={<AccountPage />} />
                 <Route path="agenda" element={<AgendaPage />} />
-              </Route>
-              <Route path="admin" element={<AdminGuard />}>
-                <Route element={<AdminLayout />}>
+                <Route path="admin" element={<AdminGuard />}>
                   <Route index element={<AdminDashboardPage />} />
                   <Route path="clubs" element={<ClubsListPage />} />
                   <Route path="clubs/new" element={<ClubFormPage />} />

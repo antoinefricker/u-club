@@ -1,14 +1,14 @@
 import { AppShell, Box, Group, NavLink, Title } from '@mantine/core';
 import {
   IconArrowLeft,
-  IconBuildingCommunity,
+  IconShieldHalf,
   IconShirtSport,
   IconUsers,
 } from '@tabler/icons-react';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 
 const NAV_ITEMS = [
-  { label: 'Clubs', icon: IconBuildingCommunity, path: '/admin/clubs' },
+  { label: 'Clubs', icon: IconShieldHalf, path: '/admin/clubs' },
   { label: 'Teams', icon: IconShirtSport, path: '/admin/teams' },
   { label: 'Members', icon: IconUsers, path: '/admin/members' },
 ];
