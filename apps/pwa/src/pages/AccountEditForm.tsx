@@ -84,7 +84,11 @@ export function AccountEditForm() {
             {...form.getInputProps('displayName')}
           />
         </Grid.Col>
-        <Grid.Col span={{ base: 12, sm: 6 }}></Grid.Col>
+        {user?.role !== 'user' && (
+          <Grid.Col span={{ base: 12, sm: 6 }}>
+            <TextInput label="Role" value={user?.role} disabled />
+          </Grid.Col>
+        )}
 
         <Grid.Col span={{ base: 12, sm: 6 }}>
           <TextInput
