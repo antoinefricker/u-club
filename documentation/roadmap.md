@@ -2,9 +2,9 @@
 
 ## Architecture & Data model
 
-- **Club staff** — `club_users` join table to link users directly to clubs without being members (janitor, secretary, volunteer). Gives non-member users a club context.
 - **Complex users**
   - users that are not members (parents or relative)
+  - club_users` join table to link users directly to clubs without being members (janitor, secretary, volunteer). Gives non-member users a club context.
 - **Create events entity**
   — core version
   - linked to a club or a team
@@ -68,11 +68,6 @@
   - filter by date range
   - filter by team
   - export
-- **Admin pages**
-  - clubs management (CRUD)
-  - teams management (CRUD)
-  - members management (CRUD)
-- **Route guards** — Role-based UI: hide admin-only nav items from regular users
 - **i18n** — Internationalization with react-i18next (French/English)
 - **Loading/error states** — Add loading skeletons and error boundaries to pages
 - **Pagination** — Cursor or offset pagination on list endpoints as data grows
