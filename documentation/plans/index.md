@@ -6,3 +6,4 @@
 - [004 - 05/04/2026 - Seed Database](004-05042026-seed-database.md) — Seed script with realistic dev data and clear command
 - [005 - 05/04/2026 - Lost Password](005-05042026-lost-password.md) — Password reset flow via email
 - [006 - 06/04/2026 - Users-Members Relationship](006-06042026-users-members-relationship.md) — Many-to-many user-member links with custom descriptions
+- [007 - 06/04/2026 - Admin Pages](007-06042026-admin-pages.md) — Admin CRUD pages for clubs, teams, and members

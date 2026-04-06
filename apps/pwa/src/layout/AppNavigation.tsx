@@ -2,9 +2,11 @@ import {
   IconCalendarWeek,
   IconLayoutDashboard,
   IconLogout,
-  IconSmartHome,
+  IconShieldHalf,
+  IconSettings,
+  IconShirtSport,
   IconUserCog,
-  IconUsersGroup,
+  IconUsers,
 } from '@tabler/icons-react';
 import { Group, Title } from '@mantine/core';
 import classes from './AppNavigation.module.css';
@@ -37,12 +39,12 @@ export function AppNavigation() {
         </a>
 
         <a href="#" className={classes.link} onClick={navigateSection('club')}>
-          <IconSmartHome className={classes.linkIcon} stroke={1.5} />
+          <IconShieldHalf className={classes.linkIcon} stroke={1.5} />
           <span>My club</span>
         </a>
 
         <a href="#" className={classes.link} onClick={navigateSection('teams')}>
-          <IconUsersGroup className={classes.linkIcon} stroke={1.5} />
+          <IconShirtSport className={classes.linkIcon} stroke={1.5} />
           <span>My teams</span>
         </a>
 
@@ -54,12 +56,54 @@ export function AppNavigation() {
           <IconCalendarWeek className={classes.linkIcon} stroke={1.5} />
           <span>Agenda</span>
         </a>
+
+        {user?.role === 'admin' && (
+          <>
+            <div className={classes.separator} />
+            <a
+              href="#"
+              className={classes.link}
+              onClick={navigateSection('admin')}
+            >
+              <IconSettings className={classes.linkIcon} stroke={1.5} />
+              <span>Administration</span>
+            </a>
+            <a
+              href="#"
+              className={classes.link}
+              onClick={navigateSection('admin/clubs')}
+              style={{ paddingLeft: 36 }}
+            >
+              <IconShieldHalf className={classes.linkIcon} stroke={1.5} />
+              <span>Clubs</span>
+            </a>
+            <a
+              href="#"
+              className={classes.link}
+              onClick={navigateSection('admin/teams')}
+              style={{ paddingLeft: 36 }}
+            >
+              <IconShirtSport className={classes.linkIcon} stroke={1.5} />
+              <span>Teams</span>
+            </a>
+            <a
+              href="#"
+              className={classes.link}
+              onClick={navigateSection('admin/members')}
+              style={{ paddingLeft: 36 }}
+            >
+              <IconUsers className={classes.linkIcon} stroke={1.5} />
+              <span>Members</span>
+            </a>
+          </>
+        )}
       </div>
 
       <div className={classes.footer}>
         <Title order={6} c="white">
           {user?.displayName}
         </Title>
+
         <a
           href="#"
           className={classes.link}

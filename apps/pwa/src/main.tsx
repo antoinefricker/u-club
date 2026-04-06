@@ -36,6 +36,14 @@ import { AgendaPage } from './pages/AgendaPage.tsx';
 import { ConfirmEmailPage } from './pages/ConfirmEmailPage.tsx';
 import { ResetPasswordPage } from './pages/ResetPasswordPage.tsx';
 import { InvitationPage } from './pages/InvitationPage.tsx';
+import { AdminGuard } from './layout/AdminGuard.tsx';
+import { AdminDashboardPage } from './pages/admin/AdminDashboardPage.tsx';
+import { ClubsListPage } from './pages/admin/ClubsListPage.tsx';
+import { ClubFormPage } from './pages/admin/ClubFormPage.tsx';
+import { TeamsListPage } from './pages/admin/TeamsListPage.tsx';
+import { TeamFormPage } from './pages/admin/TeamFormPage.tsx';
+import { MembersListPage } from './pages/admin/MembersListPage.tsx';
+import { MemberFormPage } from './pages/admin/MemberFormPage.tsx';
 
 const queryClient = new QueryClient();
 
@@ -56,6 +64,18 @@ createRoot(document.getElementById('root')!).render(
                 <Route path="teams" element={<TeamsPage />} />
                 <Route path="account" element={<AccountPage />} />
                 <Route path="agenda" element={<AgendaPage />} />
+                <Route path="admin" element={<AdminGuard />}>
+                  <Route index element={<AdminDashboardPage />} />
+                  <Route path="clubs" element={<ClubsListPage />} />
+                  <Route path="clubs/new" element={<ClubFormPage />} />
+                  <Route path="clubs/:id" element={<ClubFormPage />} />
+                  <Route path="teams" element={<TeamsListPage />} />
+                  <Route path="teams/new" element={<TeamFormPage />} />
+                  <Route path="teams/:id" element={<TeamFormPage />} />
+                  <Route path="members" element={<MembersListPage />} />
+                  <Route path="members/new" element={<MemberFormPage />} />
+                  <Route path="members/:id" element={<MemberFormPage />} />
+                </Route>
               </Route>
             </Routes>
           </BrowserRouter>
