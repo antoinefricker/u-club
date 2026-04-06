@@ -206,7 +206,6 @@ async function seed() {
 
         const [member] = await db('members')
           .insert({
-            user_id: userId,
             status_id: faker.helpers.arrayElement(statusIds),
             first_name: firstName,
             last_name: lastName,
@@ -216,6 +215,14 @@ async function seed() {
           })
           .returning('id');
         totalMembers++;
+
+        if (userId) {
+          await db('user_members').insert({
+            user_id: userId,
+            member_id: member.id,
+            type: 'self',
+          });
+        }
 
         const role = m < 2 ? 'coach' : m < 4 ? 'assistant' : 'player';
         await db('team_assignments').insert({
