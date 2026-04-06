@@ -2,6 +2,7 @@
 
 ## Architecture & Data model
 
+- **Club staff** — `club_users` join table to link users directly to clubs without being members (janitor, secretary, volunteer). Gives non-member users a club context.
 - **Complex users**
   - users that are not members (parents or relative)
 - **Create events entity**
