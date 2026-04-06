@@ -6,11 +6,10 @@ import {
   Group,
   Loader,
   Select,
-  Stack,
   Table,
-  Title,
 } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
+import { PageTitle } from '../../layout/PageTitle';
 import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import { useMembers, useDeleteMember } from '../../hooks/useMembers';
@@ -43,13 +42,12 @@ export function MembersListPage() {
   if (error) return <Alert color="red">{String(error)}</Alert>;
 
   return (
-    <Stack>
-      <Group justify="space-between">
-        <Title order={2}>Members</Title>
+    <>
+      <PageTitle label="Members">
         <Button onClick={() => navigate('/admin/members/new')}>
           New member
         </Button>
-      </Group>
+      </PageTitle>
 
       <Select
         label="Filter by team"
@@ -60,7 +58,6 @@ export function MembersListPage() {
         clearable
         maw={300}
       />
-
       <Table striped highlightOnHover>
         <Table.Thead>
           <Table.Tr>
@@ -106,6 +103,6 @@ export function MembersListPage() {
           ))}
         </Table.Tbody>
       </Table>
-    </Stack>
+    </>
   );
 }

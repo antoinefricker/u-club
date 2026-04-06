@@ -4,15 +4,14 @@ import {
   Group,
   Loader,
   NumberInput,
-  Paper,
   Select,
   Stack,
   TextInput,
-  Title,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useNavigate, useParams } from 'react-router';
+import { PageTitle } from '../../layout/PageTitle';
 import {
   useMember,
   useCreateMember,
@@ -97,67 +96,62 @@ export function MemberFormPage() {
   if (isEdit && isLoading) return <Loader />;
 
   return (
-    <Stack>
-      <Title order={2}>{isEdit ? 'Edit member' : 'New member'}</Title>
+    <>
+      <PageTitle label={isEdit ? 'Edit member' : 'New member'} />
 
-      <Paper p="lg" shadow="xs" withBorder maw={600}>
-        <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
-          <Stack>
-            <TextInput
-              label="First name"
-              placeholder="First name"
-              required
-              {...form.getInputProps('firstName')}
-            />
-            <TextInput
-              label="Last name"
-              placeholder="Last name"
-              required
-              {...form.getInputProps('lastName')}
-            />
-            <Select
-              label="Gender"
-              placeholder="Select gender"
-              data={[
-                { value: 'male', label: 'Male' },
-                { value: 'female', label: 'Female' },
-              ]}
-              required
-              {...form.getInputProps('gender')}
-            />
-            <NumberInput
-              label="Year"
-              placeholder="e.g. 2026"
-              required
-              {...form.getInputProps('year')}
-            />
-            <TextInput
-              label="Birth date"
-              type="date"
-              {...form.getInputProps('birthDate')}
-            />
-            <TextInput
-              label="License"
-              placeholder="Optional license number"
-              {...form.getInputProps('license')}
-            />
-            <Group>
-              <Button
-                type="submit"
-                loading={createMember.isPending || updateMember.isPending}
-              >
-                {isEdit ? 'Update' : 'Create'}
-              </Button>
-              <Button
-                variant="subtle"
-                onClick={() => navigate('/admin/members')}
-              >
-                Cancel
-              </Button>
-            </Group>
-          </Stack>
-        </form>
-      </Paper>
-    </Stack>
+      <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
+        <Stack>
+          <TextInput
+            label="First name"
+            placeholder="First name"
+            required
+            {...form.getInputProps('firstName')}
+          />
+          <TextInput
+            label="Last name"
+            placeholder="Last name"
+            required
+            {...form.getInputProps('lastName')}
+          />
+          <Select
+            label="Gender"
+            placeholder="Select gender"
+            data={[
+              { value: 'male', label: 'Male' },
+              { value: 'female', label: 'Female' },
+            ]}
+            required
+            {...form.getInputProps('gender')}
+          />
+          <NumberInput
+            label="Year"
+            placeholder="e.g. 2026"
+            required
+            {...form.getInputProps('year')}
+          />
+          <TextInput
+            label="Birth date"
+            type="date"
+            {...form.getInputProps('birthDate')}
+          />
+          <TextInput
+            label="License"
+            placeholder="Optional license number"
+            {...form.getInputProps('license')}
+          />
+          <Group>
+            <Button
+              type="submit"
+              loading={createMember.isPending || updateMember.isPending}
+            >
+              {isEdit ? 'Update' : 'Create'}
+            </Button>
+            <Button variant="subtle" onClick={() => navigate('/admin/members')}>
+              Cancel
+            </Button>
+          </Group>
+        </Stack>
+      </form>
+    </>
   );
 }

@@ -1,14 +1,6 @@
-import {
-  ActionIcon,
-  Alert,
-  Button,
-  Group,
-  Loader,
-  Stack,
-  Table,
-  Title,
-} from '@mantine/core';
+import { ActionIcon, Alert, Button, Group, Loader, Table } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
+import { PageTitle } from '../../layout/PageTitle';
 import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import { useClubs, useDeleteClub } from '../../hooks/useClubs';
@@ -35,12 +27,10 @@ export function ClubsListPage() {
   if (error) return <Alert color="red">{String(error)}</Alert>;
 
   return (
-    <Stack>
-      <Group justify="space-between">
-        <Title order={2}>Clubs</Title>
+    <>
+      <PageTitle label="Clubs">
         <Button onClick={() => navigate('/admin/clubs/new')}>New club</Button>
-      </Group>
-
+      </PageTitle>
       <Table striped highlightOnHover>
         <Table.Thead>
           <Table.Tr>
@@ -77,6 +67,6 @@ export function ClubsListPage() {
           ))}
         </Table.Tbody>
       </Table>
-    </Stack>
+    </>
   );
 }

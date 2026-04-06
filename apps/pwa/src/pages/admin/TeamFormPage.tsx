@@ -4,16 +4,15 @@ import {
   Group,
   Loader,
   NumberInput,
-  Paper,
   Select,
   Stack,
   TextInput,
   Textarea,
-  Title,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useNavigate, useParams } from 'react-router';
+import { PageTitle } from '../../layout/PageTitle';
 import { useTeam, useCreateTeam, useUpdateTeam } from '../../hooks/useTeams';
 import { useClubs } from '../../hooks/useClubs';
 
@@ -95,61 +94,59 @@ export function TeamFormPage() {
   if (isEdit && isLoading) return <Loader />;
 
   return (
-    <Stack>
-      <Title order={2}>{isEdit ? 'Edit team' : 'New team'}</Title>
+    <>
+      <PageTitle label={isEdit ? 'Edit team' : 'New team'} />
 
-      <Paper p="lg" shadow="xs" withBorder maw={600}>
-        <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
-          <Stack>
-            <TextInput
-              label="Label"
-              placeholder="Team label"
-              required
-              {...form.getInputProps('label')}
-            />
-            <Select
-              label="Club"
-              placeholder="Select a club"
-              data={clubOptions}
-              required
-              {...form.getInputProps('clubId')}
-            />
-            <NumberInput
-              label="Year"
-              placeholder="e.g. 2026"
-              required
-              {...form.getInputProps('year')}
-            />
-            <Select
-              label="Gender"
-              placeholder="Select gender"
-              data={[
-                { value: 'male', label: 'Male' },
-                { value: 'female', label: 'Female' },
-                { value: 'both', label: 'Both' },
-              ]}
-              required
-              {...form.getInputProps('gender')}
-            />
-            <Textarea
-              label="Description"
-              placeholder="Optional description"
-              {...form.getInputProps('description')}
-            />
-            <Group>
-              <Button
-                type="submit"
-                loading={createTeam.isPending || updateTeam.isPending}
-              >
-                {isEdit ? 'Update' : 'Create'}
-              </Button>
-              <Button variant="subtle" onClick={() => navigate('/admin/teams')}>
-                Cancel
-              </Button>
-            </Group>
-          </Stack>
-        </form>
-      </Paper>
-    </Stack>
+      <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
+        <Stack>
+          <TextInput
+            label="Label"
+            placeholder="Team label"
+            required
+            {...form.getInputProps('label')}
+          />
+          <Select
+            label="Club"
+            placeholder="Select a club"
+            data={clubOptions}
+            required
+            {...form.getInputProps('clubId')}
+          />
+          <NumberInput
+            label="Year"
+            placeholder="e.g. 2026"
+            required
+            {...form.getInputProps('year')}
+          />
+          <Select
+            label="Gender"
+            placeholder="Select gender"
+            data={[
+              { value: 'male', label: 'Male' },
+              { value: 'female', label: 'Female' },
+              { value: 'both', label: 'Both' },
+            ]}
+            required
+            {...form.getInputProps('gender')}
+          />
+          <Textarea
+            label="Description"
+            placeholder="Optional description"
+            {...form.getInputProps('description')}
+          />
+          <Group>
+            <Button
+              type="submit"
+              loading={createTeam.isPending || updateTeam.isPending}
+            >
+              {isEdit ? 'Update' : 'Create'}
+            </Button>
+            <Button variant="subtle" onClick={() => navigate('/admin/teams')}>
+              Cancel
+            </Button>
+          </Group>
+        </Stack>
+      </form>
+    </>
   );
 }

@@ -30,9 +30,11 @@ export function AppNavigation() {
   return (
     <nav className={classes.navbar}>
       <div className={classes.navbarMain}>
-        <Group className={classes.header} justify="space-between">
-          🍆 Eggplant
-        </Group>
+        <div className={classes.header}>
+          <Group gap="xs" align="center">
+            🍆 eggplant
+          </Group>
+        </div>
 
         <div className={classes.separator} />
 

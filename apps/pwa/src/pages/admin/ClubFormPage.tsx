@@ -3,15 +3,14 @@ import {
   Button,
   Group,
   Loader,
-  Paper,
   Stack,
   TextInput,
   Textarea,
-  Title,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useNavigate, useParams } from 'react-router';
+import { PageTitle } from '../../layout/PageTitle';
 import { useClub, useCreateClub, useUpdateClub } from '../../hooks/useClubs';
 
 export function ClubFormPage() {
@@ -83,43 +82,40 @@ export function ClubFormPage() {
   if (isEdit && isLoading) return <Loader />;
 
   return (
-    <Stack>
-      <Title order={2}>{isEdit ? 'Edit club' : 'New club'}</Title>
-
-      <Paper p="lg" shadow="xs" withBorder maw={600}>
-        <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
-          <Stack>
-            <TextInput
-              label="Name"
-              placeholder="Club name"
-              required
-              {...form.getInputProps('name')}
-            />
-            <TextInput
-              label="Code"
-              placeholder="Club code"
-              required
-              {...form.getInputProps('code')}
-            />
-            <Textarea
-              label="Description"
-              placeholder="Optional description"
-              {...form.getInputProps('description')}
-            />
-            <Group>
-              <Button
-                type="submit"
-                loading={createClub.isPending || updateClub.isPending}
-              >
-                {isEdit ? 'Update' : 'Create'}
-              </Button>
-              <Button variant="subtle" onClick={() => navigate('/admin/clubs')}>
-                Cancel
-              </Button>
-            </Group>
-          </Stack>
-        </form>
-      </Paper>
-    </Stack>
+    <>
+      <PageTitle label={isEdit ? 'Edit club' : 'New club'} />
+      <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
+        <Stack>
+          <TextInput
+            label="Name"
+            placeholder="Club name"
+            required
+            {...form.getInputProps('name')}
+          />
+          <TextInput
+            label="Code"
+            placeholder="Club code"
+            required
+            {...form.getInputProps('code')}
+          />
+          <Textarea
+            label="Description"
+            placeholder="Optional description"
+            {...form.getInputProps('description')}
+          />
+          <Group>
+            <Button
+              type="submit"
+              loading={createClub.isPending || updateClub.isPending}
+            >
+              {isEdit ? 'Update' : 'Create'}
+            </Button>
+            <Button variant="subtle" onClick={() => navigate('/admin/clubs')}>
+              Cancel
+            </Button>
+          </Group>
+        </Stack>
+      </form>
+    </>
   );
 }

@@ -1,9 +1,5 @@
-import { Stack, Title } from '@mantine/core';
+import { PageTitle } from '../layout/PageTitle';
 
 export function TeamsPage() {
-  return (
-    <Stack align="center">
-      <Title order={2}>My Teams</Title>
-    </Stack>
-  );
+  return <PageTitle label="My teams" />;
 }

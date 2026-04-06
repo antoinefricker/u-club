@@ -1,9 +1,5 @@
-import { Stack, Title } from '@mantine/core';
+import { PageTitle } from '../layout/PageTitle';
 
 export function ClubPage() {
-  return (
-    <Stack align="center">
-      <Title order={2}>My club</Title>
-    </Stack>
-  );
+  return <PageTitle label="My club" />;
 }
