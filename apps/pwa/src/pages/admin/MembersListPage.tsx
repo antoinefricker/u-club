@@ -11,7 +11,7 @@ import {
   Title,
 } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import { useMembers, useDeleteMember } from '../../hooks/useMembers';
 import { useTeams } from '../../hooks/useTeams';
