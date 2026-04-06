@@ -1,0 +1,25 @@
+flowchart TD
+    START{Who is inviting?}
+
+    START -->|User linked to member| A1[User A is linked to a member]
+    START -->|Admin or Manager| A2[Admin/Manager selects a member]
+
+    A1 --> B[Invite User B by email]
+    A2 --> B
+
+    B --> C[Email sent with invitation link]
+    C --> D[User B clicks link]
+    D --> E{Has an account?}
+
+    E -->|Yes| F[Log in]
+    E -->|No| G[Register + verify email]
+
+    F --> H[Accept invitation page]
+    G --> H
+
+    H --> I[Choose relationship type]
+    I --> J["type: self | relative"]
+    J --> K["Edit description (e.g. mother, uncle)"]
+    K --> L[Confirm]
+    L --> M[user_members entry created]
+    M --> N[User B is now linked to the member]
