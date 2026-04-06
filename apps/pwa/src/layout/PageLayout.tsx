@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import { AppShell } from '@mantine/core';
+import { AppShell, Burger, Group } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { AppNavigation } from './AppNavigation';
 import { useAuth } from '../auth/useAuth';
 import { Unauthenticated } from './Unauthenticated';
@@ -10,6 +11,7 @@ interface PageLayoutProps {
 
 export function PageLayout({ children }: PageLayoutProps) {
   const { user } = useAuth();
+  const [opened, { toggle, close }] = useDisclosure();
 
   if (!user) {
     return (
@@ -22,18 +24,24 @@ export function PageLayout({ children }: PageLayoutProps) {
   return (
     <AppShell
       bg="white"
-      navbar={{ width: 300, breakpoint: 'sm' }}
-      header={{ height: 0 }}
-      padding={0}
+      header={{ height: { base: 46, sm: 0 } }}
+      navbar={{ width: 300, breakpoint: 'sm', collapsed: { mobile: !opened } }}
+      padding="md"
     >
+      <AppShell.Header hiddenFrom="sm" bg="var(--mantine-primary-color-5)">
+        <Group h="100%" px="md" justify="space-between">
+          <Group gap="xs" align="center" c="white" fw={700} fz={20}>
+            🍆 eggplant
+          </Group>
+          <Burger opened={opened} onClick={toggle} color="white" size="sm" />
+        </Group>
+      </AppShell.Header>
+
       <AppShell.Navbar>
-        <AppNavigation />
+        <AppNavigation onNavigate={close} />
       </AppShell.Navbar>
-      <AppShell.Main
-        style={{ '--app-shell-header-offset': '0px' } as React.CSSProperties}
-      >
-        {children}
-      </AppShell.Main>
+
+      <AppShell.Main>{children}</AppShell.Main>
     </AppShell>
   );
 }

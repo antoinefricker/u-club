@@ -11,13 +11,17 @@ import {
   IconUserCog,
   IconUsers,
 } from '@tabler/icons-react';
-import { Group, Title, Tooltip } from '@mantine/core';
+import { Box, Group, Title, Tooltip } from '@mantine/core';
 import classes from './AppNavigation.module.css';
 import { useAuth } from '../auth/useAuth';
 import { useNavigate } from 'react-router';
 import type { MouseEvent } from 'react';
 
-export function AppNavigation() {
+interface AppNavigationProps {
+  onNavigate?: () => void;
+}
+
+export function AppNavigation({ onNavigate }: AppNavigationProps) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -25,18 +29,21 @@ export function AppNavigation() {
     (section: string) => (event: MouseEvent<HTMLAnchorElement>) => {
       event.preventDefault();
       navigate(section);
+      onNavigate?.();
     };
 
   return (
     <nav className={classes.navbar}>
       <div className={classes.navbarMain}>
-        <div className={classes.header}>
-          <Group gap="xs" align="center">
-            🍆 eggplant
-          </Group>
-        </div>
+        <Box visibleFrom="sm">
+          <div className={classes.header}>
+            <Group gap="xs" align="center">
+              🍆 eggplant
+            </Group>
+          </div>
 
-        <div className={classes.separator} />
+          <div className={classes.separator} />
+        </Box>
 
         <a href="#" className={classes.link} onClick={navigateSection('')}>
           <IconLayoutDashboard className={classes.linkIcon} stroke={1.5} />
