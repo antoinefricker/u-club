@@ -11,6 +11,7 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useAuth } from '../auth/useAuth';
 import { PageTitle } from '../layout/PageTitle';
+import { FormWrapper } from '../layout/FormWrapper';
 import { useUserUpdate, type UpdateUserPayload } from '../hooks/useUserUpdate';
 
 type AccountFormValues = UpdateUserPayload & { password: string };
@@ -56,48 +57,50 @@ export function AccountPage() {
   return (
     <>
       <PageTitle label="My account" />
-      <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
-        <Stack>
-          {error && (
-            <Alert color="red" variant="light">
-              {error}
-            </Alert>
-          )}
+      <FormWrapper>
+        <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
+          <Stack>
+            {error && (
+              <Alert color="red" variant="light">
+                {error}
+              </Alert>
+            )}
 
-          <TextInput
-            label="Display name"
-            required
-            {...form.getInputProps('displayName')}
-          />
+            <TextInput
+              label="Display name"
+              required
+              {...form.getInputProps('displayName')}
+            />
 
-          <TextInput
-            label="Email"
-            type="email"
-            required
-            {...form.getInputProps('email')}
-          />
+            <TextInput
+              label="Email"
+              type="email"
+              required
+              {...form.getInputProps('email')}
+            />
 
-          <TextInput label="Phone" {...form.getInputProps('phone')} />
+            <TextInput label="Phone" {...form.getInputProps('phone')} />
 
-          <Textarea
-            label="Bio"
-            autosize
-            minRows={2}
-            maxRows={5}
-            {...form.getInputProps('bio')}
-          />
+            <Textarea
+              label="Bio"
+              autosize
+              minRows={2}
+              maxRows={5}
+              {...form.getInputProps('bio')}
+            />
 
-          <PasswordInput
-            label="New password"
-            description="Leave blank to keep current password"
-            {...form.getInputProps('password')}
-          />
+            <PasswordInput
+              label="New password"
+              description="Leave blank to keep current password"
+              {...form.getInputProps('password')}
+            />
 
-          <Button type="submit" fullWidth loading={mutation.isPending}>
-            Save changes
-          </Button>
-        </Stack>
-      </form>
+            <Button type="submit" fullWidth loading={mutation.isPending}>
+              Save changes
+            </Button>
+          </Stack>
+        </form>
+      </FormWrapper>
     </>
   );
 }
