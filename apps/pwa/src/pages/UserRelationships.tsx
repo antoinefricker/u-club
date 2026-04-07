@@ -124,13 +124,14 @@ export function UserRelationships() {
     <Table>
       <Table.Thead>
         <Table.Tr>
+          <Table.Th w={24}>#</Table.Th>
           <Table.Th>Member</Table.Th>
           <Table.Th w={160}>Type</Table.Th>
           <Table.Th w={80} />
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>
-        {relationships.map((rel) => {
+        {relationships.map((rel, index) => {
           const edit = getEdit(rel);
           const dirty = isDirty(rel);
           const showDescription = edit.type !== 'self';
@@ -141,25 +142,30 @@ export function UserRelationships() {
                 key={rel.id}
                 style={{
                   borderBottom: showDescription ? 'none' : undefined,
-                  paddingTop: 0,
                 }}
               >
                 <Table.Td
-                  style={{ paddingBottom: showDescription ? 0 : undefined }}
+                  w={24}
+                  style={{ paddingBottom: showDescription ? 4 : undefined }}
+                >
+                  <Text size="xs" c="dimmed">
+                    {index + 1}
+                  </Text>
+                </Table.Td>
+                <Table.Td
+                  style={{ paddingBottom: showDescription ? 4 : undefined }}
                 >
                   <Text fw={700}>
                     {rel.memberFirstName} {rel.memberLastName}
                   </Text>
                 </Table.Td>
                 <Table.Td
-                  style={{ paddingBottom: showDescription ? 0 : undefined }}
+                  style={{ paddingBottom: showDescription ? 4 : undefined }}
                 >
                   <Select
-                    size="sm"
-                    variant="unstyled"
                     data={[
-                      { value: 'self', label: 'Self' },
-                      { value: 'relative', label: 'Relative' },
+                      { value: 'self', label: "It's me!" },
+                      { value: 'relative', label: "It's a relative" },
                     ]}
                     value={edit.type}
                     onChange={(v) =>
@@ -168,6 +174,7 @@ export function UserRelationships() {
                   />
                 </Table.Td>
                 <Table.Td
+                  rowSpan={2}
                   style={{ paddingBottom: showDescription ? 0 : undefined }}
                 >
                   {dirty ? (
@@ -208,13 +215,14 @@ export function UserRelationships() {
                   visibility: showDescription ? 'visible' : 'collapse',
                 }}
               >
+                <Table.Td w={24} style={{ paddingTop: 0 }} />
                 <Table.Td colSpan={2} style={{ paddingTop: 0 }}>
                   <Group w="100%" align="center" gap="xs">
                     <Text
                       size="sm"
                       style={{ flexShrink: 0, flexBasis: 'auto' }}
                     >
-                      I am {rel.memberFirstName} {rel.memberLastName}'s
+                      I am {rel.memberFirstName}'s
                     </Text>
                     <TextInput
                       size="sm"
@@ -230,7 +238,6 @@ export function UserRelationships() {
                     />
                   </Group>
                 </Table.Td>
-                <Table.Td style={{ paddingTop: 0 }} />
               </Table.Tr>
             </>
           );
