@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { IconMail, IconPhone } from '@tabler/icons-react';
+import { IconMail } from '@tabler/icons-react';
+import { PhoneInput } from '../forms/inputs/PhoneInput';
 import {
   Alert,
   Anchor,
@@ -15,10 +16,7 @@ import { notifications } from '@mantine/notifications';
 import { useAuth } from '../auth/useAuth';
 import { useUserUpdate, type UpdateUserPayload } from '../hooks/useUserUpdate';
 import { emailValidation } from '../forms/validations/emailValidation';
-import {
-  phoneValidation,
-  formatPhone,
-} from '../forms/validations/phoneValidation';
+import { phoneValidation } from '../forms/validations/phoneValidation';
 import {
   passwordValidation,
   confirmPasswordValidation,
@@ -109,28 +107,9 @@ export function AccountEditForm() {
         </Grid.Col>
 
         <Grid.Col span={{ base: 12, sm: 6 }}>
-          <TextInput
-            label="Phone"
-            placeholder="0 00 00 00 00"
-            leftSection={
-              <span
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  fontSize: 14,
-                  color: 'var(--mantine-color-dimmed)',
-                }}
-              >
-                <IconPhone size={16} />
-                +33 (0)
-              </span>
-            }
-            leftSectionWidth={78}
+          <PhoneInput
             {...form.getInputProps('phone')}
-            onChange={(e) =>
-              form.setFieldValue('phone', formatPhone(e.target.value))
-            }
+            onChange={(v) => form.setFieldValue('phone', v)}
           />
         </Grid.Col>
 
