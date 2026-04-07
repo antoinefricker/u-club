@@ -152,7 +152,9 @@ async function seed() {
   let totalMembers = 0;
   let totalUsers = 0;
   let totalAssignments = 0;
+  let totalRelationships = 0;
   const allMembers: { id: string; teamId: string }[] = [];
+  const userMemberLinks: { userId: string; memberId: string }[] = [];
 
   for (const clubDef of clubDefs) {
     s.start(`Creating "${clubDef.name}" — ${clubDef.teams.length} teams`);
@@ -222,6 +224,8 @@ async function seed() {
             member_id: member.id,
             type: 'self',
           });
+          totalRelationships++;
+          userMemberLinks.push({ userId, memberId: member.id });
         }
 
         const role = m < 2 ? 'coach' : m < 4 ? 'assistant' : 'player';
@@ -265,9 +269,50 @@ async function seed() {
   }
   s.stop(`${crossAssigned} cross-team assignments created`);
 
+  // Relative relationships (30% of users get 1-2 extra member links)
+  s.start('Creating relative relationships');
+  const descriptions = [
+    'father',
+    'mother',
+    'son',
+    'daughter',
+    'brother',
+    'sister',
+    'uncle',
+    'aunt',
+  ];
+  const relativeCount = Math.floor(userMemberLinks.length * 0.3);
+  const shuffledLinks = [...userMemberLinks].sort(() => Math.random() - 0.5);
+  let relativesCreated = 0;
+
+  for (let i = 0; i < relativeCount; i++) {
+    const link = shuffledLinks[i];
+    const extraCount = faker.number.int({ min: 1, max: 2 });
+
+    for (let j = 0; j < extraCount; j++) {
+      const randomMember = faker.helpers.arrayElement(allMembers);
+      if (randomMember.id === link.memberId) continue;
+
+      try {
+        await db('user_members').insert({
+          user_id: link.userId,
+          member_id: randomMember.id,
+          type: 'relative',
+          description: faker.helpers.arrayElement(descriptions),
+        });
+        totalRelationships++;
+        relativesCreated++;
+      } catch {
+        // unique constraint — skip
+      }
+    }
+  }
+  s.stop(`${relativesCreated} relative relationships created`);
+
   log.success(`${totalMembers} members`);
   log.success(`${totalUsers} linked users`);
   log.success(`${totalAssignments} team assignments`);
+  log.success(`${totalRelationships} user-member relationships`);
 
   outro('Database seeded!');
   await db.destroy();

@@ -48,6 +48,7 @@ When creating or editing views in the PWA app:
 
 - Do not create a PR unless the user explicitly asks for it
 - When creating a pull Request, generate a summary section and a test plan section formatted as a todo checklist. Do not check any items in the test plan — leave them all unchecked.
+- When working on PWA pages, take screenshots of edited pages and include them in the PR description.
 
 ## Makefile
 

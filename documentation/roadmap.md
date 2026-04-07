@@ -41,6 +41,7 @@
 
 - **E2e auth tests** — Cover email confirmation flow and role-based access denial in Playwright
 - **E2e registration & invitation tests** — Full registration flow (register → verify email → login) and invitation flow (send invite → accept → relationship created) in Playwright
+- **Screenshot script** — Playwright script to take authenticated screenshots of PWA pages for PR descriptions
 - **Integration test suite** — Tests hitting a real test database to complement unit tests with mocks
 - **Database seeding for tests** — Shared fixtures for consistent test data
 
