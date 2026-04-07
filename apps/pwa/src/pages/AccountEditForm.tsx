@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { IconMail, IconPhone } from '@tabler/icons-react';
 import {
   Alert,
   Anchor,
@@ -14,6 +15,10 @@ import { notifications } from '@mantine/notifications';
 import { useAuth } from '../auth/useAuth';
 import { useUserUpdate, type UpdateUserPayload } from '../hooks/useUserUpdate';
 import { emailValidation } from '../forms/validations/emailValidation';
+import {
+  phoneValidation,
+  formatPhone,
+} from '../forms/validations/phoneValidation';
 import {
   passwordValidation,
   confirmPasswordValidation,
@@ -43,6 +48,7 @@ export function AccountEditForm() {
       displayName: (v) =>
         v.trim().length > 0 ? null : 'Display name is required',
       email: emailValidation,
+      phone: phoneValidation,
       password: passwordValidation,
       confirmPassword: confirmPasswordValidation,
     },
@@ -97,12 +103,35 @@ export function AccountEditForm() {
             label="Email"
             type="email"
             required
+            leftSection={<IconMail size={16} />}
             {...form.getInputProps('email')}
           />
         </Grid.Col>
 
         <Grid.Col span={{ base: 12, sm: 6 }}>
-          <TextInput label="Phone" {...form.getInputProps('phone')} />
+          <TextInput
+            label="Phone"
+            placeholder="0 00 00 00 00"
+            leftSection={
+              <span
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  fontSize: 14,
+                  color: 'var(--mantine-color-dimmed)',
+                }}
+              >
+                <IconPhone size={16} />
+                +33 (0)
+              </span>
+            }
+            leftSectionWidth={78}
+            {...form.getInputProps('phone')}
+            onChange={(e) =>
+              form.setFieldValue('phone', formatPhone(e.target.value))
+            }
+          />
         </Grid.Col>
 
         <Grid.Col span={12}>
