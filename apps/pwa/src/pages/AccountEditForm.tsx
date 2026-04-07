@@ -157,13 +157,11 @@ export function AccountEditForm() {
           </>
         )}
 
-        <Grid.Col span={12}>
-          <Button
-            type="submit"
-            fullWidth
-            color="success"
-            loading={mutation.isPending}
-          >
+        <Grid.Col
+          span={12}
+          style={{ display: 'flex', justifyContent: 'flex-end' }}
+        >
+          <Button type="submit" color="success" loading={mutation.isPending}>
             Save changes
           </Button>
         </Grid.Col>
