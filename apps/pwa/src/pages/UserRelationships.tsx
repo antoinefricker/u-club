@@ -86,7 +86,7 @@ export function UserRelationships() {
     );
   if (!relationships?.length)
     return (
-      <Alert color="blue" variant="light">
+      <Alert color="grey" variant="light">
         No linked members yet.
       </Alert>
     );

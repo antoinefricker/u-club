@@ -8,14 +8,20 @@ export function AccountPage() {
   return (
     <>
       <PageTitle label="My account" />
+
+      <Title order={3} mt="xl" mb="md">
+        Account details
+      </Title>
       <FormWrapper>
         <AccountEditForm />
       </FormWrapper>
 
       <Title order={3} mt="xl" mb="md">
-        My relationships
+        Family & members
       </Title>
-      <UserRelationships />
+      <FormWrapper>
+        <UserRelationships />
+      </FormWrapper>
     </>
   );
 }
