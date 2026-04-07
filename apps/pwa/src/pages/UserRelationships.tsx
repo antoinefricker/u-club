@@ -9,7 +9,13 @@ import {
   ActionIcon,
   Group,
 } from '@mantine/core';
-import { IconCheck, IconTrash, IconX } from '@tabler/icons-react';
+import {
+  IconCheck,
+  IconHandFingerRight,
+  IconHeartHandshake,
+  IconTrash,
+  IconX,
+} from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import {
   useUserMembers,
@@ -126,7 +132,7 @@ export function UserRelationships() {
         <Table.Tr>
           <Table.Th w={24}>#</Table.Th>
           <Table.Th>Member</Table.Th>
-          <Table.Th w={160}>Type</Table.Th>
+          <Table.Th w={180}>Type</Table.Th>
           <Table.Th w={80} />
         </Table.Tr>
       </Table.Thead>
@@ -170,6 +176,13 @@ export function UserRelationships() {
                     value={edit.type}
                     onChange={(v) =>
                       v && setEdit(rel.id, { type: v, description: '' })
+                    }
+                    leftSection={
+                      edit.type === 'self' ? (
+                        <IconHandFingerRight size={16} />
+                      ) : (
+                        <IconHeartHandshake size={16} />
+                      )
                     }
                   />
                 </Table.Td>
