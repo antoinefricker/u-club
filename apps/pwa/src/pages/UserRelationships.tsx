@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import {
   Alert,
-  Badge,
   Loader,
   Select,
   Table,
   TextInput,
+  Text,
   ActionIcon,
   Group,
 } from '@mantine/core';
@@ -17,8 +17,7 @@ import {
   useDeleteUserMember,
 } from '../hooks/useUserMembers';
 
-interface EditingState {
-  id: string;
+interface RowEdit {
   type: string;
   description: string;
 }
@@ -27,31 +26,51 @@ export function UserRelationships() {
   const { data: relationships, isLoading, error } = useUserMembers();
   const updateMutation = useUpdateUserMember();
   const deleteMutation = useDeleteUserMember();
-  const [editing, setEditing] = useState<EditingState | null>(null);
+  const [edits, setEdits] = useState<Record<string, RowEdit>>({});
 
-  const handleEdit = (rel: {
+  const getEdit = (rel: {
+    id: string;
+    type: string;
+    description: string | null;
+  }): RowEdit =>
+    edits[rel.id] ?? { type: rel.type, description: rel.description ?? '' };
+
+  const setEdit = (id: string, patch: Partial<RowEdit>) => {
+    setEdits((prev) => ({
+      ...prev,
+      [id]: { ...getEditById(id), ...patch },
+    }));
+  };
+
+  const getEditById = (id: string): RowEdit => {
+    if (edits[id]) return edits[id];
+    const rel = relationships?.find((r) => r.id === id);
+    return { type: rel?.type ?? '', description: rel?.description ?? '' };
+  };
+
+  const isDirty = (rel: {
     id: string;
     type: string;
     description: string | null;
   }) => {
-    setEditing({
-      id: rel.id,
-      type: rel.type,
-      description: rel.description ?? '',
-    });
+    const edit = getEdit(rel);
+    return (
+      edit.type !== rel.type || edit.description !== (rel.description ?? '')
+    );
   };
 
-  const handleSave = () => {
-    if (!editing) return;
+  const handleSave = (id: string) => {
+    const edit = edits[id];
+    if (!edit) return;
     updateMutation.mutate(
-      {
-        id: editing.id,
-        type: editing.type,
-        description: editing.description || null,
-      },
+      { id, type: edit.type, description: edit.description || null },
       {
         onSuccess: () => {
-          setEditing(null);
+          setEdits((prev) => {
+            const next = { ...prev };
+            delete next[id];
+            return next;
+          });
           notifications.show({
             title: 'Updated',
             message: 'Relationship updated.',
@@ -62,7 +81,17 @@ export function UserRelationships() {
     );
   };
 
-  const handleCancel = () => setEditing(null);
+  const handleCancel = (rel: {
+    id: string;
+    type: string;
+    description: string | null;
+  }) => {
+    setEdits((prev) => {
+      const next = { ...prev };
+      delete next[rel.id];
+      return next;
+    });
+  };
 
   const handleDelete = (id: string) => {
     if (!window.confirm('Remove this relationship?')) return;
@@ -86,7 +115,7 @@ export function UserRelationships() {
     );
   if (!relationships?.length)
     return (
-      <Alert color="grey" variant="light">
+      <Alert color="blue" variant="light">
         No linked members yet.
       </Alert>
     );
@@ -96,93 +125,116 @@ export function UserRelationships() {
       <Table.Thead>
         <Table.Tr>
           <Table.Th>Member</Table.Th>
-          <Table.Th>Type</Table.Th>
-          <Table.Th>Description</Table.Th>
-          <Table.Th />
+          <Table.Th w={160}>Type</Table.Th>
+          <Table.Th w={80} />
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>
-        {relationships.map((rel) => (
-          <Table.Tr key={rel.id}>
-            <Table.Td>
-              {rel.memberFirstName} {rel.memberLastName}
-            </Table.Td>
-            <Table.Td>
-              {editing?.id === rel.id ? (
-                <Select
-                  size="xs"
-                  data={[
-                    { value: 'self', label: 'Self' },
-                    { value: 'relative', label: 'Relative' },
-                  ]}
-                  value={editing.type}
-                  onChange={(v) => v && setEditing({ ...editing, type: v })}
-                />
-              ) : (
-                <Badge
-                  variant="light"
-                  color={rel.type === 'self' ? 'blue' : 'grape'}
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => handleEdit(rel)}
+        {relationships.map((rel) => {
+          const edit = getEdit(rel);
+          const dirty = isDirty(rel);
+          const showDescription = edit.type !== 'self';
+
+          return (
+            <>
+              <Table.Tr
+                key={rel.id}
+                style={{
+                  borderBottom: showDescription ? 'none' : undefined,
+                  paddingTop: 0,
+                }}
+              >
+                <Table.Td
+                  style={{ paddingBottom: showDescription ? 0 : undefined }}
                 >
-                  {rel.type}
-                </Badge>
-              )}
-            </Table.Td>
-            <Table.Td>
-              {editing?.id === rel.id ? (
-                <TextInput
-                  size="xs"
-                  placeholder="e.g. father, mother"
-                  value={editing.description}
-                  onChange={(e) =>
-                    setEditing({ ...editing, description: e.target.value })
-                  }
-                  onKeyDown={(e) => e.key === 'Enter' && handleSave()}
-                />
-              ) : (
-                <span
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => handleEdit(rel)}
+                  <Text fw={700}>
+                    {rel.memberFirstName} {rel.memberLastName}
+                  </Text>
+                </Table.Td>
+                <Table.Td
+                  style={{ paddingBottom: showDescription ? 0 : undefined }}
                 >
-                  {rel.description || '—'}
-                </span>
-              )}
-            </Table.Td>
-            <Table.Td>
-              {editing?.id === rel.id ? (
-                <Group gap="xs">
-                  <ActionIcon
-                    color="green"
-                    variant="light"
+                  <Select
                     size="sm"
-                    onClick={handleSave}
-                    loading={updateMutation.isPending}
-                  >
-                    <IconCheck size={14} />
-                  </ActionIcon>
-                  <ActionIcon
-                    color="gray"
-                    variant="light"
-                    size="sm"
-                    onClick={handleCancel}
-                  >
-                    <IconX size={14} />
-                  </ActionIcon>
-                </Group>
-              ) : (
-                <ActionIcon
-                  color="red"
-                  variant="light"
-                  size="sm"
-                  onClick={() => handleDelete(rel.id)}
+                    variant="unstyled"
+                    data={[
+                      { value: 'self', label: 'Self' },
+                      { value: 'relative', label: 'Relative' },
+                    ]}
+                    value={edit.type}
+                    onChange={(v) =>
+                      v && setEdit(rel.id, { type: v, description: '' })
+                    }
+                  />
+                </Table.Td>
+                <Table.Td
+                  style={{ paddingBottom: showDescription ? 0 : undefined }}
                 >
-                  <IconTrash size={14} />
-                </ActionIcon>
-              )}
-            </Table.Td>
-          </Table.Tr>
-        ))}
+                  {dirty ? (
+                    <Group gap="xs">
+                      <ActionIcon
+                        color="green"
+                        variant="light"
+                        size="sm"
+                        onClick={() => handleSave(rel.id)}
+                        loading={updateMutation.isPending}
+                      >
+                        <IconCheck size={14} />
+                      </ActionIcon>
+                      <ActionIcon
+                        color="gray"
+                        variant="light"
+                        size="sm"
+                        onClick={() => handleCancel(rel)}
+                      >
+                        <IconX size={14} />
+                      </ActionIcon>
+                    </Group>
+                  ) : (
+                    <ActionIcon
+                      color="red"
+                      variant="light"
+                      size="sm"
+                      onClick={() => handleDelete(rel.id)}
+                    >
+                      <IconTrash size={14} />
+                    </ActionIcon>
+                  )}
+                </Table.Td>
+              </Table.Tr>
+              <Table.Tr
+                key={`description-${rel.id}`}
+                style={{
+                  visibility: showDescription ? 'visible' : 'collapse',
+                }}
+              >
+                <Table.Td colSpan={2} style={{ paddingTop: 0 }}>
+                  <Group w="100%" align="center" gap="xs">
+                    <Text
+                      size="sm"
+                      style={{ flexShrink: 0, flexBasis: 'auto' }}
+                    >
+                      I am {rel.memberFirstName} {rel.memberLastName}'s
+                    </Text>
+                    <TextInput
+                      size="sm"
+                      width="100%"
+                      type={showDescription ? 'text' : 'hidden'}
+                      variant="default"
+                      placeholder="father, mother..."
+                      value={edit.description}
+                      onChange={(e) =>
+                        setEdit(rel.id, { description: e.target.value })
+                      }
+                      style={{ flexShrink: 1, flexGrow: 1, flexBasis: 'auto' }}
+                    />
+                  </Group>
+                </Table.Td>
+                <Table.Td style={{ paddingTop: 0 }} />
+              </Table.Tr>
+            </>
+          );
+        })}
       </Table.Tbody>
     </Table>
   );
