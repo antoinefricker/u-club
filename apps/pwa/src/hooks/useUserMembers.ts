@@ -20,15 +20,22 @@ function useAuthHeaders() {
   };
 }
 
-export function useUserMembers() {
-  const headers = useAuthHeaders();
+export function useUserMembers(userId?: string) {
+  const { token, user } = useAuth();
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
+  };
+  const id = userId ?? user?.id;
   return useQuery<UserMember[]>({
-    queryKey: ['user-members'],
+    queryKey: ['user-members', id],
     queryFn: async () => {
-      const res = await fetch('/api/user-members', { headers });
+      const url = id ? `/api/user-members?userId=${id}` : '/api/user-members';
+      const res = await fetch(url, { headers });
       if (!res.ok) throw new Error('Failed to fetch relationships');
       return res.json();
     },
+    enabled: !!id,
   });
 }
 
