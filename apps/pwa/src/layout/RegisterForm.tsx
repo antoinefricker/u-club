@@ -11,6 +11,7 @@ import {
   Text,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { emailValidation } from '../forms/validations/emailValidation';
 
 interface RegisterFormProps {
   onSwitchMode: () => void;
@@ -30,7 +31,7 @@ export function RegisterForm({ onSwitchMode }: RegisterFormProps) {
     },
     validate: {
       displayName: (v) => (v.length > 0 ? null : 'Display name is required'),
-      email: (v) => (/^\S+@\S+\.\S+$/.test(v) ? null : 'Invalid email'),
+      email: emailValidation,
       password: (v) =>
         v.length >= 6 ? null : 'Password must be at least 6 characters',
     },

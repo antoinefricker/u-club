@@ -1,15 +1,16 @@
 import { useEffect } from 'react';
 import {
   Button,
+  Grid,
   Group,
   Loader,
-  Stack,
   TextInput,
   Textarea,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useNavigate, useParams } from 'react-router';
+import { FormWrapper } from '../../layout/FormWrapper';
 import { PageTitle } from '../../layout/PageTitle';
 import { useClub, useCreateClub, useUpdateClub } from '../../hooks/useClubs';
 
@@ -84,38 +85,51 @@ export function ClubFormPage() {
   return (
     <>
       <PageTitle label={isEdit ? 'Edit club' : 'New club'} />
-      <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
-        <Stack>
-          <TextInput
-            label="Name"
-            placeholder="Club name"
-            required
-            {...form.getInputProps('name')}
-          />
-          <TextInput
-            label="Code"
-            placeholder="Club code"
-            required
-            {...form.getInputProps('code')}
-          />
-          <Textarea
-            label="Description"
-            placeholder="Optional description"
-            {...form.getInputProps('description')}
-          />
-          <Group>
-            <Button
-              type="submit"
-              loading={createClub.isPending || updateClub.isPending}
-            >
-              {isEdit ? 'Update' : 'Create'}
-            </Button>
-            <Button variant="subtle" onClick={() => navigate('/admin/clubs')}>
-              Cancel
-            </Button>
-          </Group>
-        </Stack>
-      </form>
+      <FormWrapper>
+        <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
+          <Grid gutter="md">
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <TextInput
+                label="Name"
+                placeholder="Club name"
+                required
+                {...form.getInputProps('name')}
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <TextInput
+                label="Code"
+                placeholder="Club code"
+                required
+                {...form.getInputProps('code')}
+              />
+            </Grid.Col>
+            <Grid.Col span={12}>
+              <Textarea
+                label="Description"
+                placeholder="Optional description"
+                {...form.getInputProps('description')}
+              />
+            </Grid.Col>
+            <Grid.Col span={12}>
+              <Group>
+                <Button
+                  type="submit"
+                  loading={createClub.isPending || updateClub.isPending}
+                >
+                  {isEdit ? 'Update' : 'Create'}
+                </Button>
+                <Button
+                  variant="subtle"
+                  onClick={() => navigate('/admin/clubs')}
+                >
+                  Cancel
+                </Button>
+              </Group>
+            </Grid.Col>
+          </Grid>
+        </form>
+      </FormWrapper>
     </>
   );
 }

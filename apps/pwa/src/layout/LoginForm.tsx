@@ -12,6 +12,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useAuth } from '../auth/useAuth';
+import { emailValidation } from '../forms/validations/emailValidation';
 
 interface LoginFormProps {
   onSwitchMode: () => void;
@@ -31,7 +32,7 @@ export function LoginForm({ onSwitchMode, onForgotPassword }: LoginFormProps) {
       password: '',
     },
     validate: {
-      email: (v) => (/^\S+@\S+\.\S+$/.test(v) ? null : 'Invalid email'),
+      email: emailValidation,
       password: (v) => (v.length > 0 ? null : 'Password is required'),
     },
   });
