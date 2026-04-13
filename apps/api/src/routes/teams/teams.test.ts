@@ -42,10 +42,8 @@ const sampleTeam = {
   id: 'team-1',
   clubId: 'club-1',
   label: 'U15 Boys',
-  year: 2026,
   gender: 'male',
   description: null,
-  archived: false,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
 };
@@ -101,7 +99,7 @@ describe('POST /teams', () => {
     const res = await request(app)
       .post('/teams')
       .set('Authorization', `Bearer ${adminToken}`)
-      .send({ label: 'U15', year: 2026, gender: 'male' });
+      .send({ label: 'U15', gender: 'male' });
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'validation error');
@@ -111,17 +109,7 @@ describe('POST /teams', () => {
     const res = await request(app)
       .post('/teams')
       .set('Authorization', `Bearer ${adminToken}`)
-      .send({ clubId: 'club-1', year: 2026, gender: 'male' });
-
-    expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'validation error');
-  });
-
-  it('should return 400 if year is missing', async () => {
-    const res = await request(app)
-      .post('/teams')
-      .set('Authorization', `Bearer ${adminToken}`)
-      .send({ clubId: 'club-1', label: 'U15', gender: 'male' });
+      .send({ clubId: 'club-1', gender: 'male' });
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'validation error');
@@ -131,7 +119,7 @@ describe('POST /teams', () => {
     const res = await request(app)
       .post('/teams')
       .set('Authorization', `Bearer ${adminToken}`)
-      .send({ clubId: 'club-1', label: 'U15', year: 2026, gender: 'other' });
+      .send({ clubId: 'club-1', label: 'U15', gender: 'other' });
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'validation error');
@@ -146,7 +134,6 @@ describe('POST /teams', () => {
       .send({
         clubId: 'club-1',
         label: 'U15 Boys',
-        year: 2026,
         gender: 'male',
       });
 

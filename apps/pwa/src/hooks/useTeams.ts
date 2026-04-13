@@ -5,10 +5,8 @@ interface Team {
   id: string;
   clubId: string;
   label: string;
-  year: number;
   gender: string;
   description: string | null;
-  archived: boolean;
   createdAt: string;
   updatedAt: string;
 }
