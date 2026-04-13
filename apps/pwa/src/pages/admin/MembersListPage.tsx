@@ -64,8 +64,6 @@ export function MembersListPage() {
             <Table.Th>First name</Table.Th>
             <Table.Th>Last name</Table.Th>
             <Table.Th>Gender</Table.Th>
-            <Table.Th>Year</Table.Th>
-            <Table.Th>License</Table.Th>
             <Table.Th />
           </Table.Tr>
         </Table.Thead>
@@ -75,8 +73,6 @@ export function MembersListPage() {
               <Table.Td>{member.firstName}</Table.Td>
               <Table.Td>{member.lastName}</Table.Td>
               <Table.Td>{member.gender}</Table.Td>
-              <Table.Td>{member.year}</Table.Td>
-              <Table.Td>{member.license}</Table.Td>
               <Table.Td>
                 <Group gap="xs" justify="flex-end">
                   <ActionIcon
