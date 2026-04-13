@@ -1,13 +1,5 @@
 import { useEffect } from 'react';
-import {
-  Button,
-  Grid,
-  Group,
-  Loader,
-  NumberInput,
-  Select,
-  TextInput,
-} from '@mantine/core';
+import { Button, Grid, Group, Loader, Select, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useNavigate, useParams } from 'react-router';
@@ -33,15 +25,12 @@ export function MemberFormPage() {
       firstName: '',
       lastName: '',
       gender: '',
-      year: new Date().getFullYear(),
-      birthDate: '',
-      license: '',
+      birthdate: '',
     },
     validate: {
       firstName: (v) => (v.trim() ? null : 'First name is required'),
       lastName: (v) => (v.trim() ? null : 'Last name is required'),
       gender: (v) => (v ? null : 'Gender is required'),
-      year: (v) => (v ? null : 'Year is required'),
     },
   });
 
@@ -51,9 +40,7 @@ export function MemberFormPage() {
         firstName: member.firstName,
         lastName: member.lastName,
         gender: member.gender,
-        year: member.year,
-        birthDate: member.birthDate ?? '',
-        license: member.license ?? '',
+        birthdate: member.birthdate ?? '',
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -62,8 +49,7 @@ export function MemberFormPage() {
   const handleSubmit = (values: typeof form.values) => {
     const payload = {
       ...values,
-      birthDate: values.birthDate || null,
-      license: values.license || null,
+      birthdate: values.birthdate || null,
     };
 
     if (isEdit) {
@@ -126,31 +112,17 @@ export function MemberFormPage() {
                 data={[
                   { value: 'male', label: 'Male' },
                   { value: 'female', label: 'Female' },
+                  { value: 'mixed', label: 'Mixed' },
                 ]}
                 required
                 {...form.getInputProps('gender')}
               />
             </Grid.Col>
             <Grid.Col span={{ base: 12, sm: 6 }}>
-              <NumberInput
-                label="Year"
-                placeholder="e.g. 2026"
-                required
-                {...form.getInputProps('year')}
-              />
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6 }}>
               <TextInput
                 label="Birth date"
                 type="date"
-                {...form.getInputProps('birthDate')}
-              />
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6 }}>
-              <TextInput
-                label="License"
-                placeholder="Optional license number"
-                {...form.getInputProps('license')}
+                {...form.getInputProps('birthdate')}
               />
             </Grid.Col>
             <Grid.Col span={12}>

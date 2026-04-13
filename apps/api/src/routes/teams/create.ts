@@ -39,13 +39,12 @@ router.post(
   requireRole('admin', 'manager'),
   validate(createTeamSchema),
   async (req: Request, res: Response) => {
-    const { club_id, label, year, gender, description } = req.body;
+    const { club_id, label, gender, description } = req.body;
 
     const [team] = await db('teams')
       .insert({
         club_id,
         label,
-        year,
         gender,
         description: description || null,
       })
@@ -53,10 +52,8 @@ router.post(
         'id',
         'club_id',
         'label',
-        'year',
         'gender',
         'description',
-        'archived',
         'created_at',
         'updated_at',
       ]);

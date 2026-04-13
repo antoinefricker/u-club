@@ -39,35 +39,23 @@ router.post(
   requireRole('admin', 'manager'),
   validate(createMemberSchema),
   async (req: Request, res: Response) => {
-    const {
-      first_name,
-      last_name,
-      gender,
-      year,
-      status_id,
-      birth_date,
-      license,
-    } = req.body;
+    const { first_name, last_name, gender, status_id, birthdate } = req.body;
 
     const [member] = await db('members')
       .insert({
         first_name,
         last_name,
         gender,
-        year,
         status_id: status_id || null,
-        birth_date: birth_date || null,
-        license: license || null,
+        birthdate: birthdate || null,
       })
       .returning([
         'id',
         'status_id',
         'first_name',
         'last_name',
-        'birth_date',
-        'license',
+        'birthdate',
         'gender',
-        'year',
         'created_at',
         'updated_at',
       ]);

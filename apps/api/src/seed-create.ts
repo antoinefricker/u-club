@@ -168,7 +168,6 @@ async function seed() {
         .insert({
           club_id: club.id,
           label: teamDef.label,
-          year: 2026,
           gender: teamDef.gender,
           description: `${clubDef.name} - ${teamDef.label}`,
         })
@@ -211,9 +210,8 @@ async function seed() {
             status_id: faker.helpers.arrayElement(statusIds),
             first_name: firstName,
             last_name: lastName,
-            birth_date: birthDate.toISOString().split('T')[0],
+            birthdate: birthDate.toISOString().split('T')[0],
             gender: memberGender,
-            year: 2026,
           })
           .returning('id');
         totalMembers++;

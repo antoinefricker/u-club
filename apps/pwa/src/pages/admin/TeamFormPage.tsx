@@ -4,7 +4,6 @@ import {
   Grid,
   Group,
   Loader,
-  NumberInput,
   Select,
   TextInput,
   Textarea,
@@ -33,14 +32,12 @@ export function TeamFormPage() {
     initialValues: {
       label: '',
       clubId: '',
-      year: new Date().getFullYear(),
       gender: '',
       description: '',
     },
     validate: {
       label: (v) => (v.trim() ? null : 'Label is required'),
       clubId: (v) => (v ? null : 'Club is required'),
-      year: (v) => (v ? null : 'Year is required'),
       gender: (v) => (v ? null : 'Gender is required'),
     },
   });
@@ -50,7 +47,6 @@ export function TeamFormPage() {
       form.setValues({
         label: team.label,
         clubId: team.clubId,
-        year: team.year,
         gender: team.gender,
         description: team.description ?? '',
       });
@@ -116,14 +112,6 @@ export function TeamFormPage() {
                 data={clubOptions}
                 required
                 {...form.getInputProps('clubId')}
-              />
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6 }}>
-              <NumberInput
-                label="Year"
-                placeholder="e.g. 2026"
-                required
-                {...form.getInputProps('year')}
               />
             </Grid.Col>
             <Grid.Col span={{ base: 12, sm: 6 }}>

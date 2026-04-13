@@ -48,10 +48,8 @@ const sampleMember = {
   statusId: null,
   firstName: 'John',
   lastName: 'Doe',
-  birthDate: null,
-  license: null,
+  birthdate: null,
   gender: 'male',
-  year: 2026,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
 };
@@ -109,7 +107,7 @@ describe('POST /members', () => {
     const res = await request(app)
       .post('/members')
       .set('Authorization', `Bearer ${adminToken}`)
-      .send({ lastName: 'Doe', gender: 'male', year: 2026 });
+      .send({ lastName: 'Doe', gender: 'male' });
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'validation error');
@@ -119,7 +117,7 @@ describe('POST /members', () => {
     const res = await request(app)
       .post('/members')
       .set('Authorization', `Bearer ${adminToken}`)
-      .send({ firstName: 'John', gender: 'male', year: 2026 });
+      .send({ firstName: 'John', gender: 'male' });
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'validation error');
@@ -133,18 +131,7 @@ describe('POST /members', () => {
         firstName: 'John',
         lastName: 'Doe',
         gender: 'other',
-        year: 2026,
       });
-
-    expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'validation error');
-  });
-
-  it('should return 400 if year is missing', async () => {
-    const res = await request(app)
-      .post('/members')
-      .set('Authorization', `Bearer ${adminToken}`)
-      .send({ firstName: 'John', lastName: 'Doe', gender: 'male' });
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'validation error');
@@ -156,7 +143,7 @@ describe('POST /members', () => {
     const res = await request(app)
       .post('/members')
       .set('Authorization', `Bearer ${adminToken}`)
-      .send({ firstName: 'John', lastName: 'Doe', gender: 'male', year: 2026 });
+      .send({ firstName: 'John', lastName: 'Doe', gender: 'male' });
 
     expect(res.status).toBe(201);
     expect(res.body).toEqual(sampleMember);

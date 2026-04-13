@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
   ActionIcon,
   Alert,
-  Badge,
   Button,
   Group,
   Loader,
@@ -64,9 +63,7 @@ export function TeamsListPage() {
           <Table.Tr>
             <Table.Th>Label</Table.Th>
             <Table.Th>Club</Table.Th>
-            <Table.Th>Year</Table.Th>
             <Table.Th>Gender</Table.Th>
-            <Table.Th>Archived</Table.Th>
             <Table.Th />
           </Table.Tr>
         </Table.Thead>
@@ -77,15 +74,7 @@ export function TeamsListPage() {
               <Table.Td>
                 {clubNameById.get(team.clubId) ?? team.clubId}
               </Table.Td>
-              <Table.Td>{team.year}</Table.Td>
               <Table.Td>{team.gender}</Table.Td>
-              <Table.Td>
-                {team.archived && (
-                  <Badge color="gray" variant="light">
-                    Archived
-                  </Badge>
-                )}
-              </Table.Td>
               <Table.Td>
                 <Group gap="xs" justify="flex-end">
                   <ActionIcon

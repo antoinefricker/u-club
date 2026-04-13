@@ -65,10 +65,8 @@ router.put(
         'status_id',
         'first_name',
         'last_name',
-        'birth_date',
-        'license',
+        'birthdate',
         'gender',
-        'year',
         'created_at',
         'updated_at',
       ]);

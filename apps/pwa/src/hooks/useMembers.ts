@@ -6,10 +6,8 @@ interface Member {
   statusId: string | null;
   firstName: string;
   lastName: string;
-  birthDate: string | null;
-  license: string | null;
+  birthdate: string | null;
   gender: string;
-  year: number;
   createdAt: string;
   updatedAt: string;
 }

@@ -41,10 +41,8 @@ router.get(
       'members.status_id',
       'members.first_name',
       'members.last_name',
-      'members.birth_date',
-      'members.license',
+      'members.birthdate',
       'members.gender',
-      'members.year',
       'members.created_at',
       'members.updated_at',
     );

@@ -44,10 +44,8 @@ router.get(
         'id',
         'club_id',
         'label',
-        'year',
         'gender',
         'description',
-        'archived',
         'created_at',
         'updated_at',
       )
