@@ -20,7 +20,7 @@
     "migrate:status": "knex migrate:status --knexfile knexfile.js",
     "migrate:make": "knex migrate:make --knexfile knexfile.js -x ts",
     "seed": "tsx src/seed-create.ts",
-    "seed:clear": "tsx src/seed-clear.ts",
+    "seed:clear": "tsx src/scripts/seedClear.ts",
     "status": "tsx src/scripts/status.ts"
   },
   "dependencies": {
