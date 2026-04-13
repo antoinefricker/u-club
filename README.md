@@ -84,6 +84,7 @@ dev-stop       Stop dev services (node servers + docker)
 - [Implementation plans](./documentation/plans/index.md)
 - [Database diagram](./documentation/database-diagram.mermaid)
 - [Bruno API collection](./documentation/bruno)
+- [more...](./documentation/misc)
 
 ### Dependencies
 
