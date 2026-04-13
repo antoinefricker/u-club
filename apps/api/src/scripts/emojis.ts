@@ -1,0 +1,18 @@
+export const emojis = {
+  headSweatDown: '😓',
+  headKiss: '😘',
+  handOk: '👌',
+  handDown: '👎',
+  statusRed: '🔴',
+  statusYellow: '🟡',
+  statusGreen: '🟢',
+  rocket: '🚀',
+  magic: '✨',
+  fire: '🔥',
+  book: '📙',
+  trash: '🗑️',
+  cog: '⚙️',
+  placard: '🪧',
+  skull: '💀',
+  eggplant: '🍆',
+};
