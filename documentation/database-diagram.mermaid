@@ -35,9 +35,18 @@ erDiagram
     TEAM {
         uuid id PK
         uuid club_id FK
+        uuid category_id FK
         string label
         enum gender
         text description
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    TEAM_CATEGORY {
+        uuid id PK
+        uuid club_id FK
+        string label
         timestamp created_at
         timestamp updated_at
     }
@@ -101,6 +110,8 @@ erDiagram
     USER          ||--o{ AUTH_TOKEN        : "requests"
     USER          ||--o{ REVOKED_TOKEN      : "revokes"
     CLUB          ||--o{ TEAM               : "has"
+    CLUB          ||--o{ TEAM_CATEGORY      : "has"
+    TEAM_CATEGORY ||--o{ TEAM               : "categorizes"
     USER          ||--o{ USER_MEMBER         : "linked"
     MEMBER        ||--o{ USER_MEMBER         : "linked"
     USER          ||--o{ MEMBER_INVITATION   : "invites"
