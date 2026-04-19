@@ -2,9 +2,9 @@ import db from '../../db.js';
 import { hashPassword } from '../../password.js';
 import type {
   Club,
+  MemberStatus,
   Team,
   TeamCategory,
-  TeamGender,
 } from '../../types/index.js';
 
 export const hashedPassword = await hashPassword(
@@ -44,10 +44,10 @@ export const dbClear = async (): Promise<string[]> => {
   return results;
 };
 
-export const insertMemberStatus = async (label: string) => {
-  const [status] = await db('member_statuses')
-    .insert({ label })
-    .returning('id');
+export const insertMemberStatus = async (
+  label: string,
+): Promise<MemberStatus> => {
+  const [status] = await db('member_statuses').insert({ label }).returning('*');
   return status;
 };
 
@@ -90,45 +90,25 @@ export const insertUserMemberLink = async (insertedLink: {
   await db('user_members').insert(insertedLink);
 };
 
-export const insertClub = async (club: {
-  code: string;
-  name: string;
-  description?: string;
-}): Promise<Club> => {
-  const [createdClub] = await db('clubs')
-    .insert({
-      name: club.name,
-      code: club.code,
-      description: club.description,
-    })
-    .returning('*');
+export const insertClub = async (
+  club: Pick<Club, 'name' | 'code' | 'description'>,
+): Promise<Club> => {
+  const [createdClub] = await db('clubs').insert(club).returning('*');
   return createdClub;
 };
 
-export const insertTeamCategory = async (category: {
-  clubId: string;
-  label: string;
-}): Promise<TeamCategory> => {
+export const insertTeamCategory = async (
+  category: Pick<TeamCategory, 'club_id' | 'label'>,
+): Promise<TeamCategory> => {
   const [createdCategory] = await db('team_categories')
-    .insert({
-      club_id: category.clubId,
-      label: category.label,
-    })
+    .insert(category)
     .returning('*');
   return createdCategory;
 };
 
-export const insertTeam = async (team: {
-  clubId: string;
-  label: string;
-  gender: TeamGender;
-}): Promise<Team> => {
-  const [createdTeam] = await db('teams')
-    .insert({
-      club_id: team.clubId,
-      label: team.label,
-      gender: team.gender,
-    })
-    .returning('*');
+export const insertTeam = async (
+  team: Pick<Team, 'club_id' | 'category_id' | 'label' | 'gender'>,
+): Promise<Team> => {
+  const [createdTeam] = await db('teams').insert(team).returning('*');
   return createdTeam;
 };

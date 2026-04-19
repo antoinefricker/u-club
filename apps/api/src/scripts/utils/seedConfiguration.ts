@@ -133,4 +133,5 @@ export default {
   season: SEASON,
   seedPassword: 'password123',
   clubs: CLUB_CONFIGURATION,
+  memberStatuses: ['active', 'pending', 'inactive'],
 };
