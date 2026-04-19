@@ -1,6 +1,6 @@
 import * as readline from 'node:readline';
-import { Listr } from 'listr2';
 import db from '../db.js';
+import { Logger } from './utils/logUtils.js';
 import { checkDbConnection, dbClear } from './utils/seedUtils.js';
 
 function confirm(message: string): Promise<boolean> {
@@ -24,26 +24,25 @@ export async function seedClear(force: boolean) {
       'This will delete ALL data. Continue?',
     );
     if (!shouldContinue) {
-      console.log('Aborted.');
+      Logger.info('Aborted.');
       await db.destroy();
       process.exit(0);
     }
   }
 
-  const tasks = new Listr([
-    {
-      title: 'Clearing database',
-      task: async (_, task) => {
-        const results = await dbClear();
-        task.title =
-          results.length > 0
-            ? `Cleared: ${results.join(', ')}`
-            : 'Database was already empty';
-      },
-    },
-  ]);
-
-  await tasks.run();
+  Logger.title('CLEARING DATABASE');
+  Logger.nl();
+  const results = await dbClear();
+  if (results.length > 0) {
+    for (const entry of results) {
+      Logger.info(entry, ' ');
+    }
+    Logger.nl();
+    Logger.info(`Cleared: ${results.join(', ')}`);
+  } else {
+    Logger.info('Database was already empty');
+  }
+  Logger.nl(2);
 }
 
 // only self-execute when run directly vs imported
