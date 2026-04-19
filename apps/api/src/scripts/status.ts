@@ -45,34 +45,3 @@ Logger.status(await checkPort(PWA_PORT), ['PWA', String(PWA_PORT)]);
 Logger.separator();
 Logger.nl();
 Logger.nl();
-
-Logger.title('Checking services status');
-Logger.nl();
-Logger.status('warning', ['Postgres', '54321']);
-Logger.status('warning', ['Mail', '32475']);
-Logger.status('success', ['API', '8000']);
-Logger.status('success', ['Swagger', '3232']);
-Logger.status('error', ['Redis', '6379']);
-Logger.status('error', ['RabbitMQ', '5672']);
-Logger.separator();
-Logger.nl();
-
-await Logger.select<boolean>('Do you want to stop all services?', [
-  { value: true, label: 'Yes, stop all services' },
-  { value: false, label: 'No, keep them running' },
-]).then((answer) => {
-  if (answer) {
-    Logger.info('Stopping all services...');
-    Logger.info('All services stopped.');
-  }
-});
-Logger.nl();
-
-Logger.info('https://httpbin.org/status/200');
-Logger.nl();
-
-Logger.info('https://httpbin.org/status/400');
-Logger.warn('https://httpbin.org/status/400');
-Logger.error('https://httpbin.org/status/400');
-console.error('caca');
-Logger.nl();
