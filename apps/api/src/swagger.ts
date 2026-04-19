@@ -97,7 +97,7 @@ const options: swaggerJsdoc.Options = {
             id: { type: 'string', format: 'uuid' },
             clubId: { type: 'string', format: 'uuid' },
             label: { type: 'string' },
-            gender: { type: 'string', enum: ['male', 'female', 'both'] },
+            gender: { type: 'string', enum: ['male', 'female', 'mixed'] },
             description: { type: 'string', nullable: true },
             createdAt: { type: 'string', format: 'date-time' },
             updatedAt: { type: 'string', format: 'date-time' },
@@ -109,7 +109,7 @@ const options: swaggerJsdoc.Options = {
           properties: {
             clubId: { type: 'string', format: 'uuid' },
             label: { type: 'string' },
-            gender: { type: 'string', enum: ['male', 'female', 'both'] },
+            gender: { type: 'string', enum: ['male', 'female', 'mixed'] },
             description: { type: 'string', nullable: true },
           },
         },
@@ -117,7 +117,7 @@ const options: swaggerJsdoc.Options = {
           type: 'object',
           properties: {
             label: { type: 'string' },
-            gender: { type: 'string', enum: ['male', 'female', 'both'] },
+            gender: { type: 'string', enum: ['male', 'female', 'mixed'] },
             description: { type: 'string', nullable: true },
           },
         },
