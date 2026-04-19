@@ -76,7 +76,7 @@ migrate-make:
 ## seed-create: Clear and seed database with dev data (use FORCE=1 to skip confirmation)
 seed-create:
 	$(check_postgres)
-	pnpm --filter @eggplant/api seed $(if $(filter 1,$(FORCE)),-- --force)
+	pnpm --filter @eggplant/api seed:create $(if $(filter 1,$(FORCE)),-- --force)
 
 ## seed-clear: Clear all data from database (use FORCE=1 to skip confirmation)
 seed-clear:

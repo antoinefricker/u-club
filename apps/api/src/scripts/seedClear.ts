@@ -1,28 +1,57 @@
-import { intro, outro, log, confirm, isCancel } from '@clack/prompts';
+import * as readline from 'node:readline';
+import { Listr } from 'listr2';
 import db from '../db.js';
 import { checkDbConnection, dbClear } from './utils/seedUtils.js';
 
-async function seedClear(force: boolean) {
-  intro('CLEAR DATABASE');
+function confirm(message: string): Promise<boolean> {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  return new Promise((resolve) => {
+    rl.question(`${message} (y/N) `, (answer) => {
+      rl.close();
+      resolve(answer.toLowerCase() === 'y');
+    });
+  });
+}
 
+export async function seedClear(force: boolean) {
   await checkDbConnection();
 
   if (!force) {
-    const shouldContinue = await confirm({
-      message: 'This will delete ALL data. Continue?',
-    });
-    if (isCancel(shouldContinue) || !shouldContinue) {
-      outro('Aborted');
+    const shouldContinue = await confirm(
+      'This will delete ALL data. Continue?',
+    );
+    if (!shouldContinue) {
+      console.log('Aborted.');
       await db.destroy();
       process.exit(0);
     }
   }
 
-  await dbClear();
-  outro('All clean!');
+  const tasks = new Listr([
+    {
+      title: 'Clearing database',
+      task: async (_, task) => {
+        const results = await dbClear();
+        task.title =
+          results.length > 0
+            ? `Cleared: ${results.join(', ')}`
+            : 'Database was already empty';
+      },
+    },
+  ]);
+
+  await tasks.run();
 }
 
-seedClear(process.argv.includes('--force')).catch((err) => {
-  log.error(String(err));
-  process.exit(1);
-});
+// only self-execute when run directly vs imported
+if (import.meta.url === `file://${process.argv[1]}`) {
+  seedClear(process.argv.includes('--force'))
+    .then(() => db.destroy())
+    .catch((err) => {
+      console.error(String(err));
+      process.exit(1);
+    });
+}
