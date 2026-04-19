@@ -1,16 +1,23 @@
+import { faker } from '@faker-js/faker/locale/fr';
+
 import { seedClear } from './seedClear.js';
 import CONFIG from './utils/seedConfiguration.js';
 import {
   insertClub,
+  insertMember,
   insertMemberStatus,
   insertTeam,
+  insertTeamAssignment,
   insertTeamCategory,
 } from './utils/seedUtils.js';
 import { Logger } from './utils/logUtils.js';
 import type {
   Club,
+  Member,
+  MemberGender,
   MemberStatus,
   Team,
+  TeamAssignment,
   TeamCategory,
   TeamGender,
 } from '../types/index.js';
@@ -20,8 +27,18 @@ type Seeded = {
   clubs: Club[];
   teamCategories: TeamCategory[];
   teams: Team[];
+  members: Member[];
+  teamAssignments: TeamAssignment[];
   memberStatuses: MemberStatus[];
 };
+
+type TeamInfo = {
+  team: Team;
+  club: Club;
+  ageRange: [number, number];
+};
+
+const toDateString = (date: Date): string => date.toISOString().split('T')[0];
 
 async function seedCreate(force: boolean) {
   await seedClear(force);
@@ -31,6 +48,8 @@ async function seedCreate(force: boolean) {
     clubs: [],
     teamCategories: [],
     teams: [],
+    members: [],
+    teamAssignments: [],
     memberStatuses: [],
   };
 
@@ -83,9 +102,10 @@ async function seedCreate(force: boolean) {
     mixed: '',
   };
 
+  const teamInfos: TeamInfo[] = [];
   for (let i = 0; i < CONFIG.clubs.length; i++) {
     const club = CONFIG.clubs[i];
-    const createdClub = seeded.clubs[i];
+    const linkedClub = seeded.clubs[i];
     for (let j = 0; j < club.categories.length; j++) {
       const category = club.categories[j];
       const createdCategory = categoriesByClub[i][j];
@@ -96,13 +116,18 @@ async function seedCreate(force: boolean) {
               ? `${category.name} ${labelForGender[genderConfig.type]}`
               : `${category.name} ${labelForGender[genderConfig.type]} ${n + 1}`;
           const createdTeam = await insertTeam({
-            club_id: createdClub.id,
+            club_id: linkedClub.id,
             category_id: createdCategory.id,
             label,
             gender: genderConfig.type,
           });
-          Logger.info([createdTeam.label, createdClub.name], ' ');
+          Logger.info([createdTeam.label, linkedClub.name], ' ');
           seeded.teams.push(createdTeam);
+          teamInfos.push({
+            team: createdTeam,
+            club: linkedClub,
+            ageRange: category.ageRange,
+          });
         }
       }
     }
@@ -123,6 +148,78 @@ async function seedCreate(force: boolean) {
   Logger.info(`Created ${seeded.memberStatuses.length} statuses`);
   Logger.nl(2);
 
+  // -------------------------- members & team assignments
+  Logger.title('MEMBERS');
+  Logger.nl();
+
+  const activeStatus =
+    seeded.memberStatuses.find((s) => s.label === 'active') ??
+    seeded.memberStatuses[0];
+
+  for (const { team, club, ageRange } of teamInfos) {
+    const playerCount = faker.number.int({ min: 10, max: 15 });
+
+    for (let p = 0; p < playerCount; p++) {
+      const gender: MemberGender =
+        team.gender === 'mixed'
+          ? faker.helpers.arrayElement<MemberGender>(['male', 'female'])
+          : team.gender;
+      const player = await insertMember({
+        status_id: activeStatus.id,
+        first_name: faker.person.firstName(gender),
+        last_name: faker.person.lastName(),
+        birthdate: toDateString(
+          faker.date.birthdate({
+            min: ageRange[0],
+            max: ageRange[1],
+            mode: 'age',
+          }),
+        ),
+        gender,
+      });
+      seeded.members.push(player);
+      const assignment = await insertTeamAssignment({
+        team_id: team.id,
+        member_id: player.id,
+        role: 'player',
+      });
+      seeded.teamAssignments.push(assignment);
+    }
+
+    const coachGender = faker.helpers.arrayElement<MemberGender>([
+      'male',
+      'female',
+    ]);
+    const coach = await insertMember({
+      status_id: activeStatus.id,
+      first_name: faker.person.firstName(coachGender),
+      last_name: faker.person.lastName(),
+      birthdate: toDateString(
+        faker.date.birthdate({ min: 25, max: 55, mode: 'age' }),
+      ),
+      gender: coachGender,
+    });
+    seeded.members.push(coach);
+    const coachAssignment = await insertTeamAssignment({
+      team_id: team.id,
+      member_id: coach.id,
+      role: 'coach',
+    });
+    seeded.teamAssignments.push(coachAssignment);
+
+    Logger.info(
+      [team.label, club.name, `${playerCount} players + 1 coach`],
+      ' ',
+    );
+  }
+
+  Logger.nl();
+  Logger.info(
+    `Created ${seeded.members.length} members, ${seeded.teamAssignments.length} team assignments`,
+  );
+  Logger.nl(2);
+
+  // -------------------------- conclusion
   Logger.nl(1);
   Logger.title(`${emojis.magic} Seeding complete`);
   process.exit(0);

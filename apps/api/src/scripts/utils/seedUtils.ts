@@ -2,8 +2,10 @@ import db from '../../db.js';
 import { hashPassword } from '../../password.js';
 import type {
   Club,
+  Member,
   MemberStatus,
   Team,
+  TeamAssignment,
   TeamCategory,
 } from '../../types/index.js';
 
@@ -51,15 +53,23 @@ export const insertMemberStatus = async (
   return status;
 };
 
-export const insertMember = async (member: {
-  statusId: string;
-  firstName: string;
-  lastName: string;
-  birthdate: Date;
-  gender: 'male' | 'female';
-}) => {
-  const [memberId] = await db('members').insert(member).returning('id');
-  return { ...member, id: memberId };
+export const insertMember = async (
+  member: Pick<
+    Member,
+    'status_id' | 'first_name' | 'last_name' | 'birthdate' | 'gender'
+  >,
+): Promise<Member> => {
+  const [createdMember] = await db('members').insert(member).returning('*');
+  return createdMember;
+};
+
+export const insertTeamAssignment = async (
+  assignment: Pick<TeamAssignment, 'team_id' | 'member_id' | 'role'>,
+): Promise<TeamAssignment> => {
+  const [createdAssignment] = await db('team_assignments')
+    .insert(assignment)
+    .returning('*');
+  return createdAssignment;
 };
 
 export const insertUser = async ({
