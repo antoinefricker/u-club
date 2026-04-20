@@ -1,6 +1,6 @@
 # Personas
 
-## Sebastien
+## Sebastien DOE
 
 <code>sebastien@eggplant.app</code>
 
@@ -10,17 +10,17 @@
 
 ### Relationships
 
-- **Site Admin**
 - Head coach in Senior/male/1
-- Head coach in U18/male/1
+- Head coach in U18/male/2
 - Player in Senior/male/1
 - Son, Benjamin, in U18/male/2
 
 ### Information
 
+- user role: admin
 - media: Phone and computer
 
-## Jean
+## Jean DOE
 
 <code>jean@eggplant.app</code>
 
@@ -35,14 +35,15 @@
 
 ### Information
 
+- user role: admin
 - media: phone only
 
-## Nathalie
+## Marine DOE
 
 <code>nathalie@eggplant.app</code>
 
 - Marine is a former player but is still very interested in the club life.
-- She follows assiduously the result of a fe teams and attend to some matchs.
+- She follows assiduously the result of a few teams and attend to some matchs.
 - She want a simple way to get in touch with her favorite teams.
 
 ### Relationships
@@ -51,9 +52,10 @@
 
 ### Information
 
+- user role: user
 - media: mostly phone
 
-## Antoine
+## Antoine DOE
 
 <code>antoine@eggplant.app</code>
 
@@ -66,7 +68,6 @@
 
 ### Relationships
 
-- **Site manager**
 - One son, Virgile, in U18/male/1
 - One son, Camille, in U13/male/1
 - Assistant coach in U13/male/1
@@ -75,11 +76,12 @@
 
 ### Information
 
+- user role: admin
 - media: mostly computer
 
-## Chloé
+## Zoé DOE
 
-<code>chloe@eggplant.app</code>
+<code>zoe@eggplant.app</code>
 
 - Chloé is a very busy mother with a demanding job and three kids in the club
 - She uses the app occasionally, mostly to check schedules and receive notifications about team events.
@@ -87,17 +89,18 @@
 
 ### Relationships
 
-- One son, Tom, in U18/male/1
+- One son, Pierre, in U18/male/1
 - One son, Sacha, in U13/male/1
-- One son, Xxx, in U7/male/1
+- One daughter, Lucille, in U7/mixed/1
 
 ### Information
 
+- user role: user
 - media:
   - phone only
   - middle range hardware
 
-## François
+## François DOE
 
 <code>francois@eggplant.app</code>
 
@@ -107,12 +110,12 @@
 
 ### Relationships
 
-- **Site manager**
 - Player in Senior/male/1
 - Head coach in U11/male/1
 
 ### Information
 
+- user role: manager
 - media:
   - phone only
   - uses extra large fonts

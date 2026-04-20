@@ -2,6 +2,9 @@ import { faker } from '@faker-js/faker/locale/fr';
 
 import { seedClear } from './seedClear.js';
 import CONFIG from './utils/seedConfiguration.js';
+import PERSONAS, {
+  type PersonaTeamRef,
+} from './utils/personasConfiguration.js';
 import {
   insertClub,
   insertMember,
@@ -9,6 +12,8 @@ import {
   insertTeam,
   insertTeamAssignment,
   insertTeamCategory,
+  insertUser,
+  insertUserMemberLink,
 } from './utils/seedUtils.js';
 import { Logger } from './utils/logUtils.js';
 import type {
@@ -20,6 +25,9 @@ import type {
   TeamAssignment,
   TeamCategory,
   TeamGender,
+  TeamRole,
+  User,
+  UserMember,
 } from '../types/index.js';
 import { emojis } from './utils/emojis.js';
 
@@ -30,6 +38,8 @@ type Seeded = {
   members: Member[];
   teamAssignments: TeamAssignment[];
   memberStatuses: MemberStatus[];
+  users: User[];
+  userMembers: UserMember[];
 };
 
 type TeamInfo = {
@@ -37,6 +47,20 @@ type TeamInfo = {
   club: Club;
   ageRange: [number, number];
 };
+
+const ROLE_PRIORITY: Record<TeamRole, number> = {
+  coach: 3,
+  assistant: 2,
+  player: 1,
+  sparring: 0,
+};
+
+const teamRefKey = (
+  clubCode: string,
+  categoryName: string,
+  gender: TeamGender,
+  index: number,
+): string => `${clubCode}:${categoryName}:${gender}:${index}`;
 
 const toDateString = (date: Date): string => date.toISOString().split('T')[0];
 
@@ -51,6 +75,8 @@ async function seedCreate(force: boolean) {
     members: [],
     teamAssignments: [],
     memberStatuses: [],
+    users: [],
+    userMembers: [],
   };
 
   // -------------------------- clubs
@@ -103,6 +129,7 @@ async function seedCreate(force: boolean) {
   };
 
   const teamInfos: TeamInfo[] = [];
+  const teamByRef = new Map<string, TeamInfo>();
   for (let i = 0; i < CONFIG.clubs.length; i++) {
     const club = CONFIG.clubs[i];
     const linkedClub = seeded.clubs[i];
@@ -123,11 +150,16 @@ async function seedCreate(force: boolean) {
           });
           Logger.info([createdTeam.label, linkedClub.name], ' ');
           seeded.teams.push(createdTeam);
-          teamInfos.push({
+          const info: TeamInfo = {
             team: createdTeam,
             club: linkedClub,
             ageRange: category.ageRange,
-          });
+          };
+          teamInfos.push(info);
+          teamByRef.set(
+            teamRefKey(club.code, category.name, genderConfig.type, n + 1),
+            info,
+          );
         }
       }
     }
@@ -216,6 +248,119 @@ async function seedCreate(force: boolean) {
   Logger.nl();
   Logger.info(
     `Created ${seeded.members.length} members, ${seeded.teamAssignments.length} team assignments`,
+  );
+  Logger.nl(2);
+
+  // -------------------------- personas
+  Logger.title('PERSONAS');
+  Logger.nl();
+
+  const resolveTeam = (
+    persona: (typeof PERSONAS)[number],
+    ref: Pick<PersonaTeamRef, 'categoryName' | 'gender' | 'index'>,
+  ): TeamInfo => {
+    const info = teamByRef.get(
+      teamRefKey(persona.clubCode, ref.categoryName, ref.gender, ref.index),
+    );
+    if (!info) {
+      throw new Error(
+        `Persona ${persona.email}: no team for ${persona.clubCode} ${ref.categoryName}/${ref.gender}/${ref.index}`,
+      );
+    }
+    return info;
+  };
+
+  for (const persona of PERSONAS) {
+    const personaBirthdate = toDateString(
+      new Date(CONFIG.season - persona.age, 5, 15),
+    );
+    const personaMember = await insertMember({
+      status_id: activeStatus.id,
+      first_name: persona.first_name,
+      last_name: persona.last_name,
+      birthdate: personaBirthdate,
+      gender: persona.gender,
+    });
+    seeded.members.push(personaMember);
+
+    const personaUser = await insertUser({
+      email: persona.email,
+      display_name: `${persona.first_name} ${persona.last_name}`,
+      role: persona.role,
+    });
+    seeded.users.push(personaUser);
+
+    const selfLink = await insertUserMemberLink({
+      user_id: personaUser.id,
+      member_id: personaMember.id,
+      type: 'self',
+      description: null,
+    });
+    seeded.userMembers.push(selfLink);
+
+    const bestRoleByTeam = new Map<string, TeamRole>();
+    for (const ref of persona.assignments) {
+      const info = resolveTeam(persona, ref);
+      const current = bestRoleByTeam.get(info.team.id);
+      if (!current || ROLE_PRIORITY[ref.role] > ROLE_PRIORITY[current]) {
+        bestRoleByTeam.set(info.team.id, ref.role);
+      }
+    }
+    for (const [teamId, role] of bestRoleByTeam) {
+      const assignment = await insertTeamAssignment({
+        team_id: teamId,
+        member_id: personaMember.id,
+        role,
+      });
+      seeded.teamAssignments.push(assignment);
+    }
+
+    for (const kid of persona.kids) {
+      const kidTeam = resolveTeam(persona, kid.team);
+      const kidMember = await insertMember({
+        status_id: activeStatus.id,
+        first_name: kid.first_name,
+        last_name: persona.last_name,
+        birthdate: toDateString(
+          faker.date.birthdate({
+            min: kidTeam.ageRange[0],
+            max: kidTeam.ageRange[1],
+            mode: 'age',
+          }),
+        ),
+        gender: kid.gender,
+      });
+      seeded.members.push(kidMember);
+
+      const kidAssignment = await insertTeamAssignment({
+        team_id: kidTeam.team.id,
+        member_id: kidMember.id,
+        role: 'player',
+      });
+      seeded.teamAssignments.push(kidAssignment);
+
+      const kidLink = await insertUserMemberLink({
+        user_id: personaUser.id,
+        member_id: kidMember.id,
+        type: 'relative',
+        description: persona.gender === 'male' ? 'Father' : 'Mother',
+      });
+      seeded.userMembers.push(kidLink);
+    }
+
+    Logger.info(
+      [
+        `${persona.first_name} ${persona.last_name}`,
+        persona.role,
+        `${bestRoleByTeam.size} assignments, ${persona.kids.length} kids`,
+      ],
+      ' ',
+    );
+  }
+
+  Logger.nl();
+  Logger.info(
+    `Created ${seeded.users.length} personas, ${seeded.userMembers.length} user-member links`,
   );
   Logger.nl(2);
 
