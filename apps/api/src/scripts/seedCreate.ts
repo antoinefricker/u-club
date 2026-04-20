@@ -349,10 +349,13 @@ async function seedCreate(force: boolean) {
     }
 
     Logger.info(
+      [`${persona.first_name} [${persona.role}]`, persona.email],
+      ' ',
+    );
+    Logger.info(
       [
-        `${persona.first_name} ${persona.last_name}`,
-        persona.role,
-        `${bestRoleByTeam.size} assignments, ${persona.kids.length} kids`,
+        '',
+        `${bestRoleByTeam.size} assignments / ${persona.kids.length} relationships`,
       ],
       ' ',
     );
