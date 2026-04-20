@@ -74,6 +74,7 @@ migrate-status Show current migration status
 migrate-make   Create a new migration (usage: make migrate-make name=create_users)
 seed-create    Clear and seed database with dev data (use FORCE=1 to skip confirmation)
 seed-clear     Clear all data from database (use FORCE=1 to skip confirmation)
+status         Check availability of Postgres, API and PWA
 dev-start      Start postgres, mailpit, api and pwa in dev mode
 dev-stop       Stop dev services (node servers + docker)
 ```
@@ -84,7 +85,6 @@ dev-stop       Stop dev services (node servers + docker)
 - [Implementation plans](./documentation/plans/index.md)
 - [Database diagram](./documentation/database-diagram.mermaid)
 - [Bruno API collection](./documentation/bruno)
-- [more...](./documentation/misc)
 
 ### Dependencies
 
