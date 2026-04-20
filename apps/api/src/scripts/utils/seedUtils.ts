@@ -7,6 +7,8 @@ import type {
   Team,
   TeamAssignment,
   TeamCategory,
+  User,
+  UserMember,
 } from '../../types/index.js';
 
 export const hashedPassword = await hashPassword(
@@ -72,32 +74,27 @@ export const insertTeamAssignment = async (
   return createdAssignment;
 };
 
-export const insertUser = async ({
-  emailVerifiedAt,
-  ...user
-}: {
-  email: string;
-  displayName: string;
-  role: 'admin' | 'manager' | 'member';
-  emailVerifiedAt?: Date | null;
-}) => {
-  const [userId] = await db('users')
+export const insertUser = async (
+  user: Pick<User, 'email' | 'display_name' | 'role'> &
+    Partial<Pick<User, 'email_verified_at'>>,
+): Promise<User> => {
+  const [createdUser] = await db('users')
     .insert({
-      ...user,
+      email: user.email,
+      display_name: user.display_name,
+      role: user.role,
       password: hashedPassword,
-      email_verified_at: emailVerifiedAt || new Date(),
+      email_verified_at: user.email_verified_at ?? new Date().toISOString(),
     })
-    .returning('id');
-  return { ...user, id: userId };
+    .returning('*');
+  return createdUser;
 };
 
-export const insertUserMemberLink = async (insertedLink: {
-  userId: string;
-  memberId: string;
-  type: 'self' | 'relative';
-  description?: string;
-}) => {
-  await db('user_members').insert(insertedLink);
+export const insertUserMemberLink = async (
+  link: Pick<UserMember, 'user_id' | 'member_id' | 'type' | 'description'>,
+): Promise<UserMember> => {
+  const [createdLink] = await db('user_members').insert(link).returning('*');
+  return createdLink;
 };
 
 export const insertClub = async (

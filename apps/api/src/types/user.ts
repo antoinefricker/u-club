@@ -1,3 +1,5 @@
+export type UserRole = 'admin' | 'manager' | 'user';
+
 export interface User {
   id: string;
   display_name: string;
@@ -5,7 +7,7 @@ export interface User {
   phone: string | null;
   email: string;
   password: string;
-  role: string;
+  role: UserRole;
 
   email_verified_at: string | null;
   created_at: string;

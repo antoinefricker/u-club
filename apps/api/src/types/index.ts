@@ -5,3 +5,4 @@ export * from './team.js';
 export * from './teamAssignment.js';
 export * from './teamCategory.js';
 export * from './user.js';
+export * from './userMember.js';
