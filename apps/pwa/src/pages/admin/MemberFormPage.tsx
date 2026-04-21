@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Button, Grid, Group, Loader, Select, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
+import dayjs from 'dayjs';
 import { useNavigate, useParams } from 'react-router';
 import { FormWrapper } from '../../layout/FormWrapper';
 import { PageTitle } from '../../layout/PageTitle';
@@ -40,7 +41,9 @@ export function MemberFormPage() {
         firstName: member.firstName,
         lastName: member.lastName,
         gender: member.gender,
-        birthdate: member.birthdate ?? '',
+        birthdate: member.birthdate
+          ? dayjs(member.birthdate).format('YYYY-MM-DD')
+          : '',
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
