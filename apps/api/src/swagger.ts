@@ -64,8 +64,6 @@ const options: swaggerJsdoc.Options = {
             name: { type: 'string' },
             code: { type: 'string' },
             description: { type: 'string', nullable: true },
-            mediaLogoLg: { type: 'string', nullable: true },
-            mediaLogoSm: { type: 'string', nullable: true },
             createdAt: { type: 'string', format: 'date-time' },
             updatedAt: { type: 'string', format: 'date-time' },
           },
@@ -77,8 +75,6 @@ const options: swaggerJsdoc.Options = {
             name: { type: 'string' },
             code: { type: 'string' },
             description: { type: 'string', nullable: true },
-            mediaLogoLg: { type: 'string', nullable: true },
-            mediaLogoSm: { type: 'string', nullable: true },
           },
         },
         UpdateClubRequest: {
@@ -87,8 +83,6 @@ const options: swaggerJsdoc.Options = {
             name: { type: 'string' },
             code: { type: 'string' },
             description: { type: 'string', nullable: true },
-            mediaLogoLg: { type: 'string', nullable: true },
-            mediaLogoSm: { type: 'string', nullable: true },
           },
         },
         Team: {
@@ -135,6 +129,7 @@ const options: swaggerJsdoc.Options = {
           properties: {
             id: { type: 'string', format: 'uuid' },
             statusId: { type: 'string', format: 'uuid', nullable: true },
+            statusLabel: { type: 'string', nullable: true },
             firstName: { type: 'string' },
             lastName: { type: 'string' },
             birthdate: { type: 'string', format: 'date', nullable: true },

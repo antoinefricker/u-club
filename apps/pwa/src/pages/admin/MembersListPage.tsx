@@ -8,6 +8,7 @@ import {
   Table,
 } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
+import dayjs from 'dayjs';
 import { PageTitle } from '../../layout/PageTitle';
 import { ListFilters } from '../../layout/ListFilters';
 import { ListPagination } from '../../layout/ListPagination';
@@ -81,13 +82,15 @@ export function MembersListPage() {
         />
       </ListFilters>
 
-      <Table striped highlightOnHover>
+      <Table striped highlightOnHover layout="fixed">
         <Table.Thead>
           <Table.Tr>
             <Table.Th>First name</Table.Th>
             <Table.Th>Last name</Table.Th>
-            <Table.Th>Gender</Table.Th>
-            <Table.Th />
+            <Table.Th w={120}>Birthdate</Table.Th>
+            <Table.Th w={100}>Gender</Table.Th>
+            <Table.Th w={100}>Status</Table.Th>
+            <Table.Th w={90} />
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -95,7 +98,13 @@ export function MembersListPage() {
             <Table.Tr key={member.id}>
               <Table.Td>{member.firstName}</Table.Td>
               <Table.Td>{member.lastName}</Table.Td>
+              <Table.Td>
+                {member.birthdate
+                  ? dayjs(member.birthdate).format('DD/MM/YYYY')
+                  : '—'}
+              </Table.Td>
               <Table.Td>{member.gender}</Table.Td>
+              <Table.Td>{member.statusLabel ?? ''}</Table.Td>
               <Table.Td>
                 <Group gap="xs" justify="flex-end">
                   <ActionIcon

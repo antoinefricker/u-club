@@ -70,16 +70,7 @@ router.get(
     }
 
     const query = db('clubs')
-      .select(
-        'id',
-        'name',
-        'code',
-        'description',
-        'mediaLogoLg',
-        'mediaLogoSm',
-        'createdAt',
-        'updatedAt',
-      )
+      .select('id', 'name', 'code', 'description', 'createdAt', 'updatedAt')
       .orderBy('id', 'asc');
 
     const { data, totalItems } = await applyPagination(query, parsed.data);

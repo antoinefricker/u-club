@@ -45,7 +45,7 @@ router.post(
   requireRole('admin'),
   validate(createClubSchema),
   async (req: Request, res: Response) => {
-    const { name, code, description, mediaLogoLg, mediaLogoSm } = req.body;
+    const { name, code, description } = req.body;
 
     const existing = await db('clubs').where({ code }).first();
     if (existing) {
@@ -58,16 +58,12 @@ router.post(
         name,
         code,
         description: description || null,
-        mediaLogoLg: mediaLogoLg || null,
-        mediaLogoSm: mediaLogoSm || null,
       })
       .returning([
         'id',
         'name',
         'code',
         'description',
-        'mediaLogoLg',
-        'mediaLogoSm',
         'createdAt',
         'updatedAt',
       ]);

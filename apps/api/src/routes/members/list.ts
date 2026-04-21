@@ -79,6 +79,7 @@ router.get(
     const { teamId } = req.query;
 
     const query = db('members')
+      .leftJoin('memberStatuses', 'members.statusId', 'memberStatuses.id')
       .select(
         'members.id',
         'members.statusId',
@@ -88,6 +89,7 @@ router.get(
         'members.gender',
         'members.createdAt',
         'members.updatedAt',
+        'memberStatuses.label as statusLabel',
       )
       .orderBy('members.id', 'asc');
 
