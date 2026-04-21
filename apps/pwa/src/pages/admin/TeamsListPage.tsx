@@ -10,16 +10,31 @@ import {
 } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { PageTitle } from '../../layout/PageTitle';
+import { ListFilter } from '../../layout/ListFilter';
 import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
-import { useTeams, useDeleteTeam } from '../../hooks/useTeams';
+import { useTeams, useDeleteTeam, type TeamGender } from '../../hooks/useTeams';
 import { useClubs } from '../../hooks/useClubs';
+
+const GENDER_OPTIONS: { value: TeamGender; label: string }[] = [
+  { value: 'male', label: 'Male' },
+  { value: 'female', label: 'Female' },
+  { value: 'mixed', label: 'Mixed' },
+];
 
 export function TeamsListPage() {
   const navigate = useNavigate();
   const [clubId, setClubId] = useState<string | null>(null);
+  const [gender, setGender] = useState<TeamGender | null>(null);
   const { data: clubs } = useClubs();
-  const { data: teams, isLoading, error } = useTeams(clubId ?? undefined);
+  const {
+    data: teams,
+    isLoading,
+    error,
+  } = useTeams({
+    clubId: clubId ?? undefined,
+    gender: gender ?? undefined,
+  });
   const deleteTeam = useDeleteTeam();
 
   const clubOptions = clubs?.map((c) => ({ value: c.id, label: c.name })) ?? [];
@@ -48,15 +63,26 @@ export function TeamsListPage() {
         <Button onClick={() => navigate('/admin/teams/new')}>New team</Button>
       </PageTitle>
 
-      <Select
-        label="Filter by club"
-        placeholder="All clubs"
-        data={clubOptions}
-        value={clubId}
-        onChange={setClubId}
-        clearable
-        maw={300}
-      />
+      <ListFilter>
+        <Select
+          label="Filter by club"
+          placeholder="All clubs"
+          data={clubOptions}
+          value={clubId}
+          onChange={setClubId}
+          clearable
+          maw={300}
+        />
+        <Select
+          label="Filter by gender"
+          placeholder="All genders"
+          data={GENDER_OPTIONS}
+          value={gender}
+          onChange={(v) => setGender(v as TeamGender | null)}
+          clearable
+          maw={220}
+        />
+      </ListFilter>
 
       <Table striped highlightOnHover>
         <Table.Thead>

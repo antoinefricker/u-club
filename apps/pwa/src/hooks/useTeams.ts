@@ -1,14 +1,21 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../auth/useAuth';
 
+export type TeamGender = 'male' | 'female' | 'mixed';
+
 interface Team {
   id: string;
   clubId: string;
   label: string;
-  gender: string;
+  gender: TeamGender;
   description: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+interface UseTeamsFilters {
+  clubId?: string;
+  gender?: TeamGender;
 }
 
 function useAuthHeaders() {
@@ -19,12 +26,17 @@ function useAuthHeaders() {
   };
 }
 
-export function useTeams(clubId?: string) {
+export function useTeams(filters: UseTeamsFilters = {}) {
+  const { clubId, gender } = filters;
   const headers = useAuthHeaders();
   return useQuery<Team[]>({
-    queryKey: ['teams', clubId],
+    queryKey: ['teams', clubId, gender],
     queryFn: async () => {
-      const url = clubId ? `/api/teams?clubId=${clubId}` : '/api/teams';
+      const params = new URLSearchParams();
+      if (clubId) params.set('clubId', clubId);
+      if (gender) params.set('gender', gender);
+      const qs = params.toString();
+      const url = qs ? `/api/teams?${qs}` : '/api/teams';
       const res = await fetch(url, { headers });
       if (!res.ok) throw new Error('Failed to fetch teams');
       return res.json();
