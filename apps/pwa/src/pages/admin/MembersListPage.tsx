@@ -4,14 +4,13 @@ import {
   Button,
   Group,
   Loader,
-  Pagination,
   Select,
   Table,
-  Text,
 } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { PageTitle } from '../../layout/PageTitle';
 import { ListFilters } from '../../layout/ListFilters';
+import { ListPagination } from '../../layout/ListPagination';
 import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import { useMembers, useDeleteMember } from '../../hooks/useMembers';
@@ -23,7 +22,7 @@ const MEMBERS_FILTER_KEYS = ['teamId'] as const;
 
 export function MembersListPage() {
   const navigate = useNavigate();
-  const { page, itemsPerPage, setPage } = usePagination();
+  const { page, itemsPerPage } = usePagination();
   const { filters, setFilter } = useListFilters(MEMBERS_FILTER_KEYS);
   const teamId = filters.teamId ?? null;
 
@@ -123,17 +122,12 @@ export function MembersListPage() {
           ))}
         </Table.Tbody>
       </Table>
-      {pagination && pagination.totalPages > 1 && (
-        <Group justify="space-between" mt="md">
-          <Text size="sm" c="dimmed">
-            {pagination.totalItems} members
-          </Text>
-          <Pagination
-            total={pagination.totalPages}
-            value={page}
-            onChange={setPage}
-          />
-        </Group>
+      {pagination && (
+        <ListPagination
+          totalPages={pagination.totalPages}
+          totalItems={pagination.totalItems}
+          itemsLabel="members"
+        />
       )}
     </>
   );
