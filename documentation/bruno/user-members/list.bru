@@ -5,9 +5,15 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/user-members
+  url: {{baseUrl}}/user-members?page=1&itemsPerPage=25
   body: none
   auth: bearer
+}
+
+params:query {
+  page: 1
+  itemsPerPage: 25
+  ~userId:
 }
 
 auth:bearer {

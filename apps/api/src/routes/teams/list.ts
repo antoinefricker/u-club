@@ -2,6 +2,11 @@ import { Router, Request, Response } from 'express';
 import db from '../../db.js';
 import { requireAuth } from '../../middleware/auth.js';
 import { requireRole } from '../../middleware/requireRole.js';
+import { paginationQuerySchema } from '../../schemas/pagination.js';
+import {
+  applyPagination,
+  buildPaginationMeta,
+} from '../../utils/pagination.js';
 import { TEAM_GENDERS, type TeamGender } from '../../types/team.js';
 
 const router = Router();
@@ -25,17 +30,36 @@ const router = Router();
  *           type: string
  *           enum: [male, female, mixed]
  *         description: Filter teams by gender
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *       - in: query
+ *         name: itemsPerPage
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 25
  *     responses:
  *       200:
- *         description: Array of teams
+ *         description: Paginated list of teams
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Team'
+ *               type: object
+ *               required: [data, pagination]
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Team'
+ *                 pagination:
+ *                   $ref: '#/components/schemas/PaginationMeta'
  *       400:
- *         description: Invalid filter value
+ *         description: Invalid filter or pagination parameters
  *         content:
  *           application/json:
  *             schema:
@@ -46,6 +70,31 @@ router.get(
   requireAuth,
   requireRole('admin', 'manager'),
   async (req: Request, res: Response) => {
+    if (req.query.gender) {
+      const gender = req.query.gender;
+      if (
+        typeof gender !== 'string' ||
+        !TEAM_GENDERS.includes(gender as TeamGender)
+      ) {
+        res
+          .status(400)
+          .json({ error: 'gender must be male, female, or mixed' });
+        return;
+      }
+    }
+
+    const parsed = paginationQuerySchema.safeParse(req.query);
+    if (!parsed.success) {
+      res.status(400).json({
+        error: 'validation error',
+        details: parsed.error.issues.map((e) => ({
+          field: e.path.join('.'),
+          message: e.message,
+        })),
+      });
+      return;
+    }
+
     const query = db('teams')
       .leftJoin('teamCategories', 'teams.categoryId', 'teamCategories.id')
       .select(
@@ -58,28 +107,23 @@ router.get(
         'teams.createdAt',
         'teams.updatedAt',
         'teamCategories.label as categoryLabel',
-      );
+      )
+      .orderBy('teams.id', 'asc');
 
     if (req.query.clubId) {
       query.where('teams.clubId', req.query.clubId);
     }
 
     if (req.query.gender) {
-      const gender = req.query.gender;
-      if (
-        typeof gender !== 'string' ||
-        !TEAM_GENDERS.includes(gender as TeamGender)
-      ) {
-        res
-          .status(400)
-          .json({ error: 'gender must be male, female, or mixed' });
-        return;
-      }
-      query.where('teams.gender', gender);
+      query.where('teams.gender', req.query.gender as string);
     }
 
-    const teams = await query;
-    res.json(teams);
+    const { data, totalItems } = await applyPagination(query, parsed.data);
+
+    res.json({
+      data,
+      pagination: buildPaginationMeta({ ...parsed.data, totalItems }),
+    });
   },
 );
 

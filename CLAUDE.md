@@ -29,6 +29,13 @@ When creating or editing an API route, always follow this workflow:
 5. **Update the OpenAPI annotation** (`@openapi` JSDoc) on the route to reflect any changes to request/response schemas, status codes, or descriptions
 6. **Update the Bruno file** (`apps/api/bruno/`) for the route so it stays in sync with the implementation
 
+### List routes
+
+- Always paginated via `?page=<n>&itemsPerPage=<n>` (1-indexed; defaults `page=1`, `itemsPerPage=25`; max `itemsPerPage=100`; Zod-validated).
+- Response envelope: `{ data, pagination: { page, itemsPerPage, totalItems, totalPages } }`. Never return a bare array.
+- Must apply a deterministic `ORDER BY` (default `id ASC`) — offset pagination without stable ordering is incorrect.
+- Use the shared helpers (`paginationQuerySchema` in `apps/api/src/schemas/pagination.ts` and `applyPagination` / `buildPaginationMeta` in `apps/api/src/utils/pagination.ts`) rather than reimplementing pagination inline.
+
 ## Database
 
 When creating or editing a migration or any database schema change:
@@ -43,6 +50,14 @@ When creating or editing views in the PWA app:
 1. **Always use Mantine** components and hooks — do not use raw HTML or other UI libraries
 2. **Propose a preview first** — before writing any component code, describe the planned layout, components, and interactions to the user so they can validate the approach
 3. **Only create the content after the user approves** the proposed preview
+
+### List views
+
+- All list view state (pagination + filters) lives in the URL via React Router's `useSearchParams`, not in local `useState`. Use the shared hooks `usePagination` and `useListFilters` (`apps/pwa/src/hooks/`).
+- `setSearchParams` always uses `{ replace: true }` so page/filter changes don't pollute browser history.
+- Hide default values from the URL (page 1, default `itemsPerPage`, empty filters produce a clean URL).
+- Resource fetching hooks use `placeholderData: keepPreviousData` and include pagination + filters in the query key (`['<resource>', { page, itemsPerPage, ...filters }]`).
+- Changing a filter must reset `page` to 1 (naturally handled by `useListFilters` stripping `page` from the URL on filter change).
 
 ## Pull Requests
 

@@ -1,5 +1,15 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  keepPreviousData,
+} from '@tanstack/react-query';
 import { useAuth } from '../auth/useAuth';
+import {
+  buildListQueryString,
+  type Paginated,
+  type PaginationArgs,
+} from './pagination';
 
 interface Club {
   id: string;
@@ -20,15 +30,18 @@ function useAuthHeaders() {
   };
 }
 
-export function useClubs() {
+export function useClubs(args: PaginationArgs = {}) {
+  const { page, itemsPerPage } = args;
   const headers = useAuthHeaders();
-  return useQuery<Club[]>({
-    queryKey: ['clubs'],
+  return useQuery<Paginated<Club>>({
+    queryKey: ['clubs', { page, itemsPerPage }],
     queryFn: async () => {
-      const res = await fetch('/api/clubs', { headers });
+      const qs = buildListQueryString({ page, itemsPerPage });
+      const res = await fetch(`/api/clubs${qs}`, { headers });
       if (!res.ok) throw new Error('Failed to fetch clubs');
       return res.json();
     },
+    placeholderData: keepPreviousData,
   });
 }
 

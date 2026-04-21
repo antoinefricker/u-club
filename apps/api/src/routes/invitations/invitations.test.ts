@@ -11,6 +11,14 @@ const mockReturning = vi.fn();
 const mockUpdate = vi.fn().mockReturnThis();
 const mockDel = vi.fn();
 const mockJoin = vi.fn().mockReturnThis();
+const mockOrderBy = vi.fn().mockReturnThis();
+const mockClone = vi.fn().mockReturnThis();
+const mockClearSelect = vi.fn().mockReturnThis();
+const mockClearOrder = vi.fn().mockReturnThis();
+const mockCount = vi.fn().mockReturnThis();
+const mockCountDistinct = vi.fn().mockReturnThis();
+const mockLimit = vi.fn().mockReturnThis();
+const mockOffset = vi.fn();
 const mockSendMail = vi.fn().mockResolvedValue({});
 
 const mockTrxInsert = vi.fn().mockResolvedValue([]);
@@ -29,6 +37,14 @@ vi.mock('../../db.js', () => {
       update: mockUpdate,
       del: mockDel,
       join: mockJoin,
+      orderBy: mockOrderBy,
+      clone: mockClone,
+      clearSelect: mockClearSelect,
+      clearOrder: mockClearOrder,
+      count: mockCount,
+      countDistinct: mockCountDistinct,
+      limit: mockLimit,
+      offset: mockOffset,
     })),
     {
       raw: vi.fn(),
@@ -67,6 +83,13 @@ beforeEach(() => {
   mockInsert.mockReturnThis();
   mockUpdate.mockReturnThis();
   mockJoin.mockReturnThis();
+  mockOrderBy.mockReturnThis();
+  mockClone.mockReturnThis();
+  mockClearSelect.mockReturnThis();
+  mockClearOrder.mockReturnThis();
+  mockCount.mockReturnThis();
+  mockCountDistinct.mockReturnThis();
+  mockLimit.mockReturnThis();
   mockTrxWhere.mockReturnThis();
 });
 
@@ -113,49 +136,189 @@ describe('POST /invitations', () => {
   });
 });
 
-describe('GET /invitations', () => {
-  it('should return 200 with pending invitations for current user email', async () => {
-    const invitations = [
-      {
-        id: 'inv-1',
-        memberId: 'member-1',
-        email: 'user@test.com',
-        type: 'self',
-      },
-    ];
-    // First call: db('users').where({ id }).first() -> user record
+describe('GET /invitations (received)', () => {
+  const sampleInvitation = {
+    id: 'inv-1',
+    memberId: 'member-1',
+    email: 'user@test.com',
+    type: 'self',
+  };
+
+  const mockList = (rows: unknown[], total: number) => {
+    // First .first() call: db('users').where({ id }).first() -> user record
     mockFirst.mockResolvedValueOnce({ id: 'uuid-1', email: 'user@test.com' });
-    // Second call: the chained query -> invitations list
-    mockSelect.mockResolvedValueOnce(invitations);
+    // Second .first() call: count query
+    mockFirst.mockResolvedValueOnce({ total });
+    // Data query resolves via offset
+    mockOffset.mockResolvedValueOnce(rows);
+  };
+
+  it('returns envelope with defaults for current user email', async () => {
+    mockList([sampleInvitation], 1);
 
     const res = await request(app)
       .get('/invitations')
       .set('Authorization', `Bearer ${userToken}`);
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual(invitations);
+    expect(res.body).toEqual({
+      data: [sampleInvitation],
+      pagination: {
+        page: 1,
+        itemsPerPage: 25,
+        totalItems: 1,
+        totalPages: 1,
+      },
+    });
   });
+
+  it('applies page=2 and itemsPerPage=10', async () => {
+    mockList([sampleInvitation], 42);
+
+    const res = await request(app)
+      .get('/invitations?page=2&itemsPerPage=10')
+      .set('Authorization', `Bearer ${userToken}`);
+
+    expect(res.status).toBe(200);
+    expect(mockLimit).toHaveBeenCalledWith(10);
+    expect(mockOffset).toHaveBeenCalledWith(10);
+    expect(res.body.pagination.totalPages).toBe(5);
+  });
+
+  it('returns empty envelope when no pending invitations', async () => {
+    mockList([], 0);
+
+    const res = await request(app)
+      .get('/invitations')
+      .set('Authorization', `Bearer ${userToken}`);
+
+    expect(res.body).toEqual({
+      data: [],
+      pagination: {
+        page: 1,
+        itemsPerPage: 25,
+        totalItems: 0,
+        totalPages: 1,
+      },
+    });
+  });
+
+  it('returns 404 when user record not found', async () => {
+    mockFirst.mockResolvedValueOnce(undefined);
+
+    const res = await request(app)
+      .get('/invitations')
+      .set('Authorization', `Bearer ${userToken}`);
+
+    expect(res.status).toBe(404);
+    expect(res.body).toHaveProperty('error', 'user not found');
+  });
+
+  it('orders results by memberInvitations.id ascending', async () => {
+    mockList([sampleInvitation], 1);
+    await request(app)
+      .get('/invitations')
+      .set('Authorization', `Bearer ${userToken}`);
+    expect(mockOrderBy).toHaveBeenCalledWith('memberInvitations.id', 'asc');
+  });
+
+  it.each([['page=0'], ['itemsPerPage=101']])(
+    'returns 400 for %s',
+    async (qs) => {
+      const res = await request(app)
+        .get(`/invitations?${qs}`)
+        .set('Authorization', `Bearer ${userToken}`);
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty('error', 'validation error');
+    },
+  );
 });
 
 describe('GET /invitations/sent', () => {
-  it('should return 200 with invitations sent by current user', async () => {
-    const invitations = [
-      {
-        id: 'inv-1',
-        memberId: 'member-1',
-        invitedBy: 'uuid-1',
-        email: 'someone@test.com',
-      },
-    ];
-    mockSelect.mockResolvedValueOnce(invitations);
+  const sampleInvitation = {
+    id: 'inv-1',
+    memberId: 'member-1',
+    invitedBy: 'uuid-1',
+    email: 'someone@test.com',
+  };
+
+  const mockList = (rows: unknown[], total: number) => {
+    mockFirst.mockResolvedValueOnce({ total });
+    mockOffset.mockResolvedValueOnce(rows);
+  };
+
+  it('returns envelope with defaults for invitations sent by current user', async () => {
+    mockList([sampleInvitation], 1);
 
     const res = await request(app)
       .get('/invitations/sent')
       .set('Authorization', `Bearer ${userToken}`);
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual(invitations);
+    expect(res.body).toEqual({
+      data: [sampleInvitation],
+      pagination: {
+        page: 1,
+        itemsPerPage: 25,
+        totalItems: 1,
+        totalPages: 1,
+      },
+    });
+    expect(mockWhere).toHaveBeenCalledWith(
+      'memberInvitations.invitedBy',
+      'uuid-1',
+    );
   });
+
+  it('applies page=2 and itemsPerPage=10', async () => {
+    mockList([sampleInvitation], 42);
+
+    const res = await request(app)
+      .get('/invitations/sent?page=2&itemsPerPage=10')
+      .set('Authorization', `Bearer ${userToken}`);
+
+    expect(res.status).toBe(200);
+    expect(mockLimit).toHaveBeenCalledWith(10);
+    expect(mockOffset).toHaveBeenCalledWith(10);
+    expect(res.body.pagination.totalPages).toBe(5);
+  });
+
+  it('returns empty envelope when no sent invitations', async () => {
+    mockList([], 0);
+
+    const res = await request(app)
+      .get('/invitations/sent')
+      .set('Authorization', `Bearer ${userToken}`);
+
+    expect(res.body).toEqual({
+      data: [],
+      pagination: {
+        page: 1,
+        itemsPerPage: 25,
+        totalItems: 0,
+        totalPages: 1,
+      },
+    });
+  });
+
+  it('orders results by memberInvitations.id ascending', async () => {
+    mockList([sampleInvitation], 1);
+    await request(app)
+      .get('/invitations/sent')
+      .set('Authorization', `Bearer ${userToken}`);
+    expect(mockOrderBy).toHaveBeenCalledWith('memberInvitations.id', 'asc');
+  });
+
+  it.each([['page=0'], ['itemsPerPage=101']])(
+    'returns 400 for %s',
+    async (qs) => {
+      const res = await request(app)
+        .get(`/invitations/sent?${qs}`)
+        .set('Authorization', `Bearer ${userToken}`);
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty('error', 'validation error');
+    },
+  );
 });
 
 describe('POST /invitations/:id/accept', () => {

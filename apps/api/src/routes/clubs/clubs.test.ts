@@ -5,6 +5,14 @@ import { createTestToken } from '../../test-utils.js';
 const mockSelect = vi.fn().mockReturnThis();
 const mockWhere = vi.fn().mockReturnThis();
 const mockWhereNot = vi.fn().mockReturnThis();
+const mockOrderBy = vi.fn().mockReturnThis();
+const mockClone = vi.fn().mockReturnThis();
+const mockClearSelect = vi.fn().mockReturnThis();
+const mockClearOrder = vi.fn().mockReturnThis();
+const mockCount = vi.fn().mockReturnThis();
+const mockCountDistinct = vi.fn().mockReturnThis();
+const mockLimit = vi.fn().mockReturnThis();
+const mockOffset = vi.fn();
 const mockFirst = vi.fn();
 const mockInsert = vi.fn().mockReturnThis();
 const mockReturning = vi.fn();
@@ -17,6 +25,14 @@ vi.mock('../../db.js', () => {
       select: mockSelect,
       where: mockWhere,
       whereNot: mockWhereNot,
+      orderBy: mockOrderBy,
+      clone: mockClone,
+      clearSelect: mockClearSelect,
+      clearOrder: mockClearOrder,
+      count: mockCount,
+      countDistinct: mockCountDistinct,
+      limit: mockLimit,
+      offset: mockOffset,
       first: mockFirst,
       insert: mockInsert,
       returning: mockReturning,
@@ -39,6 +55,7 @@ vi.mock('../../mailer.js', () => ({
 
 const { default: app } = await import('../../app.js');
 const adminToken = createTestToken('uuid-1', 'admin@example.com', 'admin');
+const userToken = createTestToken('uuid-2', 'user@example.com', 'user');
 
 const sampleClub = {
   id: 'club-1',
@@ -57,20 +74,148 @@ beforeEach(() => {
   mockSelect.mockReturnThis();
   mockWhere.mockReturnThis();
   mockWhereNot.mockReturnThis();
+  mockOrderBy.mockReturnThis();
+  mockClone.mockReturnThis();
+  mockClearSelect.mockReturnThis();
+  mockClearOrder.mockReturnThis();
+  mockCount.mockReturnThis();
+  mockCountDistinct.mockReturnThis();
+  mockLimit.mockReturnThis();
   mockInsert.mockReturnThis();
   mockUpdate.mockReturnThis();
 });
 
 describe('GET /clubs', () => {
-  it('should return a list of clubs', async () => {
-    mockSelect.mockResolvedValueOnce([sampleClub]);
+  const mockList = (rows: unknown[], total: number) => {
+    mockFirst.mockResolvedValueOnce({ total });
+    mockOffset.mockResolvedValueOnce(rows);
+  };
+
+  it('returns envelope with defaults when no query params', async () => {
+    mockList([sampleClub], 1);
 
     const res = await request(app)
       .get('/clubs')
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual([sampleClub]);
+    expect(res.body).toEqual({
+      data: [sampleClub],
+      pagination: {
+        page: 1,
+        itemsPerPage: 25,
+        totalItems: 1,
+        totalPages: 1,
+      },
+    });
+    expect(mockLimit).toHaveBeenCalledWith(25);
+    expect(mockOffset).toHaveBeenCalledWith(0);
+  });
+
+  it('applies page=2 and itemsPerPage=10 to the query', async () => {
+    mockList([sampleClub], 42);
+
+    const res = await request(app)
+      .get('/clubs?page=2&itemsPerPage=10')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(mockLimit).toHaveBeenCalledWith(10);
+    expect(mockOffset).toHaveBeenCalledWith(10);
+    expect(res.body.pagination).toEqual({
+      page: 2,
+      itemsPerPage: 10,
+      totalItems: 42,
+      totalPages: 5,
+    });
+  });
+
+  it('computes totalPages correctly for exact and partial last page', async () => {
+    mockList([sampleClub], 30);
+    const exact = await request(app)
+      .get('/clubs?itemsPerPage=10')
+      .set('Authorization', `Bearer ${adminToken}`);
+    expect(exact.body.pagination.totalPages).toBe(3);
+
+    mockList([sampleClub], 31);
+    const partial = await request(app)
+      .get('/clubs?itemsPerPage=10')
+      .set('Authorization', `Bearer ${adminToken}`);
+    expect(partial.body.pagination.totalPages).toBe(4);
+  });
+
+  it('returns empty data with totalPages=1 when no clubs exist', async () => {
+    mockList([], 0);
+
+    const res = await request(app)
+      .get('/clubs')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      data: [],
+      pagination: {
+        page: 1,
+        itemsPerPage: 25,
+        totalItems: 0,
+        totalPages: 1,
+      },
+    });
+  });
+
+  it('preserves requested page in meta when beyond last page', async () => {
+    mockList([], 5);
+
+    const res = await request(app)
+      .get('/clubs?page=99&itemsPerPage=10')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toEqual([]);
+    expect(res.body.pagination).toEqual({
+      page: 99,
+      itemsPerPage: 10,
+      totalItems: 5,
+      totalPages: 1,
+    });
+  });
+
+  it('orders results by id ascending', async () => {
+    mockList([sampleClub], 1);
+
+    await request(app)
+      .get('/clubs')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(mockOrderBy).toHaveBeenCalledWith('id', 'asc');
+  });
+
+  it.each([
+    ['page=0', 'page=0'],
+    ['page=-1', 'page=-1'],
+    ['page=abc', 'page=abc'],
+    ['page=1.5', 'page=1.5'],
+    ['itemsPerPage=0', 'itemsPerPage=0'],
+    ['itemsPerPage=101', 'itemsPerPage=101'],
+  ])('returns 400 for %s', async (_label, qs) => {
+    const res = await request(app)
+      .get(`/clubs?${qs}`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'validation error');
+  });
+
+  it('returns 401 when unauthenticated', async () => {
+    const res = await request(app).get('/clubs');
+    expect(res.status).toBe(401);
+  });
+
+  it('returns 403 when authenticated as a regular user', async () => {
+    const res = await request(app)
+      .get('/clubs')
+      .set('Authorization', `Bearer ${userToken}`);
+    expect(res.status).toBe(403);
   });
 });
 

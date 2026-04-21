@@ -211,6 +211,16 @@ const options: swaggerJsdoc.Options = {
             createdAt: { type: 'string', format: 'date-time' },
           },
         },
+        PaginationMeta: {
+          type: 'object',
+          required: ['page', 'itemsPerPage', 'totalItems', 'totalPages'],
+          properties: {
+            page: { type: 'integer', minimum: 1 },
+            itemsPerPage: { type: 'integer', minimum: 1 },
+            totalItems: { type: 'integer', minimum: 0 },
+            totalPages: { type: 'integer', minimum: 1 },
+          },
+        },
         Error: {
           type: 'object',
           properties: {

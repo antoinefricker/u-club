@@ -4,6 +4,11 @@ import {
   requireAuth,
   type AuthenticatedRequest,
 } from '../../middleware/auth.js';
+import { paginationQuerySchema } from '../../schemas/pagination.js';
+import {
+  applyPagination,
+  buildPaginationMeta,
+} from '../../utils/pagination.js';
 
 const router = Router();
 
@@ -14,55 +19,58 @@ const router = Router();
  *     tags: [Invitations]
  *     summary: List invitations sent by the current user
  *     description: Returns all invitations where the current user is the inviter.
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *       - in: query
+ *         name: itemsPerPage
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 25
  *     responses:
  *       200:
- *         description: List of sent invitations
+ *         description: Paginated list of sent invitations
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: string
- *                     format: uuid
- *                   memberId:
- *                     type: string
- *                     format: uuid
- *                   invitedBy:
- *                     type: string
- *                     format: uuid
- *                   email:
- *                     type: string
- *                     format: email
- *                   type:
- *                     type: string
- *                     enum: [self, relative]
- *                   description:
- *                     type: string
- *                     nullable: true
- *                   token:
- *                     type: string
- *                   expiresAt:
- *                     type: string
- *                     format: date-time
- *                   acceptedAt:
- *                     type: string
- *                     format: date-time
- *                     nullable: true
- *                   createdAt:
- *                     type: string
- *                     format: date-time
- *                   memberFirstName:
- *                     type: string
- *                   memberLastName:
- *                     type: string
+ *               type: object
+ *               required: [data, pagination]
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/MemberInvitation'
+ *                 pagination:
+ *                   $ref: '#/components/schemas/PaginationMeta'
+ *       400:
+ *         description: Invalid pagination parameters
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 router.get('/sent', requireAuth, async (req: Request, res: Response) => {
+  const parsed = paginationQuerySchema.safeParse(req.query);
+  if (!parsed.success) {
+    res.status(400).json({
+      error: 'validation error',
+      details: parsed.error.issues.map((e) => ({
+        field: e.path.join('.'),
+        message: e.message,
+      })),
+    });
+    return;
+  }
+
   const user = (req as AuthenticatedRequest).user;
 
-  const invitations = await db('memberInvitations')
+  const query = db('memberInvitations')
     .join('members', 'members.id', 'memberInvitations.memberId')
     .where('memberInvitations.invitedBy', user.id)
     .select(
@@ -78,9 +86,15 @@ router.get('/sent', requireAuth, async (req: Request, res: Response) => {
       'memberInvitations.createdAt',
       'members.firstName as memberFirstName',
       'members.lastName as memberLastName',
-    );
+    )
+    .orderBy('memberInvitations.id', 'asc');
 
-  res.json(invitations);
+  const { data, totalItems } = await applyPagination(query, parsed.data);
+
+  res.json({
+    data,
+    pagination: buildPaginationMeta({ ...parsed.data, totalItems }),
+  });
 });
 
 export default router;

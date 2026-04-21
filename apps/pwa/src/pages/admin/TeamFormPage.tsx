@@ -22,11 +22,12 @@ export function TeamFormPage() {
   const navigate = useNavigate();
 
   const { data: team, isLoading } = useTeam(id ?? '');
-  const { data: clubs } = useClubs();
+  const { data: clubs } = useClubs({ itemsPerPage: 100 });
   const createTeam = useCreateTeam();
   const updateTeam = useUpdateTeam();
 
-  const clubOptions = clubs?.map((c) => ({ value: c.id, label: c.name })) ?? [];
+  const clubOptions =
+    clubs?.data.map((c) => ({ value: c.id, label: c.name })) ?? [];
 
   const form = useForm({
     initialValues: {

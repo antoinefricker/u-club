@@ -29,7 +29,8 @@ interface RowEdit {
 }
 
 export function UserRelationships() {
-  const { data: relationships, isLoading, error } = useUserMembers();
+  const { data, isLoading, error } = useUserMembers({ itemsPerPage: 100 });
+  const relationships = data?.data;
   const updateMutation = useUpdateUserMember();
   const deleteMutation = useDeleteUserMember();
   const [edits, setEdits] = useState<Record<string, RowEdit>>({});

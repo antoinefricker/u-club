@@ -10,6 +10,14 @@ const mockInsert = vi.fn().mockReturnThis();
 const mockReturning = vi.fn();
 const mockUpdate = vi.fn().mockReturnThis();
 const mockDel = vi.fn();
+const mockOrderBy = vi.fn().mockReturnThis();
+const mockClone = vi.fn().mockReturnThis();
+const mockClearSelect = vi.fn().mockReturnThis();
+const mockClearOrder = vi.fn().mockReturnThis();
+const mockCount = vi.fn().mockReturnThis();
+const mockCountDistinct = vi.fn().mockReturnThis();
+const mockLimit = vi.fn().mockReturnThis();
+const mockOffset = vi.fn();
 
 vi.mock('../../db.js', () => {
   const db = Object.assign(
@@ -22,6 +30,14 @@ vi.mock('../../db.js', () => {
       returning: mockReturning,
       update: mockUpdate,
       del: mockDel,
+      orderBy: mockOrderBy,
+      clone: mockClone,
+      clearSelect: mockClearSelect,
+      clearOrder: mockClearOrder,
+      count: mockCount,
+      countDistinct: mockCountDistinct,
+      limit: mockLimit,
+      offset: mockOffset,
     })),
     { raw: vi.fn() },
   );
@@ -50,19 +66,91 @@ beforeEach(() => {
   mockWhereNot.mockReturnThis();
   mockInsert.mockReturnThis();
   mockUpdate.mockReturnThis();
+  mockOrderBy.mockReturnThis();
+  mockClone.mockReturnThis();
+  mockClearSelect.mockReturnThis();
+  mockClearOrder.mockReturnThis();
+  mockCount.mockReturnThis();
+  mockCountDistinct.mockReturnThis();
+  mockLimit.mockReturnThis();
 });
 
 describe('GET /member-statuses', () => {
-  it('should return a list of statuses', async () => {
-    mockSelect.mockResolvedValueOnce([sampleStatus]);
+  const mockList = (rows: unknown[], total: number) => {
+    mockFirst.mockResolvedValueOnce({ total });
+    mockOffset.mockResolvedValueOnce(rows);
+  };
+
+  it('returns envelope with defaults when no query params', async () => {
+    mockList([sampleStatus], 1);
 
     const res = await request(app)
       .get('/member-statuses')
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual([sampleStatus]);
+    expect(res.body).toEqual({
+      data: [sampleStatus],
+      pagination: {
+        page: 1,
+        itemsPerPage: 25,
+        totalItems: 1,
+        totalPages: 1,
+      },
+    });
+    expect(mockLimit).toHaveBeenCalledWith(25);
+    expect(mockOffset).toHaveBeenCalledWith(0);
   });
+
+  it('applies page=2 and itemsPerPage=10', async () => {
+    mockList([sampleStatus], 42);
+
+    const res = await request(app)
+      .get('/member-statuses?page=2&itemsPerPage=10')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(mockLimit).toHaveBeenCalledWith(10);
+    expect(mockOffset).toHaveBeenCalledWith(10);
+    expect(res.body.pagination.totalPages).toBe(5);
+  });
+
+  it('returns empty envelope when no statuses', async () => {
+    mockList([], 0);
+
+    const res = await request(app)
+      .get('/member-statuses')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.body).toEqual({
+      data: [],
+      pagination: {
+        page: 1,
+        itemsPerPage: 25,
+        totalItems: 0,
+        totalPages: 1,
+      },
+    });
+  });
+
+  it('orders results by id ascending', async () => {
+    mockList([sampleStatus], 1);
+    await request(app)
+      .get('/member-statuses')
+      .set('Authorization', `Bearer ${adminToken}`);
+    expect(mockOrderBy).toHaveBeenCalledWith('id', 'asc');
+  });
+
+  it.each([['page=0'], ['itemsPerPage=101']])(
+    'returns 400 for %s',
+    async (qs) => {
+      const res = await request(app)
+        .get(`/member-statuses?${qs}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty('error', 'validation error');
+    },
+  );
 });
 
 describe('POST /member-statuses', () => {

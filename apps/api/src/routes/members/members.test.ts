@@ -11,6 +11,14 @@ const mockReturning = vi.fn();
 const mockUpdate = vi.fn().mockReturnThis();
 const mockDel = vi.fn();
 const mockJoin = vi.fn().mockReturnThis();
+const mockOrderBy = vi.fn().mockReturnThis();
+const mockClone = vi.fn().mockReturnThis();
+const mockClearSelect = vi.fn().mockReturnThis();
+const mockClearOrder = vi.fn().mockReturnThis();
+const mockCount = vi.fn().mockReturnThis();
+const mockCountDistinct = vi.fn().mockReturnThis();
+const mockLimit = vi.fn().mockReturnThis();
+const mockOffset = vi.fn();
 
 vi.mock('../../db.js', () => {
   const db = Object.assign(
@@ -24,6 +32,14 @@ vi.mock('../../db.js', () => {
       update: mockUpdate,
       del: mockDel,
       join: mockJoin,
+      orderBy: mockOrderBy,
+      clone: mockClone,
+      clearSelect: mockClearSelect,
+      clearOrder: mockClearOrder,
+      count: mockCount,
+      countDistinct: mockCountDistinct,
+      limit: mockLimit,
+      offset: mockOffset,
     })),
     { raw: vi.fn() },
   );
@@ -63,19 +79,109 @@ beforeEach(() => {
   mockInsert.mockReturnThis();
   mockUpdate.mockReturnThis();
   mockJoin.mockReturnThis();
+  mockOrderBy.mockReturnThis();
+  mockClone.mockReturnThis();
+  mockClearSelect.mockReturnThis();
+  mockClearOrder.mockReturnThis();
+  mockCount.mockReturnThis();
+  mockCountDistinct.mockReturnThis();
+  mockLimit.mockReturnThis();
 });
 
 describe('GET /members', () => {
-  it('should return a list of members', async () => {
-    mockSelect.mockResolvedValueOnce([sampleMember]);
+  const mockList = (rows: unknown[], total: number) => {
+    mockFirst.mockResolvedValueOnce({ total });
+    mockOffset.mockResolvedValueOnce(rows);
+  };
+
+  it('returns envelope with defaults when no query params', async () => {
+    mockList([sampleMember], 1);
 
     const res = await request(app)
       .get('/members')
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual([sampleMember]);
+    expect(res.body).toEqual({
+      data: [sampleMember],
+      pagination: {
+        page: 1,
+        itemsPerPage: 25,
+        totalItems: 1,
+        totalPages: 1,
+      },
+    });
+    expect(mockJoin).not.toHaveBeenCalled();
+    expect(mockLimit).toHaveBeenCalledWith(25);
+    expect(mockOffset).toHaveBeenCalledWith(0);
   });
+
+  it('applies page=2 and itemsPerPage=10', async () => {
+    mockList([sampleMember], 42);
+
+    const res = await request(app)
+      .get('/members?page=2&itemsPerPage=10')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(mockLimit).toHaveBeenCalledWith(10);
+    expect(mockOffset).toHaveBeenCalledWith(10);
+    expect(res.body.pagination.totalPages).toBe(5);
+  });
+
+  it('filters by teamId with an inner join and paginates the filtered set', async () => {
+    mockList([sampleMember], 7);
+
+    const res = await request(app)
+      .get('/members?teamId=team-1')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(mockJoin).toHaveBeenCalledWith(
+      'teamAssignments',
+      'members.id',
+      'teamAssignments.memberId',
+    );
+    expect(mockWhere).toHaveBeenCalledWith('teamAssignments.teamId', 'team-1');
+    expect(res.body.pagination.totalItems).toBe(7);
+  });
+
+  it('returns empty envelope when no members match', async () => {
+    mockList([], 0);
+
+    const res = await request(app)
+      .get('/members')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.body).toEqual({
+      data: [],
+      pagination: {
+        page: 1,
+        itemsPerPage: 25,
+        totalItems: 0,
+        totalPages: 1,
+      },
+    });
+  });
+
+  it('orders results by members.id ascending', async () => {
+    mockList([sampleMember], 1);
+    await request(app)
+      .get('/members')
+      .set('Authorization', `Bearer ${adminToken}`);
+    expect(mockOrderBy).toHaveBeenCalledWith('members.id', 'asc');
+  });
+
+  it.each([['page=0'], ['itemsPerPage=101']])(
+    'returns 400 for %s',
+    async (qs) => {
+      const res = await request(app)
+        .get(`/members?${qs}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty('error', 'validation error');
+    },
+  );
 });
 
 describe('GET /members/:id', () => {

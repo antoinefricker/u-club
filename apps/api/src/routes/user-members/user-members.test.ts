@@ -11,7 +11,14 @@ const mockReturning = vi.fn();
 const mockUpdate = vi.fn().mockReturnThis();
 const mockDel = vi.fn();
 const mockJoin = vi.fn().mockReturnThis();
-const mockThen = vi.fn();
+const mockOrderBy = vi.fn().mockReturnThis();
+const mockClone = vi.fn().mockReturnThis();
+const mockClearSelect = vi.fn().mockReturnThis();
+const mockClearOrder = vi.fn().mockReturnThis();
+const mockCount = vi.fn().mockReturnThis();
+const mockCountDistinct = vi.fn().mockReturnThis();
+const mockLimit = vi.fn().mockReturnThis();
+const mockOffset = vi.fn();
 
 vi.mock('../../db.js', () => {
   const db = Object.assign(
@@ -25,7 +32,14 @@ vi.mock('../../db.js', () => {
       update: mockUpdate,
       del: mockDel,
       join: mockJoin,
-      then: mockThen,
+      orderBy: mockOrderBy,
+      clone: mockClone,
+      clearSelect: mockClearSelect,
+      clearOrder: mockClearOrder,
+      count: mockCount,
+      countDistinct: mockCountDistinct,
+      limit: mockLimit,
+      offset: mockOffset,
     })),
     { raw: vi.fn() },
   );
@@ -63,39 +77,119 @@ beforeEach(() => {
   mockInsert.mockReturnThis();
   mockUpdate.mockReturnThis();
   mockJoin.mockReturnThis();
+  mockOrderBy.mockReturnThis();
+  mockClone.mockReturnThis();
+  mockClearSelect.mockReturnThis();
+  mockClearOrder.mockReturnThis();
+  mockCount.mockReturnThis();
+  mockCountDistinct.mockReturnThis();
+  mockLimit.mockReturnThis();
 });
 
 describe('GET /user-members', () => {
-  it('should return all user-members for admin (200)', async () => {
-    mockThen.mockImplementationOnce((resolve: (value: unknown) => void) =>
-      resolve([sampleUserMember]),
-    );
+  const mockList = (rows: unknown[], total: number) => {
+    mockFirst.mockResolvedValueOnce({ total });
+    mockOffset.mockResolvedValueOnce(rows);
+  };
+
+  it('returns envelope with defaults for admin without filter', async () => {
+    mockList([sampleUserMember], 1);
 
     const res = await request(app)
       .get('/user-members')
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual([sampleUserMember]);
+    expect(res.body).toEqual({
+      data: [sampleUserMember],
+      pagination: {
+        page: 1,
+        itemsPerPage: 25,
+        totalItems: 1,
+        totalPages: 1,
+      },
+    });
+    expect(mockWhere).not.toHaveBeenCalled();
   });
 
-  it('should return only own records for regular user (200)', async () => {
-    mockThen.mockImplementationOnce((resolve: (value: unknown) => void) =>
-      resolve([sampleUserMember]),
-    );
+  it('applies userId filter when admin passes it', async () => {
+    mockList([sampleUserMember], 1);
 
     const res = await request(app)
-      .get('/user-members')
-      .set('Authorization', `Bearer ${userToken}`);
+      .get('/user-members?userId=uuid-1')
+      .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual([sampleUserMember]);
     expect(mockWhere).toHaveBeenCalledWith('userMembers.userId', 'uuid-1');
   });
 
-  it('should return 401 when unauthenticated', async () => {
-    const res = await request(app).get('/user-members');
+  it('restricts regular users to their own userId and ignores userId query param', async () => {
+    mockList([sampleUserMember], 1);
 
+    const res = await request(app)
+      .get('/user-members?userId=uuid-other')
+      .set('Authorization', `Bearer ${userToken}`);
+
+    expect(res.status).toBe(200);
+    expect(mockWhere).toHaveBeenCalledWith('userMembers.userId', 'uuid-1');
+    expect(mockWhere).not.toHaveBeenCalledWith(
+      'userMembers.userId',
+      'uuid-other',
+    );
+  });
+
+  it('applies page=2 and itemsPerPage=10', async () => {
+    mockList([sampleUserMember], 42);
+
+    const res = await request(app)
+      .get('/user-members?page=2&itemsPerPage=10')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(mockLimit).toHaveBeenCalledWith(10);
+    expect(mockOffset).toHaveBeenCalledWith(10);
+    expect(res.body.pagination.totalPages).toBe(5);
+  });
+
+  it('returns empty envelope when no rows match', async () => {
+    mockList([], 0);
+
+    const res = await request(app)
+      .get('/user-members')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.body).toEqual({
+      data: [],
+      pagination: {
+        page: 1,
+        itemsPerPage: 25,
+        totalItems: 0,
+        totalPages: 1,
+      },
+    });
+  });
+
+  it('orders results by userMembers.id ascending', async () => {
+    mockList([sampleUserMember], 1);
+    await request(app)
+      .get('/user-members')
+      .set('Authorization', `Bearer ${adminToken}`);
+    expect(mockOrderBy).toHaveBeenCalledWith('userMembers.id', 'asc');
+  });
+
+  it.each([['page=0'], ['itemsPerPage=101']])(
+    'returns 400 for %s',
+    async (qs) => {
+      const res = await request(app)
+        .get(`/user-members?${qs}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty('error', 'validation error');
+    },
+  );
+
+  it('returns 401 when unauthenticated', async () => {
+    const res = await request(app).get('/user-members');
     expect(res.status).toBe(401);
   });
 });

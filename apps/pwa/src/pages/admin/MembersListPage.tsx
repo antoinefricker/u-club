@@ -1,26 +1,47 @@
-import { useState } from 'react';
 import {
   ActionIcon,
   Alert,
   Button,
   Group,
   Loader,
+  Pagination,
   Select,
   Table,
+  Text,
 } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { PageTitle } from '../../layout/PageTitle';
+import { ListFilters } from '../../layout/ListFilters';
 import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import { useMembers, useDeleteMember } from '../../hooks/useMembers';
 import { useTeams } from '../../hooks/useTeams';
+import { usePagination } from '../../hooks/usePagination';
+import { useListFilters } from '../../hooks/useListFilters';
+
+const MEMBERS_FILTER_KEYS = ['teamId'] as const;
 
 export function MembersListPage() {
   const navigate = useNavigate();
-  const [teamId, setTeamId] = useState<string | null>(null);
-  const { data: teams } = useTeams();
-  const { data: members, isLoading, error } = useMembers(teamId ?? undefined);
+  const { page, itemsPerPage, setPage } = usePagination();
+  const { filters, setFilter } = useListFilters(MEMBERS_FILTER_KEYS);
+  const teamId = filters.teamId ?? null;
+
+  const { data: teamsData } = useTeams({ itemsPerPage: 100 });
+  const {
+    data: membersData,
+    isLoading,
+    error,
+  } = useMembers({
+    page,
+    itemsPerPage,
+    teamId: teamId ?? undefined,
+  });
   const deleteMember = useDeleteMember();
+
+  const teams = teamsData?.data;
+  const members = membersData?.data;
+  const pagination = membersData?.pagination;
 
   const teamOptions =
     teams?.map((t) => ({ value: t.id, label: t.label })) ?? [];
@@ -49,15 +70,18 @@ export function MembersListPage() {
         </Button>
       </PageTitle>
 
-      <Select
-        label="Filter by team"
-        placeholder="All teams"
-        data={teamOptions}
-        value={teamId}
-        onChange={setTeamId}
-        clearable
-        maw={300}
-      />
+      <ListFilters>
+        <Select
+          label="Filter by team"
+          placeholder="All teams"
+          data={teamOptions}
+          value={teamId}
+          onChange={(v) => setFilter('teamId', v)}
+          clearable
+          maw={300}
+        />
+      </ListFilters>
+
       <Table striped highlightOnHover>
         <Table.Thead>
           <Table.Tr>
@@ -99,6 +123,18 @@ export function MembersListPage() {
           ))}
         </Table.Tbody>
       </Table>
+      {pagination && pagination.totalPages > 1 && (
+        <Group justify="space-between" mt="md">
+          <Text size="sm" c="dimmed">
+            {pagination.totalItems} members
+          </Text>
+          <Pagination
+            total={pagination.totalPages}
+            value={page}
+            onChange={setPage}
+          />
+        </Group>
+      )}
     </>
   );
 }

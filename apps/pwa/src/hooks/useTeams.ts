@@ -1,5 +1,15 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  keepPreviousData,
+} from '@tanstack/react-query';
 import { useAuth } from '../auth/useAuth';
+import {
+  buildListQueryString,
+  type Paginated,
+  type PaginationArgs,
+} from './pagination';
 
 export type TeamGender = 'male' | 'female' | 'mixed';
 
@@ -15,7 +25,7 @@ interface Team {
   updatedAt: string;
 }
 
-interface UseTeamsFilters {
+interface UseTeamsArgs extends PaginationArgs {
   clubId?: string;
   gender?: TeamGender;
 }
@@ -28,21 +38,23 @@ function useAuthHeaders() {
   };
 }
 
-export function useTeams(filters: UseTeamsFilters = {}) {
-  const { clubId, gender } = filters;
+export function useTeams(args: UseTeamsArgs = {}) {
+  const { page, itemsPerPage, clubId, gender } = args;
   const headers = useAuthHeaders();
-  return useQuery<Team[]>({
-    queryKey: ['teams', clubId, gender],
+  return useQuery<Paginated<Team>>({
+    queryKey: ['teams', { page, itemsPerPage, clubId, gender }],
     queryFn: async () => {
-      const params = new URLSearchParams();
-      if (clubId) params.set('clubId', clubId);
-      if (gender) params.set('gender', gender);
-      const qs = params.toString();
-      const url = qs ? `/api/teams?${qs}` : '/api/teams';
-      const res = await fetch(url, { headers });
+      const qs = buildListQueryString({
+        page,
+        itemsPerPage,
+        clubId,
+        gender,
+      });
+      const res = await fetch(`/api/teams${qs}`, { headers });
       if (!res.ok) throw new Error('Failed to fetch teams');
       return res.json();
     },
+    placeholderData: keepPreviousData,
   });
 }
 
