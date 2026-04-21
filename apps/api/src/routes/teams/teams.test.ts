@@ -25,6 +25,7 @@ vi.mock('../../db.js', () => {
       mockWhere(...args);
       return builder;
     },
+    leftJoin: () => builder,
     first: mockFirst,
     insert: (...args: unknown[]) => {
       mockInsert(...args);
@@ -60,11 +61,13 @@ const adminToken = createTestToken('uuid-1', 'admin@example.com', 'admin');
 const sampleTeam = {
   id: 'team-1',
   clubId: 'club-1',
+  categoryId: 'cat-1',
   label: 'U15 Boys',
   gender: 'male',
   description: null,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
+  categoryLabel: 'U15',
 };
 
 beforeEach(() => {
@@ -96,7 +99,7 @@ describe('GET /teams', () => {
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual([femaleTeam]);
-    expect(mockWhere).toHaveBeenCalledWith({ gender: 'female' });
+    expect(mockWhere).toHaveBeenCalledWith('teams.gender', 'female');
   });
 
   it('should combine clubId and gender filters', async () => {
@@ -107,8 +110,8 @@ describe('GET /teams', () => {
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(200);
-    expect(mockWhere).toHaveBeenCalledWith({ clubId: 'club-1' });
-    expect(mockWhere).toHaveBeenCalledWith({ gender: 'male' });
+    expect(mockWhere).toHaveBeenCalledWith('teams.clubId', 'club-1');
+    expect(mockWhere).toHaveBeenCalledWith('teams.gender', 'male');
   });
 
   it('should return 400 for an invalid gender value', async () => {

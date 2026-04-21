@@ -46,18 +46,22 @@ router.get(
   requireAuth,
   requireRole('admin', 'manager'),
   async (req: Request, res: Response) => {
-    const query = db('teams').select(
-      'id',
-      'clubId',
-      'label',
-      'gender',
-      'description',
-      'createdAt',
-      'updatedAt',
-    );
+    const query = db('teams')
+      .leftJoin('teamCategories', 'teams.categoryId', 'teamCategories.id')
+      .select(
+        'teams.id',
+        'teams.clubId',
+        'teams.categoryId',
+        'teams.label',
+        'teams.gender',
+        'teams.description',
+        'teams.createdAt',
+        'teams.updatedAt',
+        'teamCategories.label as categoryLabel',
+      );
 
     if (req.query.clubId) {
-      query.where({ clubId: req.query.clubId });
+      query.where('teams.clubId', req.query.clubId);
     }
 
     if (req.query.gender) {
@@ -71,7 +75,7 @@ router.get(
           .json({ error: 'gender must be male, female, or mixed' });
         return;
       }
-      query.where({ gender });
+      query.where('teams.gender', gender);
     }
 
     const teams = await query;
