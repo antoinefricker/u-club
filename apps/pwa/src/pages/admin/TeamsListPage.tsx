@@ -10,7 +10,7 @@ import {
 } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { PageTitle } from '../../layout/PageTitle';
-import { ListFilter } from '../../layout/ListFilter';
+import { ListFilters } from '../../layout/ListFilters';
 import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import { useTeams, useDeleteTeam, type TeamGender } from '../../hooks/useTeams';
@@ -63,7 +63,7 @@ export function TeamsListPage() {
         <Button onClick={() => navigate('/admin/teams/new')}>New team</Button>
       </PageTitle>
 
-      <ListFilter>
+      <ListFilters>
         <Select
           label="Filter by club"
           placeholder="All clubs"
@@ -82,7 +82,7 @@ export function TeamsListPage() {
           clearable
           maw={220}
         />
-      </ListFilter>
+      </ListFilters>
 
       <Table striped highlightOnHover>
         <Table.Thead>
