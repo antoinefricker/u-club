@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 export const createUserMemberSchema = z.object({
-  user_id: z.string({ error: 'user_id is required' }),
-  member_id: z.string({ error: 'member_id is required' }),
+  userId: z.string({ error: 'userId is required' }),
+  memberId: z.string({ error: 'memberId is required' }),
   type: z.enum(['self', 'relative'], {
     error: "type must be 'self' or 'relative'",
   }),

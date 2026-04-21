@@ -27,10 +27,10 @@ const router = Router();
  *                   id:
  *                     type: string
  *                     format: uuid
- *                   member_id:
+ *                   memberId:
  *                     type: string
  *                     format: uuid
- *                   invited_by:
+ *                   invitedBy:
  *                     type: string
  *                     format: uuid
  *                   email:
@@ -42,15 +42,15 @@ const router = Router();
  *                   description:
  *                     type: string
  *                     nullable: true
- *                   expires_at:
+ *                   expiresAt:
  *                     type: string
  *                     format: date-time
- *                   created_at:
+ *                   createdAt:
  *                     type: string
  *                     format: date-time
- *                   member_first_name:
+ *                   memberFirstName:
  *                     type: string
- *                   member_last_name:
+ *                   memberLastName:
  *                     type: string
  */
 router.get('/', requireAuth, async (req: Request, res: Response) => {
@@ -62,22 +62,22 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
     return;
   }
 
-  const invitations = await db('member_invitations')
-    .join('members', 'members.id', 'member_invitations.member_id')
-    .where('member_invitations.email', userRecord.email)
-    .whereNull('member_invitations.accepted_at')
-    .where('member_invitations.expires_at', '>', new Date())
+  const invitations = await db('memberInvitations')
+    .join('members', 'members.id', 'memberInvitations.memberId')
+    .where('memberInvitations.email', userRecord.email)
+    .whereNull('memberInvitations.acceptedAt')
+    .where('memberInvitations.expiresAt', '>', new Date())
     .select(
-      'member_invitations.id',
-      'member_invitations.member_id',
-      'member_invitations.invited_by',
-      'member_invitations.email',
-      'member_invitations.type',
-      'member_invitations.description',
-      'member_invitations.expires_at',
-      'member_invitations.created_at',
-      'members.first_name as member_first_name',
-      'members.last_name as member_last_name',
+      'memberInvitations.id',
+      'memberInvitations.memberId',
+      'memberInvitations.invitedBy',
+      'memberInvitations.email',
+      'memberInvitations.type',
+      'memberInvitations.description',
+      'memberInvitations.expiresAt',
+      'memberInvitations.createdAt',
+      'members.firstName as memberFirstName',
+      'members.lastName as memberLastName',
     );
 
   res.json(invitations);

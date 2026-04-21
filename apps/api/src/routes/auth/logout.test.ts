@@ -72,7 +72,7 @@ describe('POST /auth/logout', () => {
     expect(mockInsert).toHaveBeenCalledWith(
       expect.objectContaining({
         token,
-        expires_at: expect.any(Date),
+        expiresAt: expect.any(Date),
       }),
     );
   });

@@ -26,7 +26,7 @@ router.get(
   requireAuth,
   requireRole('admin', 'manager'),
   async (req: Request, res: Response) => {
-    const statuses = await db('member_statuses').select('id', 'label');
+    const statuses = await db('memberStatuses').select('id', 'label');
 
     res.json(statuses);
   },

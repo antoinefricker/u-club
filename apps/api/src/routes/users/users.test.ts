@@ -167,7 +167,7 @@ describe('POST /users', () => {
     mockReturning.mockResolvedValueOnce([sampleUser]);
 
     await request(app).post('/users').send({
-      display_name: 'johnd',
+      displayName: 'johnd',
       email: 'john@example.com',
       password: 'secret',
     });

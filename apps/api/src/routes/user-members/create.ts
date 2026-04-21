@@ -49,35 +49,35 @@ router.post(
   async (req: Request, res: Response) => {
     const user = (req as AuthenticatedRequest).user;
     const isPrivileged = user.role === 'admin' || user.role === 'manager';
-    const { user_id, member_id, type, description } = req.body;
+    const { userId, memberId, type, description } = req.body;
 
-    if (!isPrivileged && user_id !== user.id) {
+    if (!isPrivileged && userId !== user.id) {
       res.status(403).json({ error: 'not allowed to create for another user' });
       return;
     }
 
-    const existing = await db('user_members')
-      .where({ user_id, member_id })
+    const existing = await db('userMembers')
+      .where({ userId, memberId })
       .first();
     if (existing) {
       res.status(409).json({ error: 'association already exists' });
       return;
     }
 
-    const [userMember] = await db('user_members')
+    const [userMember] = await db('userMembers')
       .insert({
-        user_id,
-        member_id,
+        userId,
+        memberId,
         type,
         description: description ?? null,
       })
       .returning([
         'id',
-        'user_id',
-        'member_id',
+        'userId',
+        'memberId',
         'type',
         'description',
-        'created_at',
+        'createdAt',
       ]);
 
     res.status(201).json(userMember);

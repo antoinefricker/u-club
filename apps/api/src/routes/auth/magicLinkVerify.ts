@@ -52,9 +52,9 @@ router.post('/magic_link_verify', async (req: Request, res: Response) => {
     return;
   }
 
-  const loginToken = await db('auth_tokens')
+  const loginToken = await db('authTokens')
     .where({ token })
-    .where('expires_at', '>', new Date())
+    .where('expiresAt', '>', new Date())
     .first();
 
   if (!loginToken) {
@@ -62,7 +62,7 @@ router.post('/magic_link_verify', async (req: Request, res: Response) => {
     return;
   }
 
-  await db('auth_tokens').where({ id: loginToken.id }).del();
+  await db('authTokens').where({ id: loginToken.id }).del();
 
   const user = await db('users').where({ email: loginToken.email }).first();
   if (!user) {
@@ -70,10 +70,10 @@ router.post('/magic_link_verify', async (req: Request, res: Response) => {
     return;
   }
 
-  if (!user.email_verified_at) {
+  if (!user.emailVerifiedAt) {
     await db('users')
       .where({ id: user.id })
-      .update({ email_verified_at: new Date() });
+      .update({ emailVerifiedAt: new Date() });
   }
 
   const jwtSecret = process.env.JWT_SECRET;
@@ -90,7 +90,7 @@ router.post('/magic_link_verify', async (req: Request, res: Response) => {
     },
   );
 
-  res.json({ access_token: accessToken });
+  res.json({ accessToken });
 });
 
 export default router;

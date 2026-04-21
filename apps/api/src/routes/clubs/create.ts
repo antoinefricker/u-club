@@ -45,7 +45,7 @@ router.post(
   requireRole('admin'),
   validate(createClubSchema),
   async (req: Request, res: Response) => {
-    const { name, code, description, media_logo_lg, media_logo_sm } = req.body;
+    const { name, code, description, mediaLogoLg, mediaLogoSm } = req.body;
 
     const existing = await db('clubs').where({ code }).first();
     if (existing) {
@@ -58,18 +58,18 @@ router.post(
         name,
         code,
         description: description || null,
-        media_logo_lg: media_logo_lg || null,
-        media_logo_sm: media_logo_sm || null,
+        mediaLogoLg: mediaLogoLg || null,
+        mediaLogoSm: mediaLogoSm || null,
       })
       .returning([
         'id',
         'name',
         'code',
         'description',
-        'media_logo_lg',
-        'media_logo_sm',
-        'created_at',
-        'updated_at',
+        'mediaLogoLg',
+        'mediaLogoSm',
+        'createdAt',
+        'updatedAt',
       ]);
 
     res.status(201).json(club);

@@ -25,16 +25,16 @@ export const checkDbConnection = async () => {
 
 export const dbClear = async (): Promise<string[]> => {
   const tables = [
-    'member_invitations',
-    'user_members',
-    'team_assignments',
+    'memberInvitations',
+    'userMembers',
+    'teamAssignments',
     'members',
-    'member_statuses',
+    'memberStatuses',
     'teams',
-    'team_categories',
+    'teamCategories',
     'clubs',
-    'auth_tokens',
-    'revoked_tokens',
+    'authTokens',
+    'revokedTokens',
     'users',
   ];
 
@@ -51,14 +51,14 @@ export const dbClear = async (): Promise<string[]> => {
 export const insertMemberStatus = async (
   label: string,
 ): Promise<MemberStatus> => {
-  const [status] = await db('member_statuses').insert({ label }).returning('*');
+  const [status] = await db('memberStatuses').insert({ label }).returning('*');
   return status;
 };
 
 export const insertMember = async (
   member: Pick<
     Member,
-    'status_id' | 'first_name' | 'last_name' | 'birthdate' | 'gender'
+    'statusId' | 'firstName' | 'lastName' | 'birthdate' | 'gender'
   >,
 ): Promise<Member> => {
   const [createdMember] = await db('members').insert(member).returning('*');
@@ -66,34 +66,34 @@ export const insertMember = async (
 };
 
 export const insertTeamAssignment = async (
-  assignment: Pick<TeamAssignment, 'team_id' | 'member_id' | 'role'>,
+  assignment: Pick<TeamAssignment, 'teamId' | 'memberId' | 'role'>,
 ): Promise<TeamAssignment> => {
-  const [createdAssignment] = await db('team_assignments')
+  const [createdAssignment] = await db('teamAssignments')
     .insert(assignment)
     .returning('*');
   return createdAssignment;
 };
 
 export const insertUser = async (
-  user: Pick<User, 'email' | 'display_name' | 'role'> &
-    Partial<Pick<User, 'email_verified_at'>>,
+  user: Pick<User, 'email' | 'displayName' | 'role'> &
+    Partial<Pick<User, 'emailVerifiedAt'>>,
 ): Promise<User> => {
   const [createdUser] = await db('users')
     .insert({
       email: user.email,
-      display_name: user.display_name,
+      displayName: user.displayName,
       role: user.role,
       password: hashedPassword,
-      email_verified_at: user.email_verified_at ?? new Date().toISOString(),
+      emailVerifiedAt: user.emailVerifiedAt ?? new Date().toISOString(),
     })
     .returning('*');
   return createdUser;
 };
 
 export const insertUserMemberLink = async (
-  link: Pick<UserMember, 'user_id' | 'member_id' | 'type' | 'description'>,
+  link: Pick<UserMember, 'userId' | 'memberId' | 'type' | 'description'>,
 ): Promise<UserMember> => {
-  const [createdLink] = await db('user_members').insert(link).returning('*');
+  const [createdLink] = await db('userMembers').insert(link).returning('*');
   return createdLink;
 };
 
@@ -105,16 +105,16 @@ export const insertClub = async (
 };
 
 export const insertTeamCategory = async (
-  category: Pick<TeamCategory, 'club_id' | 'label'>,
+  category: Pick<TeamCategory, 'clubId' | 'label'>,
 ): Promise<TeamCategory> => {
-  const [createdCategory] = await db('team_categories')
+  const [createdCategory] = await db('teamCategories')
     .insert(category)
     .returning('*');
   return createdCategory;
 };
 
 export const insertTeam = async (
-  team: Pick<Team, 'club_id' | 'category_id' | 'label' | 'gender'>,
+  team: Pick<Team, 'clubId' | 'categoryId' | 'label' | 'gender'>,
 ): Promise<Team> => {
   const [createdTeam] = await db('teams').insert(team).returning('*');
   return createdTeam;

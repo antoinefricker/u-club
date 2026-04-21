@@ -30,13 +30,13 @@ router.get(
   async (req: Request, res: Response) => {
     const users = await db('users').select(
       'id',
-      'display_name',
+      'displayName',
       'bio',
       'phone',
       'email',
       'role',
-      'created_at',
-      'updated_at',
+      'createdAt',
+      'updatedAt',
     );
 
     res.json(users);

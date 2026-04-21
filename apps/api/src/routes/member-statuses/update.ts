@@ -66,7 +66,7 @@ router.put(
     const updates = { ...req.body };
 
     if (updates.label) {
-      const existing = await db('member_statuses')
+      const existing = await db('memberStatuses')
         .where({ label: updates.label })
         .whereNot({ id })
         .first();
@@ -76,7 +76,7 @@ router.put(
       }
     }
 
-    const [status] = await db('member_statuses')
+    const [status] = await db('memberStatuses')
       .where({ id })
       .update(updates)
       .returning(['id', 'label']);

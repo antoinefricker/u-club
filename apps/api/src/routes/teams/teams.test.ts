@@ -95,7 +95,7 @@ describe('GET /teams/:id', () => {
 });
 
 describe('POST /teams', () => {
-  it('should return 400 if club_id is missing', async () => {
+  it('should return 400 if clubId is missing', async () => {
     const res = await request(app)
       .post('/teams')
       .set('Authorization', `Bearer ${adminToken}`)

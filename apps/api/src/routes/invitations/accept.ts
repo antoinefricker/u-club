@@ -74,18 +74,18 @@ router.post(
     const { id } = req.params;
     const { type, description } = req.body;
 
-    const invitation = await db('member_invitations').where({ id }).first();
+    const invitation = await db('memberInvitations').where({ id }).first();
     if (!invitation) {
       res.status(404).json({ error: 'invitation not found' });
       return;
     }
 
-    if (invitation.accepted_at) {
+    if (invitation.acceptedAt) {
       res.status(400).json({ error: 'invitation already accepted' });
       return;
     }
 
-    if (new Date(invitation.expires_at) < new Date()) {
+    if (new Date(invitation.expiresAt) < new Date()) {
       res.status(400).json({ error: 'invitation has expired' });
       return;
     }
@@ -97,15 +97,15 @@ router.post(
     }
 
     await db.transaction(async (trx) => {
-      await trx('user_members').insert({
-        user_id: user.id,
-        member_id: invitation.member_id,
+      await trx('userMembers').insert({
+        userId: user.id,
+        memberId: invitation.memberId,
         type: type ?? invitation.type,
         description: description ?? invitation.description ?? null,
       });
 
-      await trx('member_invitations').where({ id }).update({
-        accepted_at: new Date(),
+      await trx('memberInvitations').where({ id }).update({
+        acceptedAt: new Date(),
       });
     });
 

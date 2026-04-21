@@ -55,9 +55,9 @@ router.post('/logout', async (req: Request, res: Response) => {
     return;
   }
 
-  await db('revoked_tokens').insert({
+  await db('revokedTokens').insert({
     token,
-    expires_at: new Date((payload.exp ?? 0) * 1000),
+    expiresAt: new Date((payload.exp ?? 0) * 1000),
   });
 
   res.json({ message: 'logged out' });

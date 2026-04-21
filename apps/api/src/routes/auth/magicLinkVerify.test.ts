@@ -60,7 +60,7 @@ describe('POST /auth/magic_link_verify', () => {
       id: '123',
       email: 'deleted@example.com',
       token: 'valid-token',
-      expires_at: new Date(Date.now() + 60000),
+      expiresAt: new Date(Date.now() + 60000),
     });
     // Second call: users lookup returns nothing
     mockFirst.mockResolvedValueOnce(undefined);
@@ -79,13 +79,13 @@ describe('POST /auth/magic_link_verify', () => {
       id: '123',
       email: 'test@example.com',
       token: 'valid-token',
-      expires_at: new Date(Date.now() + 60000),
+      expiresAt: new Date(Date.now() + 60000),
     });
     // Second call: users lookup
     mockFirst.mockResolvedValueOnce({
       id: 'user-uuid-1',
       email: 'test@example.com',
-      email_verified_at: null,
+      emailVerifiedAt: null,
     });
 
     const res = await request(app)

@@ -24,9 +24,9 @@ const router = Router();
  *         application/json:
  *           schema:
  *             type: object
- *             required: [member_id, email, type]
+ *             required: [memberId, email, type]
  *             properties:
- *               member_id:
+ *               memberId:
  *                 type: string
  *                 format: uuid
  *               email:
@@ -62,11 +62,11 @@ router.post(
   async (req: Request, res: Response) => {
     const user = (req as AuthenticatedRequest).user;
     const isPrivileged = user.role === 'admin' || user.role === 'manager';
-    const { member_id, email, type, description } = req.body;
+    const { memberId, email, type, description } = req.body;
 
     if (!isPrivileged) {
-      const link = await db('user_members')
-        .where({ user_id: user.id, member_id })
+      const link = await db('userMembers')
+        .where({ userId: user.id, memberId })
         .first();
       if (!link) {
         res.status(403).json({ error: 'not linked to this member' });
@@ -77,14 +77,14 @@ router.post(
     const token = crypto.randomBytes(32).toString('hex');
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-    await db('member_invitations').insert({
-      member_id,
-      invited_by: user.id,
+    await db('memberInvitations').insert({
+      memberId,
+      invitedBy: user.id,
       email,
       type,
       description: description ?? null,
       token,
-      expires_at: expiresAt,
+      expiresAt,
     });
 
     const appUrl = process.env.APP_URL || 'http://localhost:5173';

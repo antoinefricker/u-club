@@ -54,15 +54,15 @@ router.post(
       return;
     }
 
-    await db('auth_tokens').where({ email, type: 'password_reset' }).del();
+    await db('authTokens').where({ email, type: 'password_reset' }).del();
 
     const token = crypto.randomBytes(32).toString('hex');
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
 
-    await db('auth_tokens').insert({
+    await db('authTokens').insert({
       email,
       token,
-      expires_at: expiresAt,
+      expiresAt,
       type: 'password_reset',
     });
 

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const createTeamSchema = z.object({
-  club_id: z.string({ error: 'club_id is required' }),
+  clubId: z.string({ error: 'clubId is required' }),
   label: z.string({ error: 'label is required' }),
   gender: z.enum(['male', 'female', 'mixed'], {
     error: 'gender must be male, female, or mixed',

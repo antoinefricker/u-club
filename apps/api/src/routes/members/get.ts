@@ -42,13 +42,13 @@ router.get(
     const member = await db('members')
       .select(
         'id',
-        'status_id',
-        'first_name',
-        'last_name',
+        'statusId',
+        'firstName',
+        'lastName',
         'birthdate',
         'gender',
-        'created_at',
-        'updated_at',
+        'createdAt',
+        'updatedAt',
       )
       .where({ id })
       .first();

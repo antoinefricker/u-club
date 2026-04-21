@@ -70,7 +70,7 @@ describe('POST /auth/verify_email', () => {
       email: 'deleted@example.com',
       token: 'valid-token',
       type: 'confirmation',
-      expires_at: new Date(Date.now() + 60000),
+      expiresAt: new Date(Date.now() + 60000),
     });
     mockFirst.mockResolvedValueOnce(undefined);
 
@@ -88,12 +88,12 @@ describe('POST /auth/verify_email', () => {
       email: 'test@example.com',
       token: 'valid-token',
       type: 'confirmation',
-      expires_at: new Date(Date.now() + 60000),
+      expiresAt: new Date(Date.now() + 60000),
     });
     mockFirst.mockResolvedValueOnce({
       id: 'user-uuid-1',
       email: 'test@example.com',
-      email_verified_at: null,
+      emailVerifiedAt: null,
     });
 
     const res = await request(app)

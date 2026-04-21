@@ -51,13 +51,13 @@ router.post(
   async (req: Request, res: Response) => {
     const { label } = req.body;
 
-    const existing = await db('member_statuses').where({ label }).first();
+    const existing = await db('memberStatuses').where({ label }).first();
     if (existing) {
       res.status(409).json({ error: 'label already in use' });
       return;
     }
 
-    const [status] = await db('member_statuses')
+    const [status] = await db('memberStatuses')
       .insert({ label })
       .returning(['id', 'label']);
 

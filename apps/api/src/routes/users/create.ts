@@ -44,7 +44,7 @@ router.post(
   '/',
   validate(createUserSchema),
   async (req: Request, res: Response) => {
-    const { display_name, bio, phone, email, password } = req.body;
+    const { displayName, bio, phone, email, password } = req.body;
 
     const existing = await db('users').where({ email }).first();
     if (existing) {
@@ -59,7 +59,7 @@ router.post(
 
     const [user] = await db('users')
       .insert({
-        display_name,
+        displayName,
         bio: bio || null,
         phone: phone || null,
         email,
@@ -68,22 +68,22 @@ router.post(
       })
       .returning([
         'id',
-        'display_name',
+        'displayName',
         'bio',
         'phone',
         'email',
         'role',
-        'created_at',
-        'updated_at',
+        'createdAt',
+        'updatedAt',
       ]);
 
     const token = crypto.randomBytes(32).toString('hex');
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    await db('auth_tokens').insert({
+    await db('authTokens').insert({
       email,
       token,
-      expires_at: expiresAt,
+      expiresAt,
       type: 'confirmation',
     });
 

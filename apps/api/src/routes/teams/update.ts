@@ -55,19 +55,19 @@ router.put(
     const { id } = req.params;
 
     const updates = { ...req.body };
-    updates.updated_at = new Date().toISOString();
+    updates.updatedAt = new Date().toISOString();
 
     const [team] = await db('teams')
       .where({ id })
       .update(updates)
       .returning([
         'id',
-        'club_id',
+        'clubId',
         'label',
         'gender',
         'description',
-        'created_at',
-        'updated_at',
+        'createdAt',
+        'updatedAt',
       ]);
 
     if (!team) {

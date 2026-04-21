@@ -2,8 +2,8 @@ export type TeamRole = 'player' | 'coach' | 'assistant' | 'sparring';
 
 export interface TeamAssignment {
   id: string;
-  team_id: string;
-  member_id: string;
+  teamId: string;
+  memberId: string;
   role: TeamRole;
-  created_at: string;
+  createdAt: string;
 }

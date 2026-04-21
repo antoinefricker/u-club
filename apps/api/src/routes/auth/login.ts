@@ -77,7 +77,7 @@ router.post(
       return;
     }
 
-    if (!user.email_verified_at) {
+    if (!user.emailVerifiedAt) {
       res.status(403).json({ error: 'email not verified' });
       return;
     }
@@ -96,7 +96,7 @@ router.post(
       },
     );
 
-    res.json({ access_token: accessToken });
+    res.json({ accessToken });
   },
 );
 
