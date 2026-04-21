@@ -5,12 +5,14 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/teams
+  url: {{baseUrl}}/teams?page=1&itemsPerPage=25
   body: none
   auth: bearer
 }
 
 params:query {
+  page: 1
+  itemsPerPage: 25
   ~clubId:
   ~gender:
 }
@@ -21,6 +23,11 @@ auth:bearer {
 
 docs {
   Optional query parameters:
+  - page: integer, default 1, minimum 1
+  - itemsPerPage: integer, default 25, range 1–100
   - clubId: UUID — filter by club
   - gender: male | female | mixed — filter by gender (400 if invalid)
+
+  Response envelope:
+    { "data": [...], "pagination": { "page", "itemsPerPage", "totalItems", "totalPages" } }
 }

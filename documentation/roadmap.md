@@ -61,6 +61,8 @@
 
 ## PWA
 
+- documentation/bruno/ has no members/ or member-statuses/ directories, so those routes still lack Bruno coverage
+- apps/pwa has no test framework, so usePagination / useListFilters rely on type safety + integration-level verification
 - **One time password**
 - **PWA polish**
   - app icons (192x192, 512x512)
@@ -81,5 +83,4 @@
   - export
 - **i18n** — Internationalization with react-i18next (French/English)
 - **Loading/error states** — Add loading skeletons and error boundaries to pages
-- **Pagination** — Cursor or offset pagination on list endpoints as data grows
 - **Admin teams — category filter** — Add a category filter on `/admin/teams` (may require team_categories endpoints: list at minimum, possibly CRUD)

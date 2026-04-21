@@ -1,5 +1,15 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  keepPreviousData,
+} from '@tanstack/react-query';
 import { useAuth } from '../auth/useAuth';
+import {
+  buildListQueryString,
+  type Paginated,
+  type PaginationArgs,
+} from './pagination';
 
 interface Member {
   id: string;
@@ -12,6 +22,10 @@ interface Member {
   updatedAt: string;
 }
 
+interface UseMembersArgs extends PaginationArgs {
+  teamId?: string;
+}
+
 function useAuthHeaders() {
   const { token } = useAuth();
   return {
@@ -20,16 +34,18 @@ function useAuthHeaders() {
   };
 }
 
-export function useMembers(teamId?: string) {
+export function useMembers(args: UseMembersArgs = {}) {
+  const { page, itemsPerPage, teamId } = args;
   const headers = useAuthHeaders();
-  return useQuery<Member[]>({
-    queryKey: ['members', teamId],
+  return useQuery<Paginated<Member>>({
+    queryKey: ['members', { page, itemsPerPage, teamId }],
     queryFn: async () => {
-      const url = teamId ? `/api/members?teamId=${teamId}` : '/api/members';
-      const res = await fetch(url, { headers });
+      const qs = buildListQueryString({ page, itemsPerPage, teamId });
+      const res = await fetch(`/api/members${qs}`, { headers });
       if (!res.ok) throw new Error('Failed to fetch members');
       return res.json();
     },
+    placeholderData: keepPreviousData,
   });
 }
 

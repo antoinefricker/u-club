@@ -5,9 +5,14 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/clubs
+  url: {{baseUrl}}/clubs?page=1&itemsPerPage=25
   body: none
   auth: bearer
+}
+
+params:query {
+  page: 1
+  itemsPerPage: 25
 }
 
 auth:bearer {

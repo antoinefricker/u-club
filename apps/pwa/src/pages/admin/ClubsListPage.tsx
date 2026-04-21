@@ -1,14 +1,24 @@
 import { ActionIcon, Alert, Button, Group, Loader, Table } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { PageTitle } from '../../layout/PageTitle';
+import { ListPagination } from '../../layout/ListPagination';
 import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import { useClubs, useDeleteClub } from '../../hooks/useClubs';
+import { usePagination } from '../../hooks/usePagination';
 
 export function ClubsListPage() {
   const navigate = useNavigate();
-  const { data: clubs, isLoading, error } = useClubs();
+  const { page, itemsPerPage } = usePagination();
+  const {
+    data: clubsData,
+    isLoading,
+    error,
+  } = useClubs({ page, itemsPerPage });
   const deleteClub = useDeleteClub();
+
+  const clubs = clubsData?.data;
+  const pagination = clubsData?.pagination;
 
   const handleDelete = (id: string, name: string) => {
     if (!window.confirm(`Delete club "${name}"?`)) return;
@@ -67,6 +77,13 @@ export function ClubsListPage() {
           ))}
         </Table.Tbody>
       </Table>
+      {pagination && (
+        <ListPagination
+          totalPages={pagination.totalPages}
+          totalItems={pagination.totalItems}
+          itemsLabel="clubs"
+        />
+      )}
     </>
   );
 }

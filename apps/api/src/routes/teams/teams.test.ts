@@ -9,6 +9,11 @@ const mockInsert = vi.fn();
 const mockReturning = vi.fn();
 const mockUpdate = vi.fn();
 const mockDel = vi.fn();
+const mockOrderBy = vi.fn();
+const mockLimit = vi.fn();
+const mockOffset = vi.fn();
+const mockCount = vi.fn();
+const mockCountDistinct = vi.fn();
 
 let listResult: unknown = [];
 const setListResult = (v: unknown) => {
@@ -37,6 +42,29 @@ vi.mock('../../db.js', () => {
       return builder;
     },
     del: mockDel,
+    orderBy: (...args: unknown[]) => {
+      mockOrderBy(...args);
+      return builder;
+    },
+    clone: () => builder,
+    clearSelect: () => builder,
+    clearOrder: () => builder,
+    count: (...args: unknown[]) => {
+      mockCount(...args);
+      return builder;
+    },
+    countDistinct: (...args: unknown[]) => {
+      mockCountDistinct(...args);
+      return builder;
+    },
+    limit: (...args: unknown[]) => {
+      mockLimit(...args);
+      return builder;
+    },
+    offset: (...args: unknown[]) => {
+      mockOffset(...args);
+      return builder;
+    },
     then: (resolve: (v: unknown) => void) => resolve(listResult),
   };
   const db = Object.assign(
@@ -77,44 +105,74 @@ beforeEach(() => {
 });
 
 describe('GET /teams', () => {
-  it('should return a list of teams', async () => {
-    setListResult([sampleTeam]);
+  const mockList = (rows: unknown[], total: number) => {
+    setListResult(rows);
+    mockFirst.mockResolvedValueOnce({ total });
+  };
+
+  it('returns envelope with defaults when no query params', async () => {
+    mockList([sampleTeam], 1);
 
     const res = await request(app)
       .get('/teams')
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual([sampleTeam]);
+    expect(res.body).toEqual({
+      data: [sampleTeam],
+      pagination: {
+        page: 1,
+        itemsPerPage: 25,
+        totalItems: 1,
+        totalPages: 1,
+      },
+    });
     expect(mockWhere).not.toHaveBeenCalled();
+    expect(mockLimit).toHaveBeenCalledWith(25);
+    expect(mockOffset).toHaveBeenCalledWith(0);
   });
 
-  it('should filter by gender when provided', async () => {
+  it('applies page=2 and itemsPerPage=10', async () => {
+    mockList([sampleTeam], 42);
+
+    const res = await request(app)
+      .get('/teams?page=2&itemsPerPage=10')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(mockLimit).toHaveBeenCalledWith(10);
+    expect(mockOffset).toHaveBeenCalledWith(10);
+    expect(res.body.pagination.totalPages).toBe(5);
+  });
+
+  it('filters by gender and paginates the filtered set', async () => {
     const femaleTeam = { ...sampleTeam, id: 'team-2', gender: 'female' };
-    setListResult([femaleTeam]);
+    mockList([femaleTeam], 3);
 
     const res = await request(app)
       .get('/teams?gender=female')
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual([femaleTeam]);
+    expect(res.body.data).toEqual([femaleTeam]);
+    expect(res.body.pagination.totalItems).toBe(3);
     expect(mockWhere).toHaveBeenCalledWith('teams.gender', 'female');
   });
 
-  it('should combine clubId and gender filters', async () => {
-    setListResult([sampleTeam]);
+  it('combines clubId and gender filters with pagination', async () => {
+    mockList([sampleTeam], 1);
 
     const res = await request(app)
-      .get('/teams?clubId=club-1&gender=male')
+      .get('/teams?clubId=club-1&gender=male&page=1&itemsPerPage=10')
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(200);
     expect(mockWhere).toHaveBeenCalledWith('teams.clubId', 'club-1');
     expect(mockWhere).toHaveBeenCalledWith('teams.gender', 'male');
+    expect(mockLimit).toHaveBeenCalledWith(10);
   });
 
-  it('should return 400 for an invalid gender value', async () => {
+  it('returns 400 for an invalid gender value', async () => {
     const res = await request(app)
       .get('/teams?gender=other')
       .set('Authorization', `Bearer ${adminToken}`);
@@ -127,8 +185,8 @@ describe('GET /teams', () => {
     expect(mockWhere).not.toHaveBeenCalled();
   });
 
-  it('should ignore an empty gender value', async () => {
-    setListResult([sampleTeam]);
+  it('ignores an empty gender value', async () => {
+    mockList([sampleTeam], 1);
 
     const res = await request(app)
       .get('/teams?gender=')
@@ -137,6 +195,43 @@ describe('GET /teams', () => {
     expect(res.status).toBe(200);
     expect(mockWhere).not.toHaveBeenCalled();
   });
+
+  it('returns empty envelope when no teams match', async () => {
+    mockList([], 0);
+
+    const res = await request(app)
+      .get('/teams?clubId=club-none')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.body).toEqual({
+      data: [],
+      pagination: {
+        page: 1,
+        itemsPerPage: 25,
+        totalItems: 0,
+        totalPages: 1,
+      },
+    });
+  });
+
+  it('orders results by teams.id ascending', async () => {
+    mockList([sampleTeam], 1);
+    await request(app)
+      .get('/teams')
+      .set('Authorization', `Bearer ${adminToken}`);
+    expect(mockOrderBy).toHaveBeenCalledWith('teams.id', 'asc');
+  });
+
+  it.each([['page=0'], ['itemsPerPage=101']])(
+    'returns 400 for %s',
+    async (qs) => {
+      const res = await request(app)
+        .get(`/teams?${qs}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty('error', 'validation error');
+    },
+  );
 });
 
 describe('GET /teams/:id', () => {

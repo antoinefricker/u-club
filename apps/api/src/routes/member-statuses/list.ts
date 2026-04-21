@@ -2,6 +2,11 @@ import { Router, Request, Response } from 'express';
 import db from '../../db.js';
 import { requireAuth } from '../../middleware/auth.js';
 import { requireRole } from '../../middleware/requireRole.js';
+import { paginationQuerySchema } from '../../schemas/pagination.js';
+import {
+  applyPagination,
+  buildPaginationMeta,
+} from '../../utils/pagination.js';
 
 const router = Router();
 
@@ -11,24 +16,69 @@ const router = Router();
  *   get:
  *     tags: [MemberStatuses]
  *     summary: List all member statuses
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *       - in: query
+ *         name: itemsPerPage
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 25
  *     responses:
  *       200:
- *         description: Array of member statuses
+ *         description: Paginated list of member statuses
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/MemberStatus'
+ *               type: object
+ *               required: [data, pagination]
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/MemberStatus'
+ *                 pagination:
+ *                   $ref: '#/components/schemas/PaginationMeta'
+ *       400:
+ *         description: Invalid pagination parameters
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 router.get(
   '/',
   requireAuth,
   requireRole('admin', 'manager'),
   async (req: Request, res: Response) => {
-    const statuses = await db('memberStatuses').select('id', 'label');
+    const parsed = paginationQuerySchema.safeParse(req.query);
+    if (!parsed.success) {
+      res.status(400).json({
+        error: 'validation error',
+        details: parsed.error.issues.map((e) => ({
+          field: e.path.join('.'),
+          message: e.message,
+        })),
+      });
+      return;
+    }
 
-    res.json(statuses);
+    const query = db('memberStatuses')
+      .select('id', 'label')
+      .orderBy('id', 'asc');
+
+    const { data, totalItems } = await applyPagination(query, parsed.data);
+
+    res.json({
+      data,
+      pagination: buildPaginationMeta({ ...parsed.data, totalItems }),
+    });
   },
 );
 

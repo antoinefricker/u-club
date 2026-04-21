@@ -9,3 +9,4 @@
 - [007 - 06/04/2026 - Admin Pages](007-06042026-admin-pages.md) — Admin CRUD pages for clubs, teams, and members
 - [008 - 21/04/2026 - Case Hell](008-21042026-case-hell.md) — Unify on camelCase app-side via Knex mappers; delete the HTTP caseConverter middleware
 - [009 - 21/04/2026 - Test Coverage](009-21042026-test-coverage.md) — Install v8 coverage, fill middleware/schema/util test gaps, deepen thin auth tests
+- [010 - 21/04/2026 - Handle Pagination](010-21042026-handle-pagination.md) — Offset-based pagination on every API list route + Mantine/TanStack Query wiring in the PWA

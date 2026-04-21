@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   ActionIcon,
   Alert,
@@ -11,11 +10,14 @@ import {
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { PageTitle } from '../../layout/PageTitle';
 import { ListFilters } from '../../layout/ListFilters';
+import { ListPagination } from '../../layout/ListPagination';
 import { EmptyListRow } from '../../layout/EmptyListRow';
 import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import { useTeams, useDeleteTeam, type TeamGender } from '../../hooks/useTeams';
 import { useClubs } from '../../hooks/useClubs';
+import { usePagination } from '../../hooks/usePagination';
+import { useListFilters } from '../../hooks/useListFilters';
 
 const GENDER_OPTIONS: { value: TeamGender; label: string }[] = [
   { value: 'male', label: 'Male' },
@@ -23,23 +25,33 @@ const GENDER_OPTIONS: { value: TeamGender; label: string }[] = [
   { value: 'mixed', label: 'Mixed' },
 ];
 
+const TEAMS_FILTER_KEYS = ['clubId', 'gender'] as const;
+
 export function TeamsListPage() {
   const navigate = useNavigate();
-  const [clubId, setClubId] = useState<string | null>(null);
-  const [gender, setGender] = useState<TeamGender | null>(null);
-  const { data: clubs } = useClubs();
+  const { page, itemsPerPage } = usePagination();
+  const { filters, setFilter } = useListFilters(TEAMS_FILTER_KEYS);
+  const clubId = filters.clubId ?? null;
+  const gender = (filters.gender as TeamGender | undefined) ?? null;
+
+  const { data: clubsData } = useClubs({ itemsPerPage: 100 });
   const {
-    data: teams,
+    data: teamsData,
     isLoading,
     error,
   } = useTeams({
+    page,
+    itemsPerPage,
     clubId: clubId ?? undefined,
     gender: gender ?? undefined,
   });
   const deleteTeam = useDeleteTeam();
 
-  const clubOptions = clubs?.map((c) => ({ value: c.id, label: c.name })) ?? [];
+  const clubs = clubsData?.data;
+  const teams = teamsData?.data;
+  const pagination = teamsData?.pagination;
 
+  const clubOptions = clubs?.map((c) => ({ value: c.id, label: c.name })) ?? [];
   const clubNameById = new Map(clubs?.map((c) => [c.id, c.name]));
 
   const handleDelete = (id: string, label: string) => {
@@ -70,7 +82,7 @@ export function TeamsListPage() {
           placeholder="All clubs"
           data={clubOptions}
           value={clubId}
-          onChange={setClubId}
+          onChange={(v) => setFilter('clubId', v)}
           clearable
           maw={300}
         />
@@ -79,7 +91,7 @@ export function TeamsListPage() {
           placeholder="All genders"
           data={GENDER_OPTIONS}
           value={gender}
-          onChange={(v) => setGender(v as TeamGender | null)}
+          onChange={(v) => setFilter('gender', v)}
           clearable
           maw={220}
         />
@@ -126,6 +138,13 @@ export function TeamsListPage() {
           ))}
         </Table.Tbody>
       </Table>
+      {pagination && (
+        <ListPagination
+          totalPages={pagination.totalPages}
+          totalItems={pagination.totalItems}
+          itemsLabel="teams"
+        />
+      )}
     </>
   );
 }

@@ -2,6 +2,11 @@ import { Router, Request, Response } from 'express';
 import db from '../../db.js';
 import { requireAuth } from '../../middleware/auth.js';
 import { requireRole } from '../../middleware/requireRole.js';
+import { paginationQuerySchema } from '../../schemas/pagination.js';
+import {
+  applyPagination,
+  buildPaginationMeta,
+} from '../../utils/pagination.js';
 
 const router = Router();
 
@@ -19,33 +24,72 @@ const router = Router();
  *           type: string
  *           format: uuid
  *         description: Filter members by team
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *       - in: query
+ *         name: itemsPerPage
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 25
  *     responses:
  *       200:
- *         description: Array of members
+ *         description: Paginated list of members
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Member'
+ *               type: object
+ *               required: [data, pagination]
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Member'
+ *                 pagination:
+ *                   $ref: '#/components/schemas/PaginationMeta'
+ *       400:
+ *         description: Invalid pagination parameters
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 router.get(
   '/',
   requireAuth,
   requireRole('admin', 'manager'),
   async (req: Request, res: Response) => {
+    const parsed = paginationQuerySchema.safeParse(req.query);
+    if (!parsed.success) {
+      res.status(400).json({
+        error: 'validation error',
+        details: parsed.error.issues.map((e) => ({
+          field: e.path.join('.'),
+          message: e.message,
+        })),
+      });
+      return;
+    }
+
     const { teamId } = req.query;
 
-    const query = db('members').select(
-      'members.id',
-      'members.statusId',
-      'members.firstName',
-      'members.lastName',
-      'members.birthdate',
-      'members.gender',
-      'members.createdAt',
-      'members.updatedAt',
-    );
+    const query = db('members')
+      .select(
+        'members.id',
+        'members.statusId',
+        'members.firstName',
+        'members.lastName',
+        'members.birthdate',
+        'members.gender',
+        'members.createdAt',
+        'members.updatedAt',
+      )
+      .orderBy('members.id', 'asc');
 
     if (teamId) {
       query
@@ -53,9 +97,12 @@ router.get(
         .where('teamAssignments.teamId', teamId as string);
     }
 
-    const members = await query;
+    const { data, totalItems } = await applyPagination(query, parsed.data);
 
-    res.json(members);
+    res.json({
+      data,
+      pagination: buildPaginationMeta({ ...parsed.data, totalItems }),
+    });
   },
 );
 
