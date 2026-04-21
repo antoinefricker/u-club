@@ -96,4 +96,89 @@ describe('POST /auth/magic_link_verify', () => {
     expect(res.body).toHaveProperty('accessToken');
     expect(typeof res.body.accessToken).toBe('string');
   });
+
+  it('should delete the token after successful verification (single-use)', async () => {
+    mockFirst.mockResolvedValueOnce({
+      id: 'tok-1',
+      email: 'test@example.com',
+      token: 'valid-token',
+      expiresAt: new Date(Date.now() + 60000),
+    });
+    mockFirst.mockResolvedValueOnce({
+      id: 'user-1',
+      email: 'test@example.com',
+      role: 'user',
+      emailVerifiedAt: new Date('2026-01-01'),
+    });
+
+    await request(app)
+      .post('/auth/magic_link_verify')
+      .send({ token: 'valid-token' });
+
+    expect(mockDel).toHaveBeenCalledTimes(1);
+  });
+
+  it('should mark emailVerifiedAt when verifying an unverified user', async () => {
+    mockFirst.mockResolvedValueOnce({
+      id: 'tok-1',
+      email: 'test@example.com',
+      expiresAt: new Date(Date.now() + 60000),
+    });
+    mockFirst.mockResolvedValueOnce({
+      id: 'user-1',
+      email: 'test@example.com',
+      role: 'user',
+      emailVerifiedAt: null,
+    });
+
+    await request(app)
+      .post('/auth/magic_link_verify')
+      .send({ token: 'valid-token' });
+
+    expect(mockUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ emailVerifiedAt: expect.any(Date) }),
+    );
+  });
+
+  it('should NOT update emailVerifiedAt for an already-verified user', async () => {
+    mockFirst.mockResolvedValueOnce({
+      id: 'tok-1',
+      email: 'test@example.com',
+      expiresAt: new Date(Date.now() + 60000),
+    });
+    mockFirst.mockResolvedValueOnce({
+      id: 'user-1',
+      email: 'test@example.com',
+      role: 'user',
+      emailVerifiedAt: new Date('2026-01-01'),
+    });
+
+    await request(app)
+      .post('/auth/magic_link_verify')
+      .send({ token: 'valid-token' });
+
+    expect(mockUpdate).not.toHaveBeenCalled();
+  });
+
+  it('should return 500 when JWT_SECRET is not configured', async () => {
+    delete process.env.JWT_SECRET;
+    mockFirst.mockResolvedValueOnce({
+      id: 'tok-1',
+      email: 'test@example.com',
+      expiresAt: new Date(Date.now() + 60000),
+    });
+    mockFirst.mockResolvedValueOnce({
+      id: 'user-1',
+      email: 'test@example.com',
+      role: 'user',
+      emailVerifiedAt: new Date('2026-01-01'),
+    });
+
+    const res = await request(app)
+      .post('/auth/magic_link_verify')
+      .send({ token: 'valid-token' });
+
+    expect(res.status).toBe(500);
+    expect(res.body).toHaveProperty('error', 'server configuration error');
+  });
 });
