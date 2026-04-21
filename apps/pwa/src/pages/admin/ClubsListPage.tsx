@@ -1,15 +1,7 @@
-import {
-  ActionIcon,
-  Alert,
-  Button,
-  Group,
-  Loader,
-  Pagination,
-  Table,
-  Text,
-} from '@mantine/core';
+import { ActionIcon, Alert, Button, Group, Loader, Table } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { PageTitle } from '../../layout/PageTitle';
+import { ListPagination } from '../../layout/ListPagination';
 import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import { useClubs, useDeleteClub } from '../../hooks/useClubs';
@@ -17,7 +9,7 @@ import { usePagination } from '../../hooks/usePagination';
 
 export function ClubsListPage() {
   const navigate = useNavigate();
-  const { page, itemsPerPage, setPage } = usePagination();
+  const { page, itemsPerPage } = usePagination();
   const {
     data: clubsData,
     isLoading,
@@ -85,17 +77,12 @@ export function ClubsListPage() {
           ))}
         </Table.Tbody>
       </Table>
-      {pagination && pagination.totalPages > 1 && (
-        <Group justify="space-between" mt="md">
-          <Text size="sm" c="dimmed">
-            {pagination.totalItems} clubs
-          </Text>
-          <Pagination
-            total={pagination.totalPages}
-            value={page}
-            onChange={setPage}
-          />
-        </Group>
+      {pagination && (
+        <ListPagination
+          totalPages={pagination.totalPages}
+          totalItems={pagination.totalItems}
+          itemsLabel="clubs"
+        />
       )}
     </>
   );

@@ -4,14 +4,13 @@ import {
   Button,
   Group,
   Loader,
-  Pagination,
   Select,
   Table,
-  Text,
 } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { PageTitle } from '../../layout/PageTitle';
 import { ListFilters } from '../../layout/ListFilters';
+import { ListPagination } from '../../layout/ListPagination';
 import { EmptyListRow } from '../../layout/EmptyListRow';
 import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
@@ -30,7 +29,7 @@ const TEAMS_FILTER_KEYS = ['clubId', 'gender'] as const;
 
 export function TeamsListPage() {
   const navigate = useNavigate();
-  const { page, itemsPerPage, setPage } = usePagination();
+  const { page, itemsPerPage } = usePagination();
   const { filters, setFilter } = useListFilters(TEAMS_FILTER_KEYS);
   const clubId = filters.clubId ?? null;
   const gender = (filters.gender as TeamGender | undefined) ?? null;
@@ -139,17 +138,12 @@ export function TeamsListPage() {
           ))}
         </Table.Tbody>
       </Table>
-      {pagination && pagination.totalPages > 1 && (
-        <Group justify="space-between" mt="md">
-          <Text size="sm" c="dimmed">
-            {pagination.totalItems} teams
-          </Text>
-          <Pagination
-            total={pagination.totalPages}
-            value={page}
-            onChange={setPage}
-          />
-        </Group>
+      {pagination && (
+        <ListPagination
+          totalPages={pagination.totalPages}
+          totalItems={pagination.totalItems}
+          itemsLabel="teams"
+        />
       )}
     </>
   );
