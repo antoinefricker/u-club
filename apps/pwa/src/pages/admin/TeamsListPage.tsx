@@ -11,6 +11,7 @@ import {
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { PageTitle } from '../../layout/PageTitle';
 import { ListFilters } from '../../layout/ListFilters';
+import { EmptyListRow } from '../../layout/EmptyListRow';
 import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import { useTeams, useDeleteTeam, type TeamGender } from '../../hooks/useTeams';
@@ -94,6 +95,7 @@ export function TeamsListPage() {
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
+          {teams?.length === 0 && <EmptyListRow colSpan={4} />}
           {teams?.map((team) => (
             <Table.Tr key={team.id}>
               <Table.Td>{team.label}</Table.Td>
