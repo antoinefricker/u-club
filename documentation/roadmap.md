@@ -2,16 +2,13 @@
 
 ## Bugfixes
 
-- [ ] Teams categories crud
-- [ ] Member statuses crud
 - [ ] Can't define team category in team create/update form
-- [ ] Remove media column in club table
-- [ ] add search filter (last name, first name/ birthdate)
-- [ ] Admin/member: (edit/create/show) define member status
 - [ ] Admin/member: (edit/show) display relationships, invite CTA, pending invitations
 
 ## Architecture & Data model
 
+- Teams categories CRUD
+- Member statuses CRUD
 - **Complex users**
   - users that are not members (parents or relative)
   - club_users` join table to link users directly to clubs without being members (janitor, secretary, volunteer). Gives non-member users a club context.
@@ -61,6 +58,7 @@
 
 ## PWA
 
+- Add search filter (last name, first name/ birthdate) in MEMBERS list
 - documentation/bruno/ has no members/ or member-statuses/ directories, so those routes still lack Bruno coverage
 - apps/pwa has no test framework, so usePagination / useListFilters rely on type safety + integration-level verification
 - **One time password**
