@@ -2,25 +2,44 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
 import { createTestToken } from '../../test-utils.js';
 
-const mockSelect = vi.fn().mockReturnThis();
-const mockWhere = vi.fn().mockReturnThis();
+const mockSelect = vi.fn();
+const mockWhere = vi.fn();
 const mockFirst = vi.fn();
-const mockInsert = vi.fn().mockReturnThis();
+const mockInsert = vi.fn();
 const mockReturning = vi.fn();
-const mockUpdate = vi.fn().mockReturnThis();
+const mockUpdate = vi.fn();
 const mockDel = vi.fn();
 
+let listResult: unknown = [];
+const setListResult = (v: unknown) => {
+  listResult = v;
+};
+
 vi.mock('../../db.js', () => {
+  const builder: Record<string, unknown> = {
+    select: (...args: unknown[]) => {
+      mockSelect(...args);
+      return builder;
+    },
+    where: (...args: unknown[]) => {
+      mockWhere(...args);
+      return builder;
+    },
+    first: mockFirst,
+    insert: (...args: unknown[]) => {
+      mockInsert(...args);
+      return builder;
+    },
+    returning: mockReturning,
+    update: (...args: unknown[]) => {
+      mockUpdate(...args);
+      return builder;
+    },
+    del: mockDel,
+    then: (resolve: (v: unknown) => void) => resolve(listResult),
+  };
   const db = Object.assign(
-    vi.fn(() => ({
-      select: mockSelect,
-      where: mockWhere,
-      first: mockFirst,
-      insert: mockInsert,
-      returning: mockReturning,
-      update: mockUpdate,
-      del: mockDel,
-    })),
+    vi.fn(() => builder),
     { raw: vi.fn() },
   );
   return { default: db };
@@ -51,15 +70,12 @@ const sampleTeam = {
 beforeEach(() => {
   process.env.JWT_SECRET = 'test-secret';
   vi.clearAllMocks();
-  mockSelect.mockReturnThis();
-  mockWhere.mockReturnThis();
-  mockInsert.mockReturnThis();
-  mockUpdate.mockReturnThis();
+  setListResult([]);
 });
 
 describe('GET /teams', () => {
   it('should return a list of teams', async () => {
-    mockSelect.mockResolvedValueOnce([sampleTeam]);
+    setListResult([sampleTeam]);
 
     const res = await request(app)
       .get('/teams')
@@ -67,6 +83,56 @@ describe('GET /teams', () => {
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual([sampleTeam]);
+    expect(mockWhere).not.toHaveBeenCalled();
+  });
+
+  it('should filter by gender when provided', async () => {
+    const femaleTeam = { ...sampleTeam, id: 'team-2', gender: 'female' };
+    setListResult([femaleTeam]);
+
+    const res = await request(app)
+      .get('/teams?gender=female')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual([femaleTeam]);
+    expect(mockWhere).toHaveBeenCalledWith({ gender: 'female' });
+  });
+
+  it('should combine clubId and gender filters', async () => {
+    setListResult([sampleTeam]);
+
+    const res = await request(app)
+      .get('/teams?clubId=club-1&gender=male')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(mockWhere).toHaveBeenCalledWith({ clubId: 'club-1' });
+    expect(mockWhere).toHaveBeenCalledWith({ gender: 'male' });
+  });
+
+  it('should return 400 for an invalid gender value', async () => {
+    const res = await request(app)
+      .get('/teams?gender=other')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty(
+      'error',
+      'gender must be male, female, or mixed',
+    );
+    expect(mockWhere).not.toHaveBeenCalled();
+  });
+
+  it('should ignore an empty gender value', async () => {
+    setListResult([sampleTeam]);
+
+    const res = await request(app)
+      .get('/teams?gender=')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(mockWhere).not.toHaveBeenCalled();
   });
 });
 
