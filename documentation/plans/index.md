@@ -8,3 +8,4 @@
 - [006 - 06/04/2026 - Users-Members Relationship](006-06042026-users-members-relationship.md) — Many-to-many user-member links with custom descriptions
 - [007 - 06/04/2026 - Admin Pages](007-06042026-admin-pages.md) — Admin CRUD pages for clubs, teams, and members
 - [008 - 21/04/2026 - Case Hell](008-21042026-case-hell.md) — Unify on camelCase app-side via Knex mappers; delete the HTTP caseConverter middleware
+- [009 - 21/04/2026 - Test Coverage](009-21042026-test-coverage.md) — Install v8 coverage, fill middleware/schema/util test gaps, deepen thin auth tests
