@@ -96,9 +96,11 @@ const options: swaggerJsdoc.Options = {
           properties: {
             id: { type: 'string', format: 'uuid' },
             clubId: { type: 'string', format: 'uuid' },
+            categoryId: { type: 'string', format: 'uuid', nullable: true },
             label: { type: 'string' },
             gender: { type: 'string', enum: ['male', 'female', 'mixed'] },
             description: { type: 'string', nullable: true },
+            categoryLabel: { type: 'string', nullable: true },
             createdAt: { type: 'string', format: 'date-time' },
             updatedAt: { type: 'string', format: 'date-time' },
           },

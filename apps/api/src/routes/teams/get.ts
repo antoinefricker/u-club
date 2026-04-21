@@ -40,16 +40,19 @@ router.get(
     const { id } = req.params;
 
     const team = await db('teams')
+      .leftJoin('teamCategories', 'teams.categoryId', 'teamCategories.id')
       .select(
-        'id',
-        'clubId',
-        'label',
-        'gender',
-        'description',
-        'createdAt',
-        'updatedAt',
+        'teams.id',
+        'teams.clubId',
+        'teams.categoryId',
+        'teams.label',
+        'teams.gender',
+        'teams.description',
+        'teams.createdAt',
+        'teams.updatedAt',
+        'teamCategories.label as categoryLabel',
       )
-      .where({ id })
+      .where('teams.id', id)
       .first();
 
     if (!team) {

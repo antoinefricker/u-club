@@ -8,7 +8,7 @@ interface PageTitleProps {
 
 export function PageTitle({ children, label }: PageTitleProps) {
   return (
-    <div>
+    <div style={{ marginBottom: 20 }}>
       <Group justify="space-between">
         <Title order={2}>{label}</Title>
         <div>{children}</div>

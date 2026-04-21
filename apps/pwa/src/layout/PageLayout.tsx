@@ -15,7 +15,7 @@ export function PageLayout({ children }: PageLayoutProps) {
 
   if (!user) {
     return (
-      <AppShell bg="#95689d" h="100%">
+      <AppShell bg="#bbb3a0" h="100%">
         <Unauthenticated />
       </AppShell>
     );

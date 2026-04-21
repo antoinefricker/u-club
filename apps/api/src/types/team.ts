@@ -1,4 +1,5 @@
-export type TeamGender = 'male' | 'female' | 'mixed';
+export const TEAM_GENDERS = ['male', 'female', 'mixed'] as const;
+export type TeamGender = (typeof TEAM_GENDERS)[number];
 
 export interface Team {
   id: string;

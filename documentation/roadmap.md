@@ -72,3 +72,4 @@
 - **i18n** — Internationalization with react-i18next (French/English)
 - **Loading/error states** — Add loading skeletons and error boundaries to pages
 - **Pagination** — Cursor or offset pagination on list endpoints as data grows
+- **Admin teams — category filter** — Add a category filter on `/admin/teams` (may require team_categories endpoints: list at minimum, possibly CRUD)

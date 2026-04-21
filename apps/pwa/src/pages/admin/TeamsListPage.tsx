@@ -10,16 +10,32 @@ import {
 } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { PageTitle } from '../../layout/PageTitle';
+import { ListFilters } from '../../layout/ListFilters';
+import { EmptyListRow } from '../../layout/EmptyListRow';
 import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
-import { useTeams, useDeleteTeam } from '../../hooks/useTeams';
+import { useTeams, useDeleteTeam, type TeamGender } from '../../hooks/useTeams';
 import { useClubs } from '../../hooks/useClubs';
+
+const GENDER_OPTIONS: { value: TeamGender; label: string }[] = [
+  { value: 'male', label: 'Male' },
+  { value: 'female', label: 'Female' },
+  { value: 'mixed', label: 'Mixed' },
+];
 
 export function TeamsListPage() {
   const navigate = useNavigate();
   const [clubId, setClubId] = useState<string | null>(null);
+  const [gender, setGender] = useState<TeamGender | null>(null);
   const { data: clubs } = useClubs();
-  const { data: teams, isLoading, error } = useTeams(clubId ?? undefined);
+  const {
+    data: teams,
+    isLoading,
+    error,
+  } = useTeams({
+    clubId: clubId ?? undefined,
+    gender: gender ?? undefined,
+  });
   const deleteTeam = useDeleteTeam();
 
   const clubOptions = clubs?.map((c) => ({ value: c.id, label: c.name })) ?? [];
@@ -48,32 +64,46 @@ export function TeamsListPage() {
         <Button onClick={() => navigate('/admin/teams/new')}>New team</Button>
       </PageTitle>
 
-      <Select
-        label="Filter by club"
-        placeholder="All clubs"
-        data={clubOptions}
-        value={clubId}
-        onChange={setClubId}
-        clearable
-        maw={300}
-      />
+      <ListFilters>
+        <Select
+          label="Filter by club"
+          placeholder="All clubs"
+          data={clubOptions}
+          value={clubId}
+          onChange={setClubId}
+          clearable
+          maw={300}
+        />
+        <Select
+          label="Filter by gender"
+          placeholder="All genders"
+          data={GENDER_OPTIONS}
+          value={gender}
+          onChange={(v) => setGender(v as TeamGender | null)}
+          clearable
+          maw={220}
+        />
+      </ListFilters>
 
       <Table striped highlightOnHover>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Label</Table.Th>
             <Table.Th>Club</Table.Th>
+            <Table.Th>Category</Table.Th>
             <Table.Th>Gender</Table.Th>
             <Table.Th />
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
+          {teams?.length === 0 && <EmptyListRow colSpan={5} />}
           {teams?.map((team) => (
             <Table.Tr key={team.id}>
               <Table.Td>{team.label}</Table.Td>
               <Table.Td>
                 {clubNameById.get(team.clubId) ?? team.clubId}
               </Table.Td>
+              <Table.Td>{team.categoryLabel ?? '—'}</Table.Td>
               <Table.Td>{team.gender}</Table.Td>
               <Table.Td>
                 <Group gap="xs" justify="flex-end">
