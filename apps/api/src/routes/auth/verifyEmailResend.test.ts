@@ -58,7 +58,7 @@ describe('POST /auth/verify_email_resend', () => {
     mockFirst.mockResolvedValueOnce({
       id: 'uuid-1',
       email: 'verified@example.com',
-      email_verified_at: '2026-01-01T00:00:00.000Z',
+      emailVerifiedAt: '2026-01-01T00:00:00.000Z',
     });
 
     const res = await request(app)
@@ -74,7 +74,7 @@ describe('POST /auth/verify_email_resend', () => {
     mockFirst.mockResolvedValueOnce({
       id: 'uuid-1',
       email: 'unverified@example.com',
-      email_verified_at: null,
+      emailVerifiedAt: null,
     });
 
     const res = await request(app)

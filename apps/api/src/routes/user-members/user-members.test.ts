@@ -90,7 +90,7 @@ describe('GET /user-members', () => {
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual([sampleUserMember]);
-    expect(mockWhere).toHaveBeenCalledWith('user_members.user_id', 'uuid-1');
+    expect(mockWhere).toHaveBeenCalledWith('userMembers.userId', 'uuid-1');
   });
 
   it('should return 401 when unauthenticated', async () => {
@@ -109,8 +109,8 @@ describe('POST /user-members', () => {
       .post('/user-members')
       .set('Authorization', `Bearer ${adminToken}`)
       .send({
-        user_id: 'uuid-1',
-        member_id: 'member-1',
+        userId: 'uuid-1',
+        memberId: 'member-1',
         type: 'self',
       });
 
@@ -126,8 +126,8 @@ describe('POST /user-members', () => {
       .post('/user-members')
       .set('Authorization', `Bearer ${userToken}`)
       .send({
-        user_id: 'uuid-1',
-        member_id: 'member-1',
+        userId: 'uuid-1',
+        memberId: 'member-1',
         type: 'self',
       });
 
@@ -140,8 +140,8 @@ describe('POST /user-members', () => {
       .post('/user-members')
       .set('Authorization', `Bearer ${userToken}`)
       .send({
-        user_id: 'uuid-other',
-        member_id: 'member-1',
+        userId: 'uuid-other',
+        memberId: 'member-1',
         type: 'self',
       });
 
@@ -152,15 +152,15 @@ describe('POST /user-members', () => {
     );
   });
 
-  it('should return 409 when duplicate (user_id, member_id) pair', async () => {
+  it('should return 409 when duplicate (userId, memberId) pair', async () => {
     mockFirst.mockResolvedValueOnce(sampleUserMember);
 
     const res = await request(app)
       .post('/user-members')
       .set('Authorization', `Bearer ${adminToken}`)
       .send({
-        user_id: 'uuid-1',
-        member_id: 'member-1',
+        userId: 'uuid-1',
+        memberId: 'member-1',
         type: 'self',
       });
 
@@ -172,7 +172,7 @@ describe('POST /user-members', () => {
     const res = await request(app)
       .post('/user-members')
       .set('Authorization', `Bearer ${adminToken}`)
-      .send({ user_id: 'uuid-1' });
+      .send({ userId: 'uuid-1' });
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'validation error');
@@ -182,7 +182,7 @@ describe('POST /user-members', () => {
 describe('PUT /user-members/:id', () => {
   it('should update and return 200 when owner updates', async () => {
     const updated = { ...sampleUserMember, type: 'relative' };
-    mockFirst.mockResolvedValueOnce({ ...sampleUserMember, user_id: 'uuid-1' });
+    mockFirst.mockResolvedValueOnce({ ...sampleUserMember, userId: 'uuid-1' });
     mockReturning.mockResolvedValueOnce([updated]);
 
     const res = await request(app)
@@ -212,7 +212,7 @@ describe('PUT /user-members/:id', () => {
   it('should return 403 when non-owner regular user updates', async () => {
     mockFirst.mockResolvedValueOnce({
       ...sampleUserMember,
-      user_id: 'uuid-other',
+      userId: 'uuid-other',
     });
 
     const res = await request(app)
@@ -240,7 +240,7 @@ describe('PUT /user-members/:id', () => {
 
 describe('DELETE /user-members/:id', () => {
   it('should delete and return 204 when owner deletes', async () => {
-    mockFirst.mockResolvedValueOnce({ ...sampleUserMember, user_id: 'uuid-1' });
+    mockFirst.mockResolvedValueOnce({ ...sampleUserMember, userId: 'uuid-1' });
     mockDel.mockResolvedValueOnce(1);
 
     const res = await request(app)
@@ -267,7 +267,7 @@ describe('DELETE /user-members/:id', () => {
   it('should return 403 when non-owner regular user deletes', async () => {
     mockFirst.mockResolvedValueOnce({
       ...sampleUserMember,
-      user_id: 'uuid-other',
+      userId: 'uuid-other',
     });
 
     const res = await request(app)

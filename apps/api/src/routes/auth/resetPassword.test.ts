@@ -81,7 +81,7 @@ describe('POST /auth/reset_password', () => {
       email: 'deleted@example.com',
       token: 'valid-token',
       type: 'password_reset',
-      expires_at: new Date(Date.now() + 60000),
+      expiresAt: new Date(Date.now() + 60000),
     });
     mockFirst.mockResolvedValueOnce(undefined);
 
@@ -101,7 +101,7 @@ describe('POST /auth/reset_password', () => {
       email: 'test@example.com',
       token: 'valid-token',
       type: 'password_reset',
-      expires_at: new Date(Date.now() + 60000),
+      expiresAt: new Date(Date.now() + 60000),
     });
     mockFirst.mockResolvedValueOnce({
       id: 'user-uuid-1',

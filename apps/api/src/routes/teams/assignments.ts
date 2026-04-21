@@ -38,13 +38,13 @@ router.get(
   async (req: Request, res: Response) => {
     const { teamId } = req.params;
 
-    const members = await db('team_assignments')
-      .join('members', 'team_assignments.member_id', 'members.id')
-      .where('team_assignments.team_id', teamId)
+    const members = await db('teamAssignments')
+      .join('members', 'teamAssignments.memberId', 'members.id')
+      .where('teamAssignments.teamId', teamId)
       .select(
         'members.*',
-        'team_assignments.role',
-        'team_assignments.created_at as assigned_at',
+        'teamAssignments.role',
+        'teamAssignments.createdAt as assignedAt',
       );
 
     res.json(members);
@@ -71,9 +71,9 @@ router.get(
  *         application/json:
  *           schema:
  *             type: object
- *             required: [member_id, role]
+ *             required: [memberId, role]
  *             properties:
- *               member_id:
+ *               memberId:
  *                 type: string
  *                 format: uuid
  *               role:
@@ -106,10 +106,10 @@ router.post(
   validate(createTeamAssignmentSchema),
   async (req: Request, res: Response) => {
     const { teamId } = req.params;
-    const { member_id, role } = req.body;
+    const { memberId, role } = req.body;
 
-    const existing = await db('team_assignments')
-      .where({ team_id: teamId, member_id })
+    const existing = await db('teamAssignments')
+      .where({ teamId, memberId })
       .first();
 
     if (existing) {
@@ -119,13 +119,13 @@ router.post(
       return;
     }
 
-    const [assignment] = await db('team_assignments')
+    const [assignment] = await db('teamAssignments')
       .insert({
-        team_id: teamId,
-        member_id,
+        teamId,
+        memberId,
         role,
       })
-      .returning(['id', 'team_id', 'member_id', 'role', 'created_at']);
+      .returning(['id', 'teamId', 'memberId', 'role', 'createdAt']);
 
     res.status(201).json(assignment);
   },
@@ -169,8 +169,8 @@ router.delete(
   async (req: Request, res: Response) => {
     const { teamId, memberId } = req.params;
 
-    const deleted = await db('team_assignments')
-      .where({ team_id: teamId, member_id: memberId })
+    const deleted = await db('teamAssignments')
+      .where({ teamId, memberId })
       .del();
 
     if (!deleted) {

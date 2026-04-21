@@ -37,7 +37,7 @@ const router = Router();
  *             schema:
  *               type: object
  *               properties:
- *                 access_token:
+ *                 accessToken:
  *                   type: string
  *       400:
  *         description: Missing required fields
@@ -58,9 +58,9 @@ router.post(
   async (req: Request, res: Response) => {
     const { token, email, password } = req.body;
 
-    const resetToken = await db('auth_tokens')
+    const resetToken = await db('authTokens')
       .where({ token, email, type: 'password_reset' })
-      .where('expires_at', '>', new Date())
+      .where('expiresAt', '>', new Date())
       .first();
 
     if (!resetToken) {
@@ -68,7 +68,7 @@ router.post(
       return;
     }
 
-    await db('auth_tokens').where({ id: resetToken.id }).del();
+    await db('authTokens').where({ id: resetToken.id }).del();
 
     const user = await db('users').where({ email: resetToken.email }).first();
     if (!user) {
@@ -80,7 +80,7 @@ router.post(
 
     await db('users')
       .where({ id: user.id })
-      .update({ password: hashedPassword, updated_at: new Date() });
+      .update({ password: hashedPassword, updatedAt: new Date() });
 
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
@@ -96,7 +96,7 @@ router.post(
       },
     );
 
-    res.json({ access_token: accessToken });
+    res.json({ accessToken });
   },
 );
 

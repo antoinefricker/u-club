@@ -49,20 +49,20 @@ router.post(
     const { email } = req.body;
 
     const user = await db('users').where({ email }).first();
-    if (!user || user.email_verified_at) {
+    if (!user || user.emailVerifiedAt) {
       res.json({ message: 'verification email sent' });
       return;
     }
 
-    await db('auth_tokens').where({ email, type: 'confirmation' }).del();
+    await db('authTokens').where({ email, type: 'confirmation' }).del();
 
     const token = crypto.randomBytes(32).toString('hex');
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    await db('auth_tokens').insert({
+    await db('authTokens').insert({
       email,
       token,
-      expires_at: expiresAt,
+      expiresAt,
       type: 'confirmation',
     });
 

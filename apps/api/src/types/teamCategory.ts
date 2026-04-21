@@ -1,7 +1,7 @@
 export interface TeamCategory {
   id: string;
-  club_id: string;
+  clubId: string;
   label: string;
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
 }

@@ -13,14 +13,14 @@ export type PersonaTeamRef = {
 };
 
 export type PersonaKid = {
-  first_name: string;
+  firstName: string;
   gender: MemberGender;
   team: Omit<PersonaTeamRef, 'role'>;
 };
 
 export type PersonaConfiguration = {
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   role: UserRole;
   gender: MemberGender;
@@ -33,8 +33,8 @@ export type PersonaConfiguration = {
 
 const PERSONAS: PersonaConfiguration[] = [
   {
-    first_name: 'Sebastien',
-    last_name: 'Doe',
+    firstName: 'Sebastien',
+    lastName: 'Doe',
     email: 'sebastien@eggplant.app',
     role: 'admin',
     gender: 'male',
@@ -47,7 +47,7 @@ const PERSONAS: PersonaConfiguration[] = [
     ],
     kids: [
       {
-        first_name: 'Benjamin',
+        firstName: 'Benjamin',
         gender: 'male',
         team: { categoryName: 'U18', gender: 'male', index: 2 },
       },
@@ -59,8 +59,8 @@ const PERSONAS: PersonaConfiguration[] = [
     ],
   },
   {
-    first_name: 'Marine',
-    last_name: 'Doe',
+    firstName: 'Marine',
+    lastName: 'Doe',
     email: 'nathalie@eggplant.app',
     role: 'user',
     gender: 'female',
@@ -75,8 +75,8 @@ const PERSONAS: PersonaConfiguration[] = [
     ],
   },
   {
-    first_name: 'Antoine',
-    last_name: 'Doe',
+    firstName: 'Antoine',
+    lastName: 'Doe',
     email: 'antoine@eggplant.app',
     role: 'manager',
     gender: 'male',
@@ -89,12 +89,12 @@ const PERSONAS: PersonaConfiguration[] = [
     ],
     kids: [
       {
-        first_name: 'Virgile',
+        firstName: 'Virgile',
         gender: 'male',
         team: { categoryName: 'U18', gender: 'male', index: 1 },
       },
       {
-        first_name: 'Camille',
+        firstName: 'Camille',
         gender: 'male',
         team: { categoryName: 'U13', gender: 'male', index: 1 },
       },
@@ -105,8 +105,8 @@ const PERSONAS: PersonaConfiguration[] = [
     ],
   },
   {
-    first_name: 'Zoé',
-    last_name: 'Doe',
+    firstName: 'Zoé',
+    lastName: 'Doe',
     email: 'zoe@eggplant.app',
     role: 'user',
     gender: 'female',
@@ -115,17 +115,17 @@ const PERSONAS: PersonaConfiguration[] = [
     assignments: [],
     kids: [
       {
-        first_name: 'Pierre',
+        firstName: 'Pierre',
         gender: 'male',
         team: { categoryName: 'U18', gender: 'male', index: 1 },
       },
       {
-        first_name: 'Sacha',
+        firstName: 'Sacha',
         gender: 'male',
         team: { categoryName: 'U13', gender: 'male', index: 1 },
       },
       {
-        first_name: 'Lucille',
+        firstName: 'Lucille',
         gender: 'female',
         team: { categoryName: 'U7', gender: 'mixed', index: 1 },
       },
@@ -139,8 +139,8 @@ const PERSONAS: PersonaConfiguration[] = [
     ],
   },
   {
-    first_name: 'François',
-    last_name: 'Doe',
+    firstName: 'François',
+    lastName: 'Doe',
     email: 'francois@eggplant.app',
     role: 'manager',
     gender: 'male',
@@ -158,8 +158,8 @@ const PERSONAS: PersonaConfiguration[] = [
     ],
   },
   {
-    first_name: 'Eline',
-    last_name: 'Doe',
+    firstName: 'Eline',
+    lastName: 'Doe',
     email: 'eline@eggplant.app',
     role: 'user',
     gender: 'female',

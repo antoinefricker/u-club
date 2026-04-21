@@ -42,18 +42,18 @@ router.delete('/:id', requireAuth, async (req: Request, res: Response) => {
   const isPrivileged = user.role === 'admin' || user.role === 'manager';
   const { id } = req.params;
 
-  const userMember = await db('user_members').where({ id }).first();
+  const userMember = await db('userMembers').where({ id }).first();
   if (!userMember) {
     res.status(404).json({ error: 'user-member association not found' });
     return;
   }
 
-  if (!isPrivileged && userMember.user_id !== user.id) {
+  if (!isPrivileged && userMember.userId !== user.id) {
     res.status(403).json({ error: 'not allowed to delete this association' });
     return;
   }
 
-  await db('user_members').where({ id }).del();
+  await db('userMembers').where({ id }).del();
 
   res.status(204).send();
 });

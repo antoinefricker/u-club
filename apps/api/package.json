@@ -24,6 +24,8 @@
     "status": "tsx src/scripts/status.ts"
   },
   "dependencies": {
+    "camelcase-keys": "^10.0.2",
+    "change-case": "^5.4.4",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.0",
     "knex": "^3.1.0",

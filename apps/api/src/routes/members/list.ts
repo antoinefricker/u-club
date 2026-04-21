@@ -38,19 +38,19 @@ router.get(
 
     const query = db('members').select(
       'members.id',
-      'members.status_id',
-      'members.first_name',
-      'members.last_name',
+      'members.statusId',
+      'members.firstName',
+      'members.lastName',
       'members.birthdate',
       'members.gender',
-      'members.created_at',
-      'members.updated_at',
+      'members.createdAt',
+      'members.updatedAt',
     );
 
     if (teamId) {
       query
-        .join('team_assignments', 'members.id', 'team_assignments.member_id')
-        .where('team_assignments.team_id', teamId as string);
+        .join('teamAssignments', 'members.id', 'teamAssignments.memberId')
+        .where('teamAssignments.teamId', teamId as string);
     }
 
     const members = await query;

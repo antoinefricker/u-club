@@ -58,29 +58,29 @@ router.put(
     const isPrivileged = user.role === 'admin' || user.role === 'manager';
     const { id } = req.params;
 
-    const userMember = await db('user_members').where({ id }).first();
+    const userMember = await db('userMembers').where({ id }).first();
     if (!userMember) {
       res.status(404).json({ error: 'user-member association not found' });
       return;
     }
 
-    if (!isPrivileged && userMember.user_id !== user.id) {
+    if (!isPrivileged && userMember.userId !== user.id) {
       res.status(403).json({ error: 'not allowed to update this association' });
       return;
     }
 
     const updates: Record<string, unknown> = { ...req.body };
 
-    const [updated] = await db('user_members')
+    const [updated] = await db('userMembers')
       .where({ id })
       .update(updates)
       .returning([
         'id',
-        'user_id',
-        'member_id',
+        'userId',
+        'memberId',
         'type',
         'description',
-        'created_at',
+        'createdAt',
       ]);
 
     res.json(updated);

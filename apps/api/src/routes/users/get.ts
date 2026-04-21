@@ -42,13 +42,13 @@ router.get(
     const user = await db('users')
       .select(
         'id',
-        'display_name',
+        'displayName',
         'bio',
         'phone',
         'email',
         'role',
-        'created_at',
-        'updated_at',
+        'createdAt',
+        'updatedAt',
       )
       .where({ id })
       .first();

@@ -73,7 +73,7 @@ router.put(
       }
     }
 
-    updates.updated_at = new Date().toISOString();
+    updates.updatedAt = new Date().toISOString();
 
     const [club] = await db('clubs')
       .where({ id })
@@ -83,10 +83,10 @@ router.put(
         'name',
         'code',
         'description',
-        'media_logo_lg',
-        'media_logo_sm',
-        'created_at',
-        'updated_at',
+        'mediaLogoLg',
+        'mediaLogoSm',
+        'createdAt',
+        'updatedAt',
       ]);
 
     if (!club) {

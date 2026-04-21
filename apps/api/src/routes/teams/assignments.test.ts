@@ -77,7 +77,7 @@ describe('GET /teams/:teamId/members', () => {
 });
 
 describe('POST /teams/:teamId/members', () => {
-  it('should return 400 if member_id is missing', async () => {
+  it('should return 400 if memberId is missing', async () => {
     const res = await request(app)
       .post('/teams/team-1/members')
       .set('Authorization', `Bearer ${adminToken}`)
@@ -91,7 +91,7 @@ describe('POST /teams/:teamId/members', () => {
     const res = await request(app)
       .post('/teams/team-1/members')
       .set('Authorization', `Bearer ${adminToken}`)
-      .send({ member_id: 'member-1' });
+      .send({ memberId: 'member-1' });
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'validation error');
@@ -101,7 +101,7 @@ describe('POST /teams/:teamId/members', () => {
     const res = await request(app)
       .post('/teams/team-1/members')
       .set('Authorization', `Bearer ${adminToken}`)
-      .send({ member_id: 'member-1', role: 'goalkeeper' });
+      .send({ memberId: 'member-1', role: 'goalkeeper' });
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'validation error');
@@ -113,7 +113,7 @@ describe('POST /teams/:teamId/members', () => {
     const res = await request(app)
       .post('/teams/team-1/members')
       .set('Authorization', `Bearer ${adminToken}`)
-      .send({ member_id: 'member-1', role: 'player' });
+      .send({ memberId: 'member-1', role: 'player' });
 
     expect(res.status).toBe(409);
     expect(res.body).toHaveProperty(
@@ -129,7 +129,7 @@ describe('POST /teams/:teamId/members', () => {
     const res = await request(app)
       .post('/teams/team-1/members')
       .set('Authorization', `Bearer ${adminToken}`)
-      .send({ member_id: 'member-1', role: 'player' });
+      .send({ memberId: 'member-1', role: 'player' });
 
     expect(res.status).toBe(201);
     expect(res.body).toEqual(sampleAssignment);

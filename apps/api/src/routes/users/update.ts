@@ -78,20 +78,20 @@ router.put(
       updates.password = await hashPassword(updates.password);
     }
 
-    updates.updated_at = new Date().toISOString();
+    updates.updatedAt = new Date().toISOString();
 
     const [user] = await db('users')
       .where({ id })
       .update(updates)
       .returning([
         'id',
-        'display_name',
+        'displayName',
         'bio',
         'phone',
         'email',
         'role',
-        'created_at',
-        'updated_at',
+        'createdAt',
+        'updatedAt',
       ]);
 
     if (!user) {

@@ -35,18 +35,18 @@ router.delete('/:id', requireAuth, async (req: Request, res: Response) => {
   const user = (req as AuthenticatedRequest).user;
   const { id } = req.params;
 
-  const invitation = await db('member_invitations').where({ id }).first();
+  const invitation = await db('memberInvitations').where({ id }).first();
   if (!invitation) {
     res.status(404).json({ error: 'invitation not found' });
     return;
   }
 
-  if (invitation.invited_by !== user.id && user.role !== 'admin') {
+  if (invitation.invitedBy !== user.id && user.role !== 'admin') {
     res.status(404).json({ error: 'invitation not found' });
     return;
   }
 
-  await db('member_invitations').where({ id }).del();
+  await db('memberInvitations').where({ id }).del();
 
   res.status(204).send();
 });

@@ -42,12 +42,12 @@ router.get(
     const team = await db('teams')
       .select(
         'id',
-        'club_id',
+        'clubId',
         'label',
         'gender',
         'description',
-        'created_at',
-        'updated_at',
+        'createdAt',
+        'updatedAt',
       )
       .where({ id })
       .first();

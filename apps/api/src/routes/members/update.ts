@@ -55,20 +55,20 @@ router.put(
     const { id } = req.params;
 
     const updates = { ...req.body };
-    updates.updated_at = new Date().toISOString();
+    updates.updatedAt = new Date().toISOString();
 
     const [member] = await db('members')
       .where({ id })
       .update(updates)
       .returning([
         'id',
-        'status_id',
-        'first_name',
-        'last_name',
+        'statusId',
+        'firstName',
+        'lastName',
         'birthdate',
         'gender',
-        'created_at',
-        'updated_at',
+        'createdAt',
+        'updatedAt',
       ]);
 
     if (!member) {

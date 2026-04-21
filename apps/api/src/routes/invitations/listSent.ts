@@ -27,10 +27,10 @@ const router = Router();
  *                   id:
  *                     type: string
  *                     format: uuid
- *                   member_id:
+ *                   memberId:
  *                     type: string
  *                     format: uuid
- *                   invited_by:
+ *                   invitedBy:
  *                     type: string
  *                     format: uuid
  *                   email:
@@ -44,40 +44,40 @@ const router = Router();
  *                     nullable: true
  *                   token:
  *                     type: string
- *                   expires_at:
+ *                   expiresAt:
  *                     type: string
  *                     format: date-time
- *                   accepted_at:
+ *                   acceptedAt:
  *                     type: string
  *                     format: date-time
  *                     nullable: true
- *                   created_at:
+ *                   createdAt:
  *                     type: string
  *                     format: date-time
- *                   member_first_name:
+ *                   memberFirstName:
  *                     type: string
- *                   member_last_name:
+ *                   memberLastName:
  *                     type: string
  */
 router.get('/sent', requireAuth, async (req: Request, res: Response) => {
   const user = (req as AuthenticatedRequest).user;
 
-  const invitations = await db('member_invitations')
-    .join('members', 'members.id', 'member_invitations.member_id')
-    .where('member_invitations.invited_by', user.id)
+  const invitations = await db('memberInvitations')
+    .join('members', 'members.id', 'memberInvitations.memberId')
+    .where('memberInvitations.invitedBy', user.id)
     .select(
-      'member_invitations.id',
-      'member_invitations.member_id',
-      'member_invitations.invited_by',
-      'member_invitations.email',
-      'member_invitations.type',
-      'member_invitations.description',
-      'member_invitations.token',
-      'member_invitations.expires_at',
-      'member_invitations.accepted_at',
-      'member_invitations.created_at',
-      'members.first_name as member_first_name',
-      'members.last_name as member_last_name',
+      'memberInvitations.id',
+      'memberInvitations.memberId',
+      'memberInvitations.invitedBy',
+      'memberInvitations.email',
+      'memberInvitations.type',
+      'memberInvitations.description',
+      'memberInvitations.token',
+      'memberInvitations.expiresAt',
+      'memberInvitations.acceptedAt',
+      'memberInvitations.createdAt',
+      'members.firstName as memberFirstName',
+      'members.lastName as memberLastName',
     );
 
   res.json(invitations);

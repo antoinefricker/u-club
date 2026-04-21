@@ -3,8 +3,8 @@ export interface Club {
   name: string;
   code: string;
   description: string | null;
-  media_logo_lg: string | null;
-  media_logo_sm: string | null;
-  created_at: string;
-  updated_at: string;
+  mediaLogoLg: string | null;
+  mediaLogoSm: string | null;
+  createdAt: string;
+  updatedAt: string;
 }

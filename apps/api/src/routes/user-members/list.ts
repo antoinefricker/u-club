@@ -35,26 +35,26 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
   const user = (req as AuthenticatedRequest).user;
   const isPrivileged = user.role === 'admin' || user.role === 'manager';
 
-  const query = db('user_members')
+  const query = db('userMembers')
     .select(
-      'user_members.id',
-      'user_members.user_id',
-      'user_members.member_id',
-      'user_members.type',
-      'user_members.description',
-      'user_members.created_at',
-      'members.first_name as member_first_name',
-      'members.last_name as member_last_name',
+      'userMembers.id',
+      'userMembers.userId',
+      'userMembers.memberId',
+      'userMembers.type',
+      'userMembers.description',
+      'userMembers.createdAt',
+      'members.firstName as memberFirstName',
+      'members.lastName as memberLastName',
     )
-    .join('members', 'user_members.member_id', 'members.id');
+    .join('members', 'userMembers.memberId', 'members.id');
 
   if (isPrivileged) {
     const { userId } = req.query;
     if (userId) {
-      query.where('user_members.user_id', userId);
+      query.where('userMembers.userId', userId);
     }
   } else {
-    query.where('user_members.user_id', user.id);
+    query.where('userMembers.userId', user.id);
   }
 
   const userMembers = await query;

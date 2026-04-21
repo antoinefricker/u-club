@@ -45,10 +45,10 @@ router.get(
         'name',
         'code',
         'description',
-        'media_logo_lg',
-        'media_logo_sm',
-        'created_at',
-        'updated_at',
+        'mediaLogoLg',
+        'mediaLogoSm',
+        'createdAt',
+        'updatedAt',
       )
       .where({ id })
       .first();

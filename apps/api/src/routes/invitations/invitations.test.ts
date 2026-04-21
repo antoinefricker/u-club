@@ -72,7 +72,7 @@ beforeEach(() => {
 
 describe('POST /invitations', () => {
   const validBody = {
-    member_id: 'member-1',
+    memberId: 'member-1',
     email: 'invited@test.com',
     type: 'self',
   };
@@ -163,15 +163,15 @@ describe('POST /invitations/:id/accept', () => {
   const pastDate = new Date(Date.now() - 86400000).toISOString();
 
   it('should return 200 on successful accept', async () => {
-    // First call: db('member_invitations').where({ id }).first() -> invitation
+    // First call: db('memberInvitations').where({ id }).first() -> invitation
     mockFirst.mockResolvedValueOnce({
       id: 'inv-1',
-      member_id: 'member-1',
+      memberId: 'member-1',
       email: 'user@test.com',
       type: 'self',
       description: null,
-      accepted_at: null,
-      expires_at: futureDate,
+      acceptedAt: null,
+      expiresAt: futureDate,
     });
     // Second call: db('users').where({ id: user.id }).first() -> user
     mockFirst.mockResolvedValueOnce({ id: 'uuid-1', email: 'user@test.com' });
@@ -200,8 +200,8 @@ describe('POST /invitations/:id/accept', () => {
   it('should return 400 if already accepted', async () => {
     mockFirst.mockResolvedValueOnce({
       id: 'inv-1',
-      accepted_at: '2026-01-01T00:00:00.000Z',
-      expires_at: futureDate,
+      acceptedAt: '2026-01-01T00:00:00.000Z',
+      expiresAt: futureDate,
       email: 'user@test.com',
     });
 
@@ -217,8 +217,8 @@ describe('POST /invitations/:id/accept', () => {
   it('should return 400 if invitation has expired', async () => {
     mockFirst.mockResolvedValueOnce({
       id: 'inv-1',
-      accepted_at: null,
-      expires_at: pastDate,
+      acceptedAt: null,
+      expiresAt: pastDate,
       email: 'user@test.com',
     });
 
@@ -234,8 +234,8 @@ describe('POST /invitations/:id/accept', () => {
   it('should return 403 if email does not match', async () => {
     mockFirst.mockResolvedValueOnce({
       id: 'inv-1',
-      accepted_at: null,
-      expires_at: futureDate,
+      acceptedAt: null,
+      expiresAt: futureDate,
       email: 'other@test.com',
     });
     mockFirst.mockResolvedValueOnce({
@@ -257,7 +257,7 @@ describe('DELETE /invitations/:id', () => {
   it('should return 204 when sender deletes their invitation', async () => {
     mockFirst.mockResolvedValueOnce({
       id: 'inv-1',
-      invited_by: 'uuid-1',
+      invitedBy: 'uuid-1',
     });
     mockDel.mockResolvedValueOnce(1);
 

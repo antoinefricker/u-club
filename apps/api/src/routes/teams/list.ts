@@ -35,16 +35,16 @@ router.get(
   async (req: Request, res: Response) => {
     const query = db('teams').select(
       'id',
-      'club_id',
+      'clubId',
       'label',
       'gender',
       'description',
-      'created_at',
-      'updated_at',
+      'createdAt',
+      'updatedAt',
     );
 
-    if (req.query.club_id) {
-      query.where({ club_id: req.query.club_id });
+    if (req.query.clubId) {
+      query.where({ clubId: req.query.clubId });
     }
 
     const teams = await query;
