@@ -1,0 +1,3 @@
+.root :global(.mantine-Grid-col):last-child {
+  margin-top: var(--mantine-spacing-md);
+}
