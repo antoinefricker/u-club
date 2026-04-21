@@ -11,6 +11,7 @@ import {
   useCreateMember,
   useUpdateMember,
 } from '../../hooks/useMembers';
+import { useMemberStatuses } from '../../hooks/useMemberStatuses';
 
 export function MemberFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -18,8 +19,12 @@ export function MemberFormPage() {
   const navigate = useNavigate();
 
   const { data: member, isLoading } = useMember(id ?? '');
+  const { data: statusesData } = useMemberStatuses({ itemsPerPage: 100 });
   const createMember = useCreateMember();
   const updateMember = useUpdateMember();
+
+  const statusOptions =
+    statusesData?.data.map((s) => ({ value: s.id, label: s.label })) ?? [];
 
   const form = useForm({
     initialValues: {
@@ -27,6 +32,7 @@ export function MemberFormPage() {
       lastName: '',
       gender: '',
       birthdate: '',
+      statusId: '',
     },
     validate: {
       firstName: (v) => (v.trim() ? null : 'First name is required'),
@@ -44,6 +50,7 @@ export function MemberFormPage() {
         birthdate: member.birthdate
           ? dayjs(member.birthdate).format('YYYY-MM-DD')
           : '',
+        statusId: member.statusId ?? '',
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -53,6 +60,7 @@ export function MemberFormPage() {
     const payload = {
       ...values,
       birthdate: values.birthdate || null,
+      statusId: values.statusId || null,
     };
 
     if (isEdit) {
@@ -100,6 +108,7 @@ export function MemberFormPage() {
                 {...form.getInputProps('firstName')}
               />
             </Grid.Col>
+
             <Grid.Col span={{ base: 12, sm: 6 }}>
               <TextInput
                 label="Last name"
@@ -108,7 +117,8 @@ export function MemberFormPage() {
                 {...form.getInputProps('lastName')}
               />
             </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6 }}>
+
+            <Grid.Col span={{ base: 12, sm: 3 }}>
               <Select
                 label="Gender"
                 placeholder="Select gender"
@@ -121,13 +131,23 @@ export function MemberFormPage() {
                 {...form.getInputProps('gender')}
               />
             </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6 }}>
+            <Grid.Col span={{ base: 12, sm: 3 }}>
               <TextInput
                 label="Birth date"
                 type="date"
                 {...form.getInputProps('birthdate')}
               />
             </Grid.Col>
+            <Grid.Col span={{ base: 12, sm: 3 }}>
+              <Select
+                label="Status"
+                placeholder="No status"
+                data={statusOptions}
+                clearable
+                {...form.getInputProps('statusId')}
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, sm: 1 }}></Grid.Col>
             <Grid.Col span={12}>
               <Group>
                 <Button
