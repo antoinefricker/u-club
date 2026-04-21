@@ -11,6 +11,7 @@ const mockReturning = vi.fn();
 const mockUpdate = vi.fn().mockReturnThis();
 const mockDel = vi.fn();
 const mockJoin = vi.fn().mockReturnThis();
+const mockLeftJoin = vi.fn().mockReturnThis();
 const mockOrderBy = vi.fn().mockReturnThis();
 const mockClone = vi.fn().mockReturnThis();
 const mockClearSelect = vi.fn().mockReturnThis();
@@ -32,6 +33,7 @@ vi.mock('../../db.js', () => {
       update: mockUpdate,
       del: mockDel,
       join: mockJoin,
+      leftJoin: mockLeftJoin,
       orderBy: mockOrderBy,
       clone: mockClone,
       clearSelect: mockClearSelect,
@@ -79,6 +81,7 @@ beforeEach(() => {
   mockInsert.mockReturnThis();
   mockUpdate.mockReturnThis();
   mockJoin.mockReturnThis();
+  mockLeftJoin.mockReturnThis();
   mockOrderBy.mockReturnThis();
   mockClone.mockReturnThis();
   mockClearSelect.mockReturnThis();
@@ -170,6 +173,34 @@ describe('GET /members', () => {
       .get('/members')
       .set('Authorization', `Bearer ${adminToken}`);
     expect(mockOrderBy).toHaveBeenCalledWith('members.id', 'asc');
+  });
+
+  it('left-joins memberStatuses to expose statusLabel', async () => {
+    const memberWithStatus = { ...sampleMember, statusLabel: 'Active' };
+    mockList([memberWithStatus], 1);
+
+    const res = await request(app)
+      .get('/members')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(mockLeftJoin).toHaveBeenCalledWith(
+      'memberStatuses',
+      'members.statusId',
+      'memberStatuses.id',
+    );
+    expect(res.body.data[0]).toHaveProperty('statusLabel', 'Active');
+  });
+
+  it('returns null statusLabel when member has no status', async () => {
+    const memberWithoutStatus = { ...sampleMember, statusLabel: null };
+    mockList([memberWithoutStatus], 1);
+
+    const res = await request(app)
+      .get('/members')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.body.data[0]).toHaveProperty('statusLabel', null);
   });
 
   it.each([['page=0'], ['itemsPerPage=101']])(

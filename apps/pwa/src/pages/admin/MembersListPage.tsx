@@ -89,6 +89,7 @@ export function MembersListPage() {
             <Table.Th>Last name</Table.Th>
             <Table.Th w={120}>Birthdate</Table.Th>
             <Table.Th w={100}>Gender</Table.Th>
+            <Table.Th w={100}>Status</Table.Th>
             <Table.Th w={90} />
           </Table.Tr>
         </Table.Thead>
@@ -103,6 +104,7 @@ export function MembersListPage() {
                   : '—'}
               </Table.Td>
               <Table.Td>{member.gender}</Table.Td>
+              <Table.Td>{member.statusLabel ?? ''}</Table.Td>
               <Table.Td>
                 <Group gap="xs" justify="flex-end">
                   <ActionIcon

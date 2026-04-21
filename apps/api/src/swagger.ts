@@ -135,6 +135,7 @@ const options: swaggerJsdoc.Options = {
           properties: {
             id: { type: 'string', format: 'uuid' },
             statusId: { type: 'string', format: 'uuid', nullable: true },
+            statusLabel: { type: 'string', nullable: true },
             firstName: { type: 'string' },
             lastName: { type: 'string' },
             birthdate: { type: 'string', format: 'date', nullable: true },

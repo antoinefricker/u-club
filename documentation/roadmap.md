@@ -6,7 +6,8 @@
 - [ ] Member statuses crud
 - [ ] Can't define team category in team create/update form
 - [ ] Remove media column in club table
-- [ ] Admin/members display birthdate, status / add search filter (last name, first name/ birthdate)
+- [x] Admin/members display birthdate, status
+- [ ] add search filter (last name, first name/ birthdate)
 - [ ] Admin/member: (edit/create/show) define member status
 - [ ] Admin/member: (edit/show) display relationships, invite CTA, pending invitations
 
