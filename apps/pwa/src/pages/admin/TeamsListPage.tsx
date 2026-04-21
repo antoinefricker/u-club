@@ -90,18 +90,20 @@ export function TeamsListPage() {
           <Table.Tr>
             <Table.Th>Label</Table.Th>
             <Table.Th>Club</Table.Th>
+            <Table.Th>Category</Table.Th>
             <Table.Th>Gender</Table.Th>
             <Table.Th />
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {teams?.length === 0 && <EmptyListRow colSpan={4} />}
+          {teams?.length === 0 && <EmptyListRow colSpan={5} />}
           {teams?.map((team) => (
             <Table.Tr key={team.id}>
               <Table.Td>{team.label}</Table.Td>
               <Table.Td>
                 {clubNameById.get(team.clubId) ?? team.clubId}
               </Table.Td>
+              <Table.Td>{team.categoryLabel ?? '—'}</Table.Td>
               <Table.Td>{team.gender}</Table.Td>
               <Table.Td>
                 <Group gap="xs" justify="flex-end">
