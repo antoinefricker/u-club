@@ -64,8 +64,6 @@ const options: swaggerJsdoc.Options = {
             name: { type: 'string' },
             code: { type: 'string' },
             description: { type: 'string', nullable: true },
-            mediaLogoLg: { type: 'string', nullable: true },
-            mediaLogoSm: { type: 'string', nullable: true },
             createdAt: { type: 'string', format: 'date-time' },
             updatedAt: { type: 'string', format: 'date-time' },
           },
@@ -77,8 +75,6 @@ const options: swaggerJsdoc.Options = {
             name: { type: 'string' },
             code: { type: 'string' },
             description: { type: 'string', nullable: true },
-            mediaLogoLg: { type: 'string', nullable: true },
-            mediaLogoSm: { type: 'string', nullable: true },
           },
         },
         UpdateClubRequest: {
@@ -87,8 +83,6 @@ const options: swaggerJsdoc.Options = {
             name: { type: 'string' },
             code: { type: 'string' },
             description: { type: 'string', nullable: true },
-            mediaLogoLg: { type: 'string', nullable: true },
-            mediaLogoSm: { type: 'string', nullable: true },
           },
         },
         Team: {
