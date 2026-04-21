@@ -10,6 +10,17 @@ get {
   auth: bearer
 }
 
+params:query {
+  ~clubId:
+  ~gender:
+}
+
 auth:bearer {
   token: {{accessToken}}
+}
+
+docs {
+  Optional query parameters:
+  - clubId: UUID — filter by club
+  - gender: male | female | mixed — filter by gender (400 if invalid)
 }
