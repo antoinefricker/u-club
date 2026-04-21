@@ -65,4 +65,54 @@ describe('POST /auth/forgot_password', () => {
     expect(mockSendMail).toHaveBeenCalled();
     expect(mockInsert).toHaveBeenCalled();
   });
+
+  it('should delete existing password_reset tokens before creating a new one', async () => {
+    mockFirst.mockResolvedValueOnce({
+      id: 'u1',
+      email: 'test@example.com',
+    });
+
+    await request(app)
+      .post('/auth/forgot_password')
+      .send({ email: 'test@example.com' });
+
+    expect(mockDel).toHaveBeenCalledTimes(1);
+    expect(mockInsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: 'test@example.com',
+        type: 'password_reset',
+      }),
+    );
+  });
+
+  it('should insert a 64-hex-char token with ~1h expiry', async () => {
+    mockFirst.mockResolvedValueOnce({ id: 'u1', email: 'test@example.com' });
+
+    const before = Date.now();
+    await request(app)
+      .post('/auth/forgot_password')
+      .send({ email: 'test@example.com' });
+    const after = Date.now();
+
+    const insertArg = mockInsert.mock.calls[0][0];
+    expect(insertArg.token).toMatch(/^[a-f0-9]{64}$/);
+    const expiresMs = new Date(insertArg.expiresAt).getTime();
+    expect(expiresMs).toBeGreaterThanOrEqual(before + 60 * 60 * 1000);
+    expect(expiresMs).toBeLessThanOrEqual(after + 60 * 60 * 1000);
+  });
+
+  it('should URL-encode the email in the reset link', async () => {
+    mockFirst.mockResolvedValueOnce({
+      id: 'u1',
+      email: 'user+alias@example.com',
+    });
+
+    await request(app)
+      .post('/auth/forgot_password')
+      .send({ email: 'user+alias@example.com' });
+
+    const mailArg = mockSendMail.mock.calls[0][0];
+    expect(mailArg.to).toBe('user+alias@example.com');
+    expect(mailArg.text).toContain('email=user%2Balias%40example.com');
+  });
 });
