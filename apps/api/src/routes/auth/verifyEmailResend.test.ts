@@ -92,4 +92,41 @@ describe('POST /auth/verify_email_resend', () => {
       }),
     );
   });
+
+  it('should insert a 64-hex-char confirmation token with ~24h expiry', async () => {
+    mockFirst.mockResolvedValueOnce({
+      id: 'uuid-1',
+      email: 'unverified@example.com',
+      emailVerifiedAt: null,
+    });
+
+    const before = Date.now();
+    await request(app)
+      .post('/auth/verify_email_resend')
+      .send({ email: 'unverified@example.com' });
+    const after = Date.now();
+
+    const insertArg = mockInsert.mock.calls[0][0];
+    expect(insertArg.token).toMatch(/^[a-f0-9]{64}$/);
+    expect(insertArg.type).toBe('confirmation');
+    expect(insertArg.email).toBe('unverified@example.com');
+    const expiresMs = new Date(insertArg.expiresAt).getTime();
+    expect(expiresMs).toBeGreaterThanOrEqual(before + 24 * 60 * 60 * 1000);
+    expect(expiresMs).toBeLessThanOrEqual(after + 24 * 60 * 60 * 1000);
+  });
+
+  it('should URL-encode the email in the confirmation link', async () => {
+    mockFirst.mockResolvedValueOnce({
+      id: 'uuid-1',
+      email: 'user+alias@example.com',
+      emailVerifiedAt: null,
+    });
+
+    await request(app)
+      .post('/auth/verify_email_resend')
+      .send({ email: 'user+alias@example.com' });
+
+    const mailArg = mockSendMail.mock.calls[0][0];
+    expect(mailArg.text).toContain('email=user%2Balias%40example.com');
+  });
 });
