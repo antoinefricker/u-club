@@ -10,6 +10,11 @@ import {
 
 const router = Router();
 
+const SEARCH_MAX_LENGTH = 100;
+const SEARCH_MAX_TOKENS = 10;
+
+const escapeLike = (s: string) => s.replace(/[\\%_]/g, (ch) => `\\${ch}`);
+
 /**
  * @openapi
  * /members:
@@ -24,6 +29,17 @@ const router = Router();
  *           type: string
  *           format: uuid
  *         description: Filter members by team
+ *       - in: query
+ *         name: search
+ *         required: false
+ *         schema:
+ *           type: string
+ *           maxLength: 100
+ *         description: >
+ *           Free-text search. Whitespace-split into up to 10 tokens; each token
+ *           must match (case- and accent-insensitive, partial) at least one of
+ *           first name, last name, or the DD/MM/YYYY birthdate. `%`, `_`, and
+ *           `\` are treated as literals.
  *       - in: query
  *         name: page
  *         schema:
@@ -53,7 +69,7 @@ const router = Router();
  *                 pagination:
  *                   $ref: '#/components/schemas/PaginationMeta'
  *       400:
- *         description: Invalid pagination parameters
+ *         description: Invalid pagination or search parameters
  *         content:
  *           application/json:
  *             schema:
@@ -76,7 +92,31 @@ router.get(
       return;
     }
 
-    const { teamId } = req.query;
+    const { teamId, search } = req.query;
+
+    let searchTokens: string[] = [];
+    if (search !== undefined) {
+      if (typeof search !== 'string') {
+        res.status(400).json({ error: 'search must be a string' });
+        return;
+      }
+      const trimmed = search.trim();
+      if (trimmed.length > SEARCH_MAX_LENGTH) {
+        res.status(400).json({
+          error: `search must be ${SEARCH_MAX_LENGTH} characters or fewer`,
+        });
+        return;
+      }
+      if (trimmed.length > 0) {
+        searchTokens = trimmed.split(/\s+/);
+        if (searchTokens.length > SEARCH_MAX_TOKENS) {
+          res.status(400).json({
+            error: `search must contain at most ${SEARCH_MAX_TOKENS} tokens`,
+          });
+          return;
+        }
+      }
+    }
 
     const query = db('members')
       .leftJoin('memberStatuses', 'members.statusId', 'memberStatuses.id')
@@ -97,6 +137,21 @@ router.get(
       query
         .join('teamAssignments', 'members.id', 'teamAssignments.memberId')
         .where('teamAssignments.teamId', teamId as string);
+    }
+
+    for (const token of searchTokens) {
+      const pattern = `%${escapeLike(token)}%`;
+      query.andWhere((sub) => {
+        sub
+          .whereRaw('unaccent(members.first_name) ilike unaccent(?)', [pattern])
+          .orWhereRaw('unaccent(members.last_name) ilike unaccent(?)', [
+            pattern,
+          ])
+          .orWhereRaw(
+            "unaccent(to_char(members.birthdate, 'DD/MM/YYYY')) ilike unaccent(?)",
+            [pattern],
+          );
+      });
     }
 
     const { data, totalItems } = await applyPagination(query, parsed.data);

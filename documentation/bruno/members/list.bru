@@ -1,0 +1,36 @@
+meta {
+  name: List Members
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/members?page=1&itemsPerPage=25
+  body: none
+  auth: bearer
+}
+
+params:query {
+  page: 1
+  itemsPerPage: 25
+  ~teamId:
+  ~search:
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+docs {
+  Optional query parameters:
+  - page: integer, default 1, minimum 1
+  - itemsPerPage: integer, default 25, range 1–100
+  - teamId: UUID — filter by team (inner join on team_assignments)
+  - search: free-text — whitespace-split into up to 10 tokens (max 100 chars total); each
+    token must match (case- and accent-insensitive, partial) at least one of first name,
+    last name, or the DD/MM/YYYY birthdate. `%`, `_`, and `\` are treated as literals.
+    400 on overflow. Accent-insensitivity uses the Postgres `unaccent` extension.
+
+  Response envelope:
+    { "data": [...], "pagination": { "page", "itemsPerPage", "totalItems", "totalPages" } }
+}

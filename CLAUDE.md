@@ -11,6 +11,7 @@
 - Use conventional commits (e.g. `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`).
 - Do not add co-author lines to commits.
 - Always propose the commit message and wait for user approval before committing.
+- When implementing a plan from `documentation/plans/`, split the work into one commit per top-level section of the plan (e.g. a separate commit for the API change, the API tests, the PWA hook, the PWA view, etc.) rather than bundling everything into one commit.
 
 ## Code Quality
 
@@ -64,6 +65,7 @@ When creating or editing views in the PWA app:
 - Do not add Claude co-authoring or attribution in the PR description.
 - When creating a PR, generate a summary section and a test plan section formatted as a todo checklist. Leave all test plan items unchecked.
 - When working on PWA pages, take screenshots of edited pages and include them in the PR description.
+- Before writing the PR body, run the test suite and record the current test instrumentation in the summary: total tests passing (e.g. `308 passing`) and how many tests this PR adds, so reviewers can see how coverage moved.
 - To set or update a PR body, use `gh api -X PATCH repos/<owner>/<repo>/pulls/<n> -F body=@file.md` — `gh pr edit --body` fails on this repo due to a GraphQL `projects classic` deprecation.
 
 ## Makefile
