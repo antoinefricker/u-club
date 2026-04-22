@@ -37,9 +37,9 @@ const escapeLike = (s: string) => s.replace(/[\\%_]/g, (ch) => `\\${ch}`);
  *           maxLength: 100
  *         description: >
  *           Free-text search. Whitespace-split into up to 10 tokens; each token
- *           must match (case-insensitive, partial) at least one of first name,
- *           last name, or the DD/MM/YYYY birthdate. `%`, `_`, and `\` are
- *           treated as literals.
+ *           must match (case- and accent-insensitive, partial) at least one of
+ *           first name, last name, or the DD/MM/YYYY birthdate. `%`, `_`, and
+ *           `\` are treated as literals.
  *       - in: query
  *         name: page
  *         schema:
@@ -102,11 +102,9 @@ router.get(
       }
       const trimmed = search.trim();
       if (trimmed.length > SEARCH_MAX_LENGTH) {
-        res
-          .status(400)
-          .json({
-            error: `search must be ${SEARCH_MAX_LENGTH} characters or fewer`,
-          });
+        res.status(400).json({
+          error: `search must be ${SEARCH_MAX_LENGTH} characters or fewer`,
+        });
         return;
       }
       if (trimmed.length > 0) {
@@ -145,11 +143,14 @@ router.get(
       const pattern = `%${escapeLike(token)}%`;
       query.andWhere((sub) => {
         sub
-          .where('members.firstName', 'ilike', pattern)
-          .orWhere('members.lastName', 'ilike', pattern)
-          .orWhereRaw("to_char(members.birthdate, 'DD/MM/YYYY') ilike ?", [
+          .whereRaw('unaccent(members.first_name) ilike unaccent(?)', [pattern])
+          .orWhereRaw('unaccent(members.last_name) ilike unaccent(?)', [
             pattern,
-          ]);
+          ])
+          .orWhereRaw(
+            "unaccent(to_char(members.birthdate, 'DD/MM/YYYY')) ilike unaccent(?)",
+            [pattern],
+          );
       });
     }
 

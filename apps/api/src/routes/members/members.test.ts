@@ -10,6 +10,7 @@ const mockAndWhere = vi.fn(function (this: unknown, cb: unknown) {
   return this;
 });
 const mockOrWhere = vi.fn().mockReturnThis();
+const mockWhereRaw = vi.fn().mockReturnThis();
 const mockOrWhereRaw = vi.fn().mockReturnThis();
 const mockFirst = vi.fn();
 const mockInsert = vi.fn().mockReturnThis();
@@ -35,6 +36,7 @@ vi.mock('../../db.js', () => {
       whereNot: mockWhereNot,
       andWhere: mockAndWhere,
       orWhere: mockOrWhere,
+      whereRaw: mockWhereRaw,
       orWhereRaw: mockOrWhereRaw,
       first: mockFirst,
       insert: mockInsert,
@@ -88,6 +90,7 @@ beforeEach(() => {
   mockWhere.mockReturnThis();
   mockWhereNot.mockReturnThis();
   mockOrWhere.mockReturnThis();
+  mockWhereRaw.mockReturnThis();
   mockOrWhereRaw.mockReturnThis();
   mockInsert.mockReturnThis();
   mockUpdate.mockReturnThis();
@@ -240,7 +243,7 @@ describe('GET /members', () => {
       expect(mockAndWhere).not.toHaveBeenCalled();
     });
 
-    it('applies a single-token search with ILIKE across all three fields', async () => {
+    it('applies a single-token search with unaccent ILIKE across all three fields', async () => {
       mockList([sampleMember], 1);
 
       const res = await request(app)
@@ -249,18 +252,16 @@ describe('GET /members', () => {
 
       expect(res.status).toBe(200);
       expect(mockAndWhere).toHaveBeenCalledTimes(1);
-      expect(mockWhere).toHaveBeenCalledWith(
-        'members.firstName',
-        'ilike',
-        '%john%',
-      );
-      expect(mockOrWhere).toHaveBeenCalledWith(
-        'members.lastName',
-        'ilike',
-        '%john%',
+      expect(mockWhereRaw).toHaveBeenCalledWith(
+        'unaccent(members.first_name) ilike unaccent(?)',
+        ['%john%'],
       );
       expect(mockOrWhereRaw).toHaveBeenCalledWith(
-        "to_char(members.birthdate, 'DD/MM/YYYY') ilike ?",
+        'unaccent(members.last_name) ilike unaccent(?)',
+        ['%john%'],
+      );
+      expect(mockOrWhereRaw).toHaveBeenCalledWith(
+        "unaccent(to_char(members.birthdate, 'DD/MM/YYYY')) ilike unaccent(?)",
         ['%john%'],
       );
     });
@@ -273,15 +274,13 @@ describe('GET /members', () => {
         .set('Authorization', `Bearer ${adminToken}`);
 
       expect(mockAndWhere).toHaveBeenCalledTimes(2);
-      expect(mockWhere).toHaveBeenCalledWith(
-        'members.firstName',
-        'ilike',
-        '%john%',
+      expect(mockWhereRaw).toHaveBeenCalledWith(
+        'unaccent(members.first_name) ilike unaccent(?)',
+        ['%john%'],
       );
-      expect(mockWhere).toHaveBeenCalledWith(
-        'members.firstName',
-        'ilike',
-        '%1990%',
+      expect(mockWhereRaw).toHaveBeenCalledWith(
+        'unaccent(members.first_name) ilike unaccent(?)',
+        ['%1990%'],
       );
     });
 
@@ -302,10 +301,9 @@ describe('GET /members', () => {
         .get('/members?search=%25_%5C')
         .set('Authorization', `Bearer ${adminToken}`);
 
-      expect(mockWhere).toHaveBeenCalledWith(
-        'members.firstName',
-        'ilike',
-        '%\\%\\_\\\\%',
+      expect(mockWhereRaw).toHaveBeenCalledWith(
+        'unaccent(members.first_name) ilike unaccent(?)',
+        ['%\\%\\_\\\\%'],
       );
     });
 
@@ -355,10 +353,9 @@ describe('GET /members', () => {
         'team-1',
       );
       expect(mockAndWhere).toHaveBeenCalledTimes(1);
-      expect(mockWhere).toHaveBeenCalledWith(
-        'members.firstName',
-        'ilike',
-        '%jo%',
+      expect(mockWhereRaw).toHaveBeenCalledWith(
+        'unaccent(members.first_name) ilike unaccent(?)',
+        ['%jo%'],
       );
     });
   });
