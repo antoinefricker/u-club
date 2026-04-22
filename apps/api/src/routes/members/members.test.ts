@@ -5,6 +5,12 @@ import { createTestToken } from '../../test-utils.js';
 const mockSelect = vi.fn().mockReturnThis();
 const mockWhere = vi.fn().mockReturnThis();
 const mockWhereNot = vi.fn().mockReturnThis();
+const mockAndWhere = vi.fn(function (this: unknown, cb: unknown) {
+  if (typeof cb === 'function') cb(this);
+  return this;
+});
+const mockOrWhere = vi.fn().mockReturnThis();
+const mockOrWhereRaw = vi.fn().mockReturnThis();
 const mockFirst = vi.fn();
 const mockInsert = vi.fn().mockReturnThis();
 const mockReturning = vi.fn();
@@ -27,6 +33,9 @@ vi.mock('../../db.js', () => {
       select: mockSelect,
       where: mockWhere,
       whereNot: mockWhereNot,
+      andWhere: mockAndWhere,
+      orWhere: mockOrWhere,
+      orWhereRaw: mockOrWhereRaw,
       first: mockFirst,
       insert: mockInsert,
       returning: mockReturning,
@@ -78,6 +87,8 @@ beforeEach(() => {
   mockSelect.mockReturnThis();
   mockWhere.mockReturnThis();
   mockWhereNot.mockReturnThis();
+  mockOrWhere.mockReturnThis();
+  mockOrWhereRaw.mockReturnThis();
   mockInsert.mockReturnThis();
   mockUpdate.mockReturnThis();
   mockJoin.mockReturnThis();
@@ -213,6 +224,144 @@ describe('GET /members', () => {
       expect(res.body).toHaveProperty('error', 'validation error');
     },
   );
+
+  describe('search filter', () => {
+    it('ignores empty and whitespace-only search', async () => {
+      mockList([sampleMember], 1);
+      await request(app)
+        .get('/members?search=')
+        .set('Authorization', `Bearer ${adminToken}`);
+      expect(mockAndWhere).not.toHaveBeenCalled();
+
+      mockList([sampleMember], 1);
+      await request(app)
+        .get('/members?search=%20%20')
+        .set('Authorization', `Bearer ${adminToken}`);
+      expect(mockAndWhere).not.toHaveBeenCalled();
+    });
+
+    it('applies a single-token search with ILIKE across all three fields', async () => {
+      mockList([sampleMember], 1);
+
+      const res = await request(app)
+        .get('/members?search=john')
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(res.status).toBe(200);
+      expect(mockAndWhere).toHaveBeenCalledTimes(1);
+      expect(mockWhere).toHaveBeenCalledWith(
+        'members.firstName',
+        'ilike',
+        '%john%',
+      );
+      expect(mockOrWhere).toHaveBeenCalledWith(
+        'members.lastName',
+        'ilike',
+        '%john%',
+      );
+      expect(mockOrWhereRaw).toHaveBeenCalledWith(
+        "to_char(members.birthdate, 'DD/MM/YYYY') ilike ?",
+        ['%john%'],
+      );
+    });
+
+    it('ANDs multiple tokens — one andWhere group per token', async () => {
+      mockList([sampleMember], 1);
+
+      await request(app)
+        .get('/members?search=john%201990')
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(mockAndWhere).toHaveBeenCalledTimes(2);
+      expect(mockWhere).toHaveBeenCalledWith(
+        'members.firstName',
+        'ilike',
+        '%john%',
+      );
+      expect(mockWhere).toHaveBeenCalledWith(
+        'members.firstName',
+        'ilike',
+        '%1990%',
+      );
+    });
+
+    it('collapses internal and surrounding whitespace into tokens', async () => {
+      mockList([sampleMember], 1);
+
+      await request(app)
+        .get('/members?search=%20%20john%20%20%201990%20%20')
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(mockAndWhere).toHaveBeenCalledTimes(2);
+    });
+
+    it('escapes LIKE wildcards in user input', async () => {
+      mockList([sampleMember], 1);
+
+      await request(app)
+        .get('/members?search=%25_%5C')
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(mockWhere).toHaveBeenCalledWith(
+        'members.firstName',
+        'ilike',
+        '%\\%\\_\\\\%',
+      );
+    });
+
+    it('returns 400 when search exceeds 100 characters', async () => {
+      const long = 'a'.repeat(101);
+      const res = await request(app)
+        .get(`/members?search=${long}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty(
+        'error',
+        'search must be 100 characters or fewer',
+      );
+      expect(mockAndWhere).not.toHaveBeenCalled();
+    });
+
+    it('returns 400 when search contains more than 10 tokens', async () => {
+      const tokens = Array.from({ length: 11 }, (_, i) => `t${i}`).join(' ');
+      const res = await request(app)
+        .get(`/members?search=${encodeURIComponent(tokens)}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty(
+        'error',
+        'search must contain at most 10 tokens',
+      );
+      expect(mockAndWhere).not.toHaveBeenCalled();
+    });
+
+    it('combines search with teamId filter', async () => {
+      mockList([sampleMember], 1);
+
+      const res = await request(app)
+        .get('/members?teamId=team-1&search=jo')
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(res.status).toBe(200);
+      expect(mockJoin).toHaveBeenCalledWith(
+        'teamAssignments',
+        'members.id',
+        'teamAssignments.memberId',
+      );
+      expect(mockWhere).toHaveBeenCalledWith(
+        'teamAssignments.teamId',
+        'team-1',
+      );
+      expect(mockAndWhere).toHaveBeenCalledTimes(1);
+      expect(mockWhere).toHaveBeenCalledWith(
+        'members.firstName',
+        'ilike',
+        '%jo%',
+      );
+    });
+  });
 });
 
 describe('GET /members/:id', () => {
