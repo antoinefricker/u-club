@@ -1,0 +1,22 @@
+meta {
+  name: Create Team Category
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/team-categories
+  body: json
+  auth: bearer
+}
+
+body:json {
+  {
+    "clubId": "",
+    "label": "U15"
+  }
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

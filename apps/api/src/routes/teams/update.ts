@@ -63,6 +63,7 @@ router.put(
       .returning([
         'id',
         'clubId',
+        'categoryId',
         'label',
         'gender',
         'description',

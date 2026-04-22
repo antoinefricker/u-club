@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import { useTeams, useDeleteTeam, type TeamGender } from '../../hooks/useTeams';
 import { useClubs } from '../../hooks/useClubs';
+import { useTeamCategories } from '../../hooks/useTeamCategories';
 import { usePagination } from '../../hooks/usePagination';
 import { useListFilters } from '../../hooks/useListFilters';
 
@@ -25,16 +26,21 @@ const GENDER_OPTIONS: { value: TeamGender; label: string }[] = [
   { value: 'mixed', label: 'Mixed' },
 ];
 
-const TEAMS_FILTER_KEYS = ['clubId', 'gender'] as const;
+const TEAMS_FILTER_KEYS = ['clubId', 'categoryId', 'gender'] as const;
 
 export function TeamsListPage() {
   const navigate = useNavigate();
   const { page, itemsPerPage } = usePagination();
-  const { filters, setFilter } = useListFilters(TEAMS_FILTER_KEYS);
+  const { filters, setFilter, setFilters } = useListFilters(TEAMS_FILTER_KEYS);
   const clubId = filters.clubId ?? null;
+  const categoryId = filters.categoryId ?? null;
   const gender = (filters.gender as TeamGender | undefined) ?? null;
 
   const { data: clubsData } = useClubs({ itemsPerPage: 100 });
+  const { data: categoriesData } = useTeamCategories({
+    clubId: clubId ?? undefined,
+    itemsPerPage: 100,
+  });
   const {
     data: teamsData,
     isLoading,
@@ -43,16 +49,33 @@ export function TeamsListPage() {
     page,
     itemsPerPage,
     clubId: clubId ?? undefined,
+    categoryId: categoryId ?? undefined,
     gender: gender ?? undefined,
   });
   const deleteTeam = useDeleteTeam();
 
   const clubs = clubsData?.data;
+  const categories = categoriesData?.data;
   const teams = teamsData?.data;
   const pagination = teamsData?.pagination;
 
   const clubOptions = clubs?.map((c) => ({ value: c.id, label: c.name })) ?? [];
   const clubNameById = new Map(clubs?.map((c) => [c.id, c.name]));
+  const categoryOptions =
+    categories?.map((c) => ({
+      value: c.id,
+      label: clubId
+        ? c.label
+        : `${clubNameById.get(c.clubId) ?? c.clubId} — ${c.label}`,
+    })) ?? [];
+
+  const handleClubChange = (v: string | null) => {
+    setFilters({
+      clubId: v ?? undefined,
+      categoryId: undefined,
+      gender: gender ?? undefined,
+    });
+  };
 
   const handleDelete = (id: string, label: string) => {
     if (!window.confirm(`Delete team "${label}"?`)) return;
@@ -82,8 +105,18 @@ export function TeamsListPage() {
           placeholder="All clubs"
           data={clubOptions}
           value={clubId}
-          onChange={(v) => setFilter('clubId', v)}
+          onChange={handleClubChange}
           clearable
+          maw={300}
+        />
+        <Select
+          label="Filter by category"
+          placeholder="All categories"
+          data={categoryOptions}
+          value={categoryId}
+          onChange={(v) => setFilter('categoryId', v)}
+          clearable
+          searchable
           maw={300}
         />
         <Select

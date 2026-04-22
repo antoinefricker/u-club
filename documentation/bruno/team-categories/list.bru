@@ -1,0 +1,21 @@
+meta {
+  name: List Team Categories
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/team-categories?page=1&itemsPerPage=25
+  body: none
+  auth: bearer
+}
+
+params:query {
+  page: 1
+  itemsPerPage: 25
+  ~clubId:
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

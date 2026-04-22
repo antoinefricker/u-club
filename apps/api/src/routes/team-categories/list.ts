@@ -1,5 +1,4 @@
 import { Router, Request, Response } from 'express';
-import { z } from 'zod';
 import db from '../../db.js';
 import { requireAuth } from '../../middleware/auth.js';
 import { requireRole } from '../../middleware/requireRole.js';
@@ -8,35 +7,22 @@ import {
   applyPagination,
   buildPaginationMeta,
 } from '../../utils/pagination.js';
-import { TEAM_GENDERS, type TeamGender } from '../../types/team.js';
 
 const router = Router();
 
 /**
  * @openapi
- * /teams:
+ * /team-categories:
  *   get:
- *     tags: [Teams]
- *     summary: List all teams
+ *     tags: [TeamCategories]
+ *     summary: List team categories
  *     parameters:
  *       - in: query
  *         name: clubId
  *         schema:
  *           type: string
  *           format: uuid
- *         description: Filter teams by club ID
- *       - in: query
- *         name: categoryId
- *         schema:
- *           type: string
- *           format: uuid
- *         description: Filter teams by category ID
- *       - in: query
- *         name: gender
- *         schema:
- *           type: string
- *           enum: [male, female, mixed]
- *         description: Filter teams by gender
+ *         description: Filter categories by club
  *       - in: query
  *         name: page
  *         schema:
@@ -52,7 +38,7 @@ const router = Router();
  *           default: 25
  *     responses:
  *       200:
- *         description: Paginated list of teams
+ *         description: Paginated list of team categories
  *         content:
  *           application/json:
  *             schema:
@@ -62,11 +48,11 @@ const router = Router();
  *                 data:
  *                   type: array
  *                   items:
- *                     $ref: '#/components/schemas/Team'
+ *                     $ref: '#/components/schemas/TeamCategory'
  *                 pagination:
  *                   $ref: '#/components/schemas/PaginationMeta'
  *       400:
- *         description: Invalid filter or pagination parameters
+ *         description: Invalid pagination parameters
  *         content:
  *           application/json:
  *             schema:
@@ -77,30 +63,6 @@ router.get(
   requireAuth,
   requireRole('admin', 'manager'),
   async (req: Request, res: Response) => {
-    if (req.query.gender) {
-      const gender = req.query.gender;
-      if (
-        typeof gender !== 'string' ||
-        !TEAM_GENDERS.includes(gender as TeamGender)
-      ) {
-        res
-          .status(400)
-          .json({ error: 'gender must be male, female, or mixed' });
-        return;
-      }
-    }
-
-    if (req.query.categoryId) {
-      const categoryId = req.query.categoryId;
-      if (
-        typeof categoryId !== 'string' ||
-        !z.uuid().safeParse(categoryId).success
-      ) {
-        res.status(400).json({ error: 'categoryId must be a valid uuid' });
-        return;
-      }
-    }
-
     const parsed = paginationQuerySchema.safeParse(req.query);
     if (!parsed.success) {
       res.status(400).json({
@@ -113,31 +75,12 @@ router.get(
       return;
     }
 
-    const query = db('teams')
-      .leftJoin('teamCategories', 'teams.categoryId', 'teamCategories.id')
-      .select(
-        'teams.id',
-        'teams.clubId',
-        'teams.categoryId',
-        'teams.label',
-        'teams.gender',
-        'teams.description',
-        'teams.createdAt',
-        'teams.updatedAt',
-        'teamCategories.label as categoryLabel',
-      )
-      .orderBy('teams.id', 'asc');
+    const query = db('teamCategories')
+      .select('id', 'clubId', 'label', 'createdAt', 'updatedAt')
+      .orderBy('id', 'asc');
 
     if (req.query.clubId) {
-      query.where('teams.clubId', req.query.clubId);
-    }
-
-    if (req.query.categoryId) {
-      query.where('teams.categoryId', req.query.categoryId);
-    }
-
-    if (req.query.gender) {
-      query.where('teams.gender', req.query.gender as string);
+      query.where('clubId', req.query.clubId);
     }
 
     const { data, totalItems } = await applyPagination(query, parsed.data);
