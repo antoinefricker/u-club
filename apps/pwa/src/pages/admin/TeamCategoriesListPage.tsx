@@ -62,31 +62,6 @@ export function TeamCategoriesListPage() {
     });
   };
 
-  if (!clubId)
-    return (
-      <>
-        <PageTitle label="Team categories">
-          <Button onClick={() => navigate('/admin/team-categories/new')}>
-            New category
-          </Button>
-        </PageTitle>
-        <ListFilters>
-          <Select
-            label="Filter by club"
-            placeholder="Pick a club"
-            data={clubOptions}
-            value={clubId}
-            onChange={(v) => setFilter('clubId', v)}
-            clearable
-            maw={300}
-          />
-        </ListFilters>
-        <Alert color="blue" variant="light">
-          Pick a club to list its categories.
-        </Alert>
-      </>
-    );
-
   if (isLoading) return <Loader />;
   if (error) return <Alert color="red">{String(error)}</Alert>;
 

@@ -42,7 +42,6 @@ export function useTeamCategories(args: UseTeamCategoriesArgs = {}) {
       if (!res.ok) throw new Error('Failed to fetch team categories');
       return res.json();
     },
-    enabled: !!clubId,
     placeholderData: keepPreviousData,
   });
 }
