@@ -110,6 +110,7 @@ const options: swaggerJsdoc.Options = {
           required: ['clubId', 'label', 'gender'],
           properties: {
             clubId: { type: 'string', format: 'uuid' },
+            categoryId: { type: 'string', format: 'uuid', nullable: true },
             label: { type: 'string' },
             gender: { type: 'string', enum: ['male', 'female', 'mixed'] },
             description: { type: 'string', nullable: true },
@@ -119,8 +120,33 @@ const options: swaggerJsdoc.Options = {
           type: 'object',
           properties: {
             label: { type: 'string' },
+            categoryId: { type: 'string', format: 'uuid', nullable: true },
             gender: { type: 'string', enum: ['male', 'female', 'mixed'] },
             description: { type: 'string', nullable: true },
+          },
+        },
+        TeamCategory: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            clubId: { type: 'string', format: 'uuid' },
+            label: { type: 'string' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        CreateTeamCategoryRequest: {
+          type: 'object',
+          required: ['clubId', 'label'],
+          properties: {
+            clubId: { type: 'string', format: 'uuid' },
+            label: { type: 'string' },
+          },
+        },
+        UpdateTeamCategoryRequest: {
+          type: 'object',
+          properties: {
+            label: { type: 'string' },
           },
         },
         MemberStatus: {

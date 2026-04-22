@@ -1,23 +1,22 @@
 meta {
-  name: Update Team
+  name: Update Team Category
   type: http
   seq: 4
 }
 
 put {
-  url: {{baseUrl}}/teams/:id
+  url: {{baseUrl}}/team-categories/:id
   body: json
   auth: bearer
 }
 
 params:path {
-  id: paste-team-id-here
+  id:
 }
 
 body:json {
   {
-    "label": "U16 Boys",
-    "categoryId": null
+    "label": "U16"
   }
 }
 

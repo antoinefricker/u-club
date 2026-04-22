@@ -15,6 +15,7 @@ import { FormWrapper } from '../../layout/FormWrapper';
 import { PageTitle } from '../../layout/PageTitle';
 import { useTeam, useCreateTeam, useUpdateTeam } from '../../hooks/useTeams';
 import { useClubs } from '../../hooks/useClubs';
+import { useTeamCategories } from '../../hooks/useTeamCategories';
 
 export function TeamFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -35,6 +36,7 @@ export function TeamFormPage() {
       clubId: '',
       gender: '',
       description: '',
+      categoryId: '',
     },
     validate: {
       label: (v) => (v.trim() ? null : 'Label is required'),
@@ -43,6 +45,13 @@ export function TeamFormPage() {
     },
   });
 
+  const { data: categoriesData } = useTeamCategories({
+    clubId: form.values.clubId || undefined,
+    itemsPerPage: 100,
+  });
+  const categoryOptions =
+    categoriesData?.data.map((c) => ({ value: c.id, label: c.label })) ?? [];
+
   useEffect(() => {
     if (team) {
       form.setValues({
@@ -50,6 +59,7 @@ export function TeamFormPage() {
         clubId: team.clubId,
         gender: team.gender,
         description: team.description ?? '',
+        categoryId: team.categoryId ?? '',
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -59,6 +69,7 @@ export function TeamFormPage() {
     const payload = {
       ...values,
       description: values.description || null,
+      categoryId: values.categoryId || null,
     };
 
     if (isEdit) {
@@ -113,6 +124,22 @@ export function TeamFormPage() {
                 data={clubOptions}
                 required
                 {...form.getInputProps('clubId')}
+                onChange={(value) => {
+                  form.setFieldValue('clubId', value ?? '');
+                  form.setFieldValue('categoryId', '');
+                }}
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <Select
+                label="Category"
+                placeholder={
+                  form.values.clubId ? 'No category' : 'Pick a club first'
+                }
+                data={categoryOptions}
+                clearable
+                disabled={!form.values.clubId}
+                {...form.getInputProps('categoryId')}
               />
             </Grid.Col>
             <Grid.Col span={{ base: 12, sm: 6 }}>

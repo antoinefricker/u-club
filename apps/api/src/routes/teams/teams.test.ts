@@ -304,6 +304,55 @@ describe('POST /teams', () => {
     expect(res.status).toBe(201);
     expect(res.body).toEqual(sampleTeam);
   });
+
+  it('creates a team with a valid categoryId', async () => {
+    const categoryId = '33333333-3333-4333-8333-333333333333';
+    mockReturning.mockResolvedValueOnce([{ ...sampleTeam, categoryId }]);
+
+    const res = await request(app)
+      .post('/teams')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        clubId: 'club-1',
+        label: 'U15 Boys',
+        gender: 'male',
+        categoryId,
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.categoryId).toBe(categoryId);
+  });
+
+  it('creates a team with categoryId=null', async () => {
+    mockReturning.mockResolvedValueOnce([{ ...sampleTeam, categoryId: null }]);
+
+    const res = await request(app)
+      .post('/teams')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        clubId: 'club-1',
+        label: 'U15 Boys',
+        gender: 'male',
+        categoryId: null,
+      });
+
+    expect(res.status).toBe(201);
+  });
+
+  it('returns 400 when categoryId is not a uuid', async () => {
+    const res = await request(app)
+      .post('/teams')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        clubId: 'club-1',
+        label: 'U15 Boys',
+        gender: 'male',
+        categoryId: 'not-a-uuid',
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'validation error');
+  });
 });
 
 describe('PUT /teams/:id', () => {
@@ -350,6 +399,40 @@ describe('PUT /teams/:id', () => {
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual(updated);
+  });
+
+  it('updates categoryId with a valid uuid', async () => {
+    const categoryId = '33333333-3333-4333-8333-333333333333';
+    mockReturning.mockResolvedValueOnce([{ ...sampleTeam, categoryId }]);
+
+    const res = await request(app)
+      .put('/teams/team-1')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ categoryId });
+
+    expect(res.status).toBe(200);
+    expect(res.body.categoryId).toBe(categoryId);
+  });
+
+  it('clears categoryId with null', async () => {
+    mockReturning.mockResolvedValueOnce([{ ...sampleTeam, categoryId: null }]);
+
+    const res = await request(app)
+      .put('/teams/team-1')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ categoryId: null });
+
+    expect(res.status).toBe(200);
+  });
+
+  it('returns 400 when categoryId is not a uuid', async () => {
+    const res = await request(app)
+      .put('/teams/team-1')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ categoryId: 'not-a-uuid' });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'validation error');
   });
 });
 

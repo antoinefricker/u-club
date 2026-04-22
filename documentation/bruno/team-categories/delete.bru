@@ -1,0 +1,19 @@
+meta {
+  name: Delete Team Category
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/team-categories/:id
+  body: none
+  auth: bearer
+}
+
+params:path {
+  id:
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
