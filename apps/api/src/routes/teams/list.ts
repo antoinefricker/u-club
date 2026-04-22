@@ -1,4 +1,5 @@
 import { Router, Request, Response } from 'express';
+import { z } from 'zod';
 import db from '../../db.js';
 import { requireAuth } from '../../middleware/auth.js';
 import { requireRole } from '../../middleware/requireRole.js';
@@ -24,6 +25,12 @@ const router = Router();
  *           type: string
  *           format: uuid
  *         description: Filter teams by club ID
+ *       - in: query
+ *         name: categoryId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Filter teams by category ID
  *       - in: query
  *         name: gender
  *         schema:
@@ -83,6 +90,17 @@ router.get(
       }
     }
 
+    if (req.query.categoryId) {
+      const categoryId = req.query.categoryId;
+      if (
+        typeof categoryId !== 'string' ||
+        !z.uuid().safeParse(categoryId).success
+      ) {
+        res.status(400).json({ error: 'categoryId must be a valid uuid' });
+        return;
+      }
+    }
+
     const parsed = paginationQuerySchema.safeParse(req.query);
     if (!parsed.success) {
       res.status(400).json({
@@ -112,6 +130,10 @@ router.get(
 
     if (req.query.clubId) {
       query.where('teams.clubId', req.query.clubId);
+    }
+
+    if (req.query.categoryId) {
+      query.where('teams.categoryId', req.query.categoryId);
     }
 
     if (req.query.gender) {

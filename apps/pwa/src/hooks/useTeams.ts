@@ -27,6 +27,7 @@ interface Team {
 
 interface UseTeamsArgs extends PaginationArgs {
   clubId?: string;
+  categoryId?: string;
   gender?: TeamGender;
 }
 
@@ -39,15 +40,16 @@ function useAuthHeaders() {
 }
 
 export function useTeams(args: UseTeamsArgs = {}) {
-  const { page, itemsPerPage, clubId, gender } = args;
+  const { page, itemsPerPage, clubId, categoryId, gender } = args;
   const headers = useAuthHeaders();
   return useQuery<Paginated<Team>>({
-    queryKey: ['teams', { page, itemsPerPage, clubId, gender }],
+    queryKey: ['teams', { page, itemsPerPage, clubId, categoryId, gender }],
     queryFn: async () => {
       const qs = buildListQueryString({
         page,
         itemsPerPage,
         clubId,
+        categoryId,
         gender,
       });
       const res = await fetch(`/api/teams${qs}`, { headers });

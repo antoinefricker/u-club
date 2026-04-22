@@ -196,6 +196,42 @@ describe('GET /teams', () => {
     expect(mockWhere).not.toHaveBeenCalled();
   });
 
+  it('filters by categoryId', async () => {
+    mockList([sampleTeam], 1);
+    const categoryId = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+
+    const res = await request(app)
+      .get(`/teams?categoryId=${categoryId}`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(mockWhere).toHaveBeenCalledWith('teams.categoryId', categoryId);
+  });
+
+  it('returns 400 for an invalid categoryId', async () => {
+    const res = await request(app)
+      .get('/teams?categoryId=not-a-uuid')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'categoryId must be a valid uuid');
+    expect(mockWhere).not.toHaveBeenCalled();
+  });
+
+  it('combines clubId and categoryId filters', async () => {
+    mockList([sampleTeam], 1);
+    const clubId = 'b1ffdc88-8d1a-4fe7-aa5c-5aa8ac470b22';
+    const categoryId = 'c2bbcd77-7e2b-4ad6-99b4-4995ad370c33';
+
+    const res = await request(app)
+      .get(`/teams?clubId=${clubId}&categoryId=${categoryId}`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(mockWhere).toHaveBeenCalledWith('teams.clubId', clubId);
+    expect(mockWhere).toHaveBeenCalledWith('teams.categoryId', categoryId);
+  });
+
   it('returns empty envelope when no teams match', async () => {
     mockList([], 0);
 
