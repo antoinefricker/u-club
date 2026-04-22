@@ -11,3 +11,4 @@
 - [009 - 21/04/2026 - Test Coverage](009-21042026-test-coverage.md) — Install v8 coverage, fill middleware/schema/util test gaps, deepen thin auth tests
 - [010 - 21/04/2026 - Handle Pagination](010-21042026-handle-pagination.md) — Offset-based pagination on every API list route + Mantine/TanStack Query wiring in the PWA
 - [011 - 22/04/2026 - Team Categories CRUD](011-22042026-team-categories-crud.md) — Full CRUD API for team_categories + categoryId Select in the team create/edit form
+- [012 - 22/04/2026 - Admin Members Search](012-22042026-admin-members-search.md) — Free-text search on admin members list over first name, last name, and DD/MM/YYYY birthdate
