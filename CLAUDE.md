@@ -11,6 +11,7 @@
 - Use conventional commits (e.g. `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`).
 - Do not add co-author lines to commits.
 - Always propose the commit message and wait for user approval before committing.
+- When implementing a plan from `documentation/plans/`, split the work into one commit per top-level section of the plan (e.g. a separate commit for the API change, the API tests, the PWA hook, the PWA view, etc.) rather than bundling everything into one commit.
 
 ## Code Quality
 
