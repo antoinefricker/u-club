@@ -11,6 +11,7 @@ const mockReturning = vi.fn();
 const mockUpdate = vi.fn().mockReturnThis();
 const mockDel = vi.fn();
 const mockJoin = vi.fn().mockReturnThis();
+const mockLeftJoin = vi.fn().mockReturnThis();
 const mockOrderBy = vi.fn().mockReturnThis();
 const mockClone = vi.fn().mockReturnThis();
 const mockClearSelect = vi.fn().mockReturnThis();
@@ -32,6 +33,7 @@ vi.mock('../../db.js', () => {
       update: mockUpdate,
       del: mockDel,
       join: mockJoin,
+      leftJoin: mockLeftJoin,
       orderBy: mockOrderBy,
       clone: mockClone,
       clearSelect: mockClearSelect,
@@ -79,6 +81,7 @@ beforeEach(() => {
   mockInsert.mockReturnThis();
   mockUpdate.mockReturnThis();
   mockJoin.mockReturnThis();
+  mockLeftJoin.mockReturnThis();
   mockOrderBy.mockReturnThis();
   mockClone.mockReturnThis();
   mockClearSelect.mockReturnThis();
@@ -172,6 +175,34 @@ describe('GET /members', () => {
     expect(mockOrderBy).toHaveBeenCalledWith('members.id', 'asc');
   });
 
+  it('left-joins memberStatuses to expose statusLabel', async () => {
+    const memberWithStatus = { ...sampleMember, statusLabel: 'Active' };
+    mockList([memberWithStatus], 1);
+
+    const res = await request(app)
+      .get('/members')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(mockLeftJoin).toHaveBeenCalledWith(
+      'memberStatuses',
+      'members.statusId',
+      'memberStatuses.id',
+    );
+    expect(res.body.data[0]).toHaveProperty('statusLabel', 'Active');
+  });
+
+  it('returns null statusLabel when member has no status', async () => {
+    const memberWithoutStatus = { ...sampleMember, statusLabel: null };
+    mockList([memberWithoutStatus], 1);
+
+    const res = await request(app)
+      .get('/members')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.body.data[0]).toHaveProperty('statusLabel', null);
+  });
+
   it.each([['page=0'], ['itemsPerPage=101']])(
     'returns 400 for %s',
     async (qs) => {
@@ -254,6 +285,56 @@ describe('POST /members', () => {
     expect(res.status).toBe(201);
     expect(res.body).toEqual(sampleMember);
   });
+
+  it.each([['not-a-date'], ['2010-13-45'], ['2010/05/03']])(
+    'returns 400 for invalid birthdate %s',
+    async (birthdate) => {
+      const res = await request(app)
+        .post('/members')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          firstName: 'John',
+          lastName: 'Doe',
+          gender: 'male',
+          birthdate,
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty('error', 'validation error');
+    },
+  );
+
+  it('accepts a valid YYYY-MM-DD birthdate', async () => {
+    mockReturning.mockResolvedValueOnce([sampleMember]);
+
+    const res = await request(app)
+      .post('/members')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        firstName: 'John',
+        lastName: 'Doe',
+        gender: 'male',
+        birthdate: '2010-05-03',
+      });
+
+    expect(res.status).toBe(201);
+  });
+
+  it('accepts null birthdate', async () => {
+    mockReturning.mockResolvedValueOnce([sampleMember]);
+
+    const res = await request(app)
+      .post('/members')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        firstName: 'John',
+        lastName: 'Doe',
+        gender: 'male',
+        birthdate: null,
+      });
+
+    expect(res.status).toBe(201);
+  });
 });
 
 describe('PUT /members/:id', () => {
@@ -275,6 +356,41 @@ describe('PUT /members/:id', () => {
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'validation error');
+  });
+
+  it.each([['not-a-date'], ['2010-13-45'], ['2010/05/03']])(
+    'returns 400 for invalid birthdate %s',
+    async (birthdate) => {
+      const res = await request(app)
+        .put('/members/member-1')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ birthdate });
+
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty('error', 'validation error');
+    },
+  );
+
+  it('accepts a valid YYYY-MM-DD birthdate', async () => {
+    mockReturning.mockResolvedValueOnce([sampleMember]);
+
+    const res = await request(app)
+      .put('/members/member-1')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ birthdate: '2010-05-03' });
+
+    expect(res.status).toBe(200);
+  });
+
+  it('accepts null birthdate', async () => {
+    mockReturning.mockResolvedValueOnce([sampleMember]);
+
+    const res = await request(app)
+      .put('/members/member-1')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ birthdate: null });
+
+    expect(res.status).toBe(200);
   });
 
   it('should return 404 if member not found', async () => {

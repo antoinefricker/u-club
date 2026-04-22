@@ -83,8 +83,6 @@ router.put(
         'name',
         'code',
         'description',
-        'mediaLogoLg',
-        'mediaLogoSm',
         'createdAt',
         'updatedAt',
       ]);

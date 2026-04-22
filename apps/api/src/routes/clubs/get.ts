@@ -40,16 +40,7 @@ router.get(
     const { id } = req.params;
 
     const club = await db('clubs')
-      .select(
-        'id',
-        'name',
-        'code',
-        'description',
-        'mediaLogoLg',
-        'mediaLogoSm',
-        'createdAt',
-        'updatedAt',
-      )
+      .select('id', 'name', 'code', 'description', 'createdAt', 'updatedAt')
       .where({ id })
       .first();
 
