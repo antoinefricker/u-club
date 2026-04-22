@@ -6,9 +6,12 @@ import {
   Loader,
   Select,
   Table,
+  TextInput,
 } from '@mantine/core';
-import { IconEdit, IconTrash } from '@tabler/icons-react';
+import { useDebouncedValue } from '@mantine/hooks';
+import { IconEdit, IconSearch, IconTrash, IconX } from '@tabler/icons-react';
 import dayjs from 'dayjs';
+import { useEffect, useRef, useState } from 'react';
 import { PageTitle } from '../../layout/PageTitle';
 import { ListFilters } from '../../layout/ListFilters';
 import { ListPagination } from '../../layout/ListPagination';
@@ -19,13 +22,34 @@ import { useTeams } from '../../hooks/useTeams';
 import { usePagination } from '../../hooks/usePagination';
 import { useListFilters } from '../../hooks/useListFilters';
 
-const MEMBERS_FILTER_KEYS = ['teamId'] as const;
+const MEMBERS_FILTER_KEYS = ['teamId', 'search'] as const;
 
 export function MembersListPage() {
   const navigate = useNavigate();
   const { page, itemsPerPage } = usePagination();
   const { filters, setFilter } = useListFilters(MEMBERS_FILTER_KEYS);
   const teamId = filters.teamId ?? null;
+  const search = filters.search ?? '';
+
+  const [searchInput, setSearchInput] = useState(search);
+  const [prevSearch, setPrevSearch] = useState(search);
+
+  if (search !== prevSearch) {
+    setPrevSearch(search);
+    if (search !== searchInput) setSearchInput(search);
+  }
+
+  const [debouncedSearch] = useDebouncedValue(searchInput, 300);
+  const searchRef = useRef(search);
+  useEffect(() => {
+    searchRef.current = search;
+  }, [search]);
+
+  useEffect(() => {
+    const trimmed = debouncedSearch.trim();
+    if (trimmed === searchRef.current) return;
+    setFilter('search', trimmed || null);
+  }, [debouncedSearch, setFilter]);
 
   const { data: teamsData } = useTeams({ itemsPerPage: 100 });
   const {
@@ -36,6 +60,7 @@ export function MembersListPage() {
     page,
     itemsPerPage,
     teamId: teamId ?? undefined,
+    search: search || undefined,
   });
   const deleteMember = useDeleteMember();
 
@@ -71,6 +96,26 @@ export function MembersListPage() {
       </PageTitle>
 
       <ListFilters>
+        <TextInput
+          label="Search"
+          placeholder="Name or birthdate (DD/MM/YYYY)"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.currentTarget.value)}
+          leftSection={<IconSearch size={16} />}
+          rightSection={
+            searchInput ? (
+              <ActionIcon
+                variant="subtle"
+                color="gray"
+                onClick={() => setSearchInput('')}
+                aria-label="Clear search"
+              >
+                <IconX size={16} />
+              </ActionIcon>
+            ) : null
+          }
+          maw={320}
+        />
         <Select
           label="Filter by team"
           placeholder="All teams"
