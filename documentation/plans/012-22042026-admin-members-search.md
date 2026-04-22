@@ -15,18 +15,27 @@ The admin members list currently only supports filtering by team. With a growing
   - Zod validation: `z.string().trim().min(1).max(100)` when present; empty/whitespace is treated as "no filter" (not an error).
   - Tokenization: the trimmed value is split on whitespace (`/\s+/`). Empty tokens are dropped. A cap of **10 tokens** is enforced (400 when exceeded) to bound query complexity.
   - Wildcard characters in user input (`%`, `_`, `\`) are escaped before being embedded in each `ILIKE` pattern, so they behave as literals.
-- **Matching logic** — **multi-token**: every token must match at least one of the three fields (AND between tokens, OR between fields per token).
+- **Matching logic** — **multi-token**, **case- and accent-insensitive**: every token must match at least one of the three fields (AND between tokens, OR between fields per token).
   ```sql
   WHERE
-    (first_name ILIKE '%token1%' OR last_name ILIKE '%token1%' OR to_char(birthdate, 'DD/MM/YYYY') ILIKE '%token1%')
+    (unaccent(first_name) ILIKE unaccent('%token1%')
+     OR unaccent(last_name) ILIKE unaccent('%token1%')
+     OR unaccent(to_char(birthdate, 'DD/MM/YYYY')) ILIKE unaccent('%token1%'))
     AND
-    (first_name ILIKE '%token2%' OR last_name ILIKE '%token2%' OR to_char(birthdate, 'DD/MM/YYYY') ILIKE '%token2%')
+    (... same for token2 ...)
     AND ...
   ```
-  - Implementation: loop tokens, call `query.andWhere((sub) => sub.where(...).orWhere(...).orWhereRaw(...))` once per token with the escaped `%token%` pattern.
-  - `to_char(..., 'DD/MM/YYYY')` is Postgres-specific (client is `pg`, confirmed in `knexfile.js`).
+  - Implementation: loop tokens, call `query.andWhere((sub) => sub.whereRaw(...).orWhereRaw(...).orWhereRaw(...))` once per token with the escaped `%token%` pattern.
+  - `unaccent(...)` is provided by the Postgres `unaccent` extension (enabled by a dedicated migration). Both the column and the bound pattern are wrapped so `"lea"` matches `"Léa"`, `"francois"` matches `"François"`, etc.
+  - `to_char(..., 'DD/MM/YYYY')` is Postgres-specific (client is `pg`, confirmed in `knexfile.js`). Dates have no accents so wrapping the birthdate branch in `unaccent()` is a no-op but kept for symmetry.
   - Null `birthdate` values produce `NULL` from `to_char`, which doesn't match the `ILIKE` — that's correct (those members simply can't be matched by birthdate, but still match on names).
   - Example: `search=john 1990` → rows where "john" appears in first/last name OR "1990" appears in the formatted birthdate, AND "1990" appears in first/last name OR "1990" appears in the formatted birthdate. In practice this matches members named John born in 1990 (each token hits a different field).
+
+### Database migration — enable `unaccent`
+
+- New migration `apps/api/src/migrations/20260422_02_enable_unaccent_extension.ts` with `CREATE EXTENSION IF NOT EXISTS unaccent` (up) / `DROP EXTENSION IF EXISTS unaccent` (down).
+- No changes to tables or columns, so the `database-diagram.mermaid` does not need updating.
+- Caveat: `CREATE EXTENSION` typically requires the DB role to be a superuser or have `CREATEROLE`-equivalent permissions. In shared/hosted environments the extension may need to be enabled out-of-band by the DBA before the migration runs.
 - **Interaction with existing `teamId` filter**: ANDed — both can be active simultaneously.
 - **Pagination**: unchanged. `applyPagination` counts on the filtered query, so `totalItems`/`totalPages` reflect the filtered set.
 - **OpenAPI annotation** updated with the new param.
@@ -48,7 +57,6 @@ The admin members list currently only supports filtering by team. With a growing
 
 ### Out of scope
 
-- Accent-insensitive match (e.g. `francois` matches `François`). Would need Postgres `unaccent` extension. See Open considerations.
 - Searching other member fields (phone, email via user, gender).
 - Server-side ranking/relevance.
 - Quoted phrase tokens (e.g. `"John Smith"` as one token). v1 splits on any whitespace.
@@ -79,22 +87,24 @@ The admin members list currently only supports filtering by team. With a growing
 - Refreshing with `?search=jo` in the URL shows `jo` in the input and the filtered list.
 - Search combined with a team filter narrows both.
 - Typing a birthdate like `22/04/1990` returns the expected member(s).
+- Typing `lea` returns `"Léa"`; typing `francois` returns `"François"`.
 
 ## Implementation steps
 
-1. **API**: extend `list.ts` with the `search` param + escaping helper. Update OpenAPI. Update Bruno.
-2. **API tests**: add the cases listed above to `members.test.ts`.
-3. **PWA hook**: extend `useMembers` with `search`.
-4. **PWA page**: preview the layout change with the user first (per CLAUDE.md React Views rule), then wire the `<TextInput>` + debounce.
-5. **Validate**: `pnpm lint`, `pnpm -r typecheck`, API test suite.
+1. **Migration**: add `20260422_02_enable_unaccent_extension.ts` and run it against the dev DB.
+2. **API**: extend `list.ts` with the `search` param + escaping helper + `unaccent`-wrapped `whereRaw` clauses. Update OpenAPI. Update Bruno.
+3. **API tests**: add the cases listed above to `members.test.ts`.
+4. **PWA hook**: extend `useMembers` with `search`.
+5. **PWA page**: preview the layout change with the user first (per CLAUDE.md React Views rule), then wire the `<TextInput>` + debounce.
+6. **Validate**: `pnpm lint`, `pnpm -r typecheck`, API test suite.
 
 ## Decisions
 
 - **Multi-token**: enabled. Whitespace-split; each token must match at least one of `first_name` / `last_name` / formatted `birthdate`.
 - **Wildcard escaping**: enabled. `%`, `_`, and `\` in user input are treated as literals.
+- **Accent-insensitive**: enabled via the Postgres `unaccent` extension (new migration).
 
 ## Open considerations
 
-- **Accent-insensitive**: not covered in v1. Adding it later would require the `unaccent` Postgres extension and wrapping both the column and the pattern in `unaccent(...)`.
 - **Search across more fields**: phone, email, gender — deferred until asked.
-- **Index**: for large datasets a trigram index on `first_name`, `last_name` would make `ILIKE '%...%'` fast. Out of scope for v1; revisit when perf shows a problem.
+- **Index**: for large datasets a trigram index on `first_name`, `last_name` would make `ILIKE '%...%'` fast. Out of scope for v1; revisit when perf shows a problem. Note that once `unaccent()` is applied, a plain column index cannot help — an expression index on `unaccent(first_name)` (marked `IMMUTABLE`) would be needed.
