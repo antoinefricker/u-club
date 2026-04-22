@@ -25,6 +25,7 @@ interface Member {
 
 interface UseMembersArgs extends PaginationArgs {
   teamId?: string;
+  search?: string;
 }
 
 function useAuthHeaders() {
@@ -36,12 +37,12 @@ function useAuthHeaders() {
 }
 
 export function useMembers(args: UseMembersArgs = {}) {
-  const { page, itemsPerPage, teamId } = args;
+  const { page, itemsPerPage, teamId, search } = args;
   const headers = useAuthHeaders();
   return useQuery<Paginated<Member>>({
-    queryKey: ['members', { page, itemsPerPage, teamId }],
+    queryKey: ['members', { page, itemsPerPage, teamId, search }],
     queryFn: async () => {
-      const qs = buildListQueryString({ page, itemsPerPage, teamId });
+      const qs = buildListQueryString({ page, itemsPerPage, teamId, search });
       const res = await fetch(`/api/members${qs}`, { headers });
       if (!res.ok) throw new Error('Failed to fetch members');
       return res.json();
