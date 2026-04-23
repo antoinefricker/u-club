@@ -12,7 +12,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useAuthContext } from '../auth/useAuthContext';
-import { emailValidation } from '../forms/validations/emailValidation';
+import { emailValidation } from '../utils/formValidations/emailValidation';
 
 interface LoginFormProps {
   onSwitchMode: () => void;

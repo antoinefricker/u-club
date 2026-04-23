@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { IconMail } from '@tabler/icons-react';
-import { PhoneInput } from '../forms/inputs/PhoneInput';
+import { PhoneInput } from '../components/inputs/PhoneInput';
 import {
   Alert,
   Anchor,
@@ -15,12 +15,12 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useAuthContext } from '../auth/useAuthContext';
 import { useUserUpdate, type UpdateUserPayload } from '../hooks/useUserUpdate';
-import { emailValidation } from '../forms/validations/emailValidation';
-import { phoneValidation } from '../forms/validations/phoneValidation';
+import { emailValidation } from '../utils/formValidations/emailValidation';
+import { phoneValidation } from '../utils/formValidations/phoneValidation';
 import {
   passwordValidation,
   confirmPasswordValidation,
-} from '../forms/validations/passwordValidation';
+} from '../utils/formValidations/passwordValidation';
 
 type AccountFormValues = UpdateUserPayload & {
   password: string;

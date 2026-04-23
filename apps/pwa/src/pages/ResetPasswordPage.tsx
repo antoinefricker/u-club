@@ -9,7 +9,7 @@ import {
   Paper,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { confirmPasswordValidation } from '../forms/validations/passwordValidation';
+import { confirmPasswordValidation } from '../utils/formValidations/passwordValidation';
 
 export function ResetPasswordPage() {
   const [searchParams] = useSearchParams();

@@ -1,6 +1,6 @@
 import { TextInput, type TextInputProps } from '@mantine/core';
 import { IconPhone } from '@tabler/icons-react';
-import { formatPhone } from '../validations/phoneValidation';
+import { formatPhone } from '../../utils/formValidations/phoneValidation';
 
 interface PhoneInputProps extends Omit<TextInputProps, 'onChange'> {
   onChange?: (value: string) => void;

@@ -11,7 +11,7 @@ import {
   Text,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { emailValidation } from '../forms/validations/emailValidation';
+import { emailValidation } from '../utils/formValidations/emailValidation';
 
 interface RegisterFormProps {
   onSwitchMode: () => void;
