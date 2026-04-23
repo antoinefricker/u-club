@@ -67,6 +67,10 @@ When creating or refactoring a React context, follow the `AuthContextProvider` /
 - Hook: `useXxxContext` (not `useXxx`), co-located with the `XxxContextValue` type and `createContext` call in `useXxxContext.ts` — all three live together, no separate `xxxContextValue.ts` file.
 - The hook throws when used outside the provider, with a message naming both `useXxxContext` and `XxxContextProvider`.
 
+### Domain types
+
+- Domain/resource types (server entities like `Team`, `Club`, `Member`, `TeamGender`, …) live in `apps/pwa/src/types/`, one file per entity named after the type (e.g. `types/Team.ts`). Do not define them inline in hooks.
+
 ## Pull Requests
 
 - Do not create a PR unless the user explicitly asks for it.
