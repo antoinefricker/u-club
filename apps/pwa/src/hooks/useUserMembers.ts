@@ -4,7 +4,7 @@ import {
   useQueryClient,
   keepPreviousData,
 } from '@tanstack/react-query';
-import { useAuth } from '../auth/useAuth';
+import { useAuthContext } from '../auth/useAuthContext';
 import {
   buildListQueryString,
   type Paginated,
@@ -27,7 +27,7 @@ interface UseUserMembersArgs extends PaginationArgs {
 }
 
 function useAuthHeaders() {
-  const { token } = useAuth();
+  const { token } = useAuthContext();
   return {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,
@@ -35,7 +35,7 @@ function useAuthHeaders() {
 }
 
 export function useUserMembers(args: UseUserMembersArgs = {}) {
-  const { token, user } = useAuth();
+  const { token, user } = useAuthContext();
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,

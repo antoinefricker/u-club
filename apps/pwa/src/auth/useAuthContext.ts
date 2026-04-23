@@ -1,5 +1,15 @@
-import { createContext } from 'react';
+import { createContext, useContext } from 'react';
 import type { User } from '../types/User';
+
+export function useAuthContext() {
+  const ctx = useContext(AuthContext);
+  if (!ctx) {
+    throw new Error(
+      'useAuthContext must be used within an AuthContextProvider',
+    );
+  }
+  return ctx;
+}
 
 export interface AuthContextValue {
   token: string | null;

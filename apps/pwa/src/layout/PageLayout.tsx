@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { AppShell, Burger, Group } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { AppNavigation } from './AppNavigation';
-import { useAuth } from '../auth/useAuth';
+import { useAuthContext } from '../auth/useAuthContext';
 import { Unauthenticated } from './Unauthenticated';
 
 interface PageLayoutProps {
@@ -10,7 +10,7 @@ interface PageLayoutProps {
 }
 
 export function PageLayout({ children }: PageLayoutProps) {
-  const { user } = useAuth();
+  const { user } = useAuthContext();
   const [opened, { toggle, close }] = useDisclosure();
 
   if (!user) {

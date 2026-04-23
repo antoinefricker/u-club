@@ -13,7 +13,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { useAuth } from '../auth/useAuth';
+import { useAuthContext } from '../auth/useAuthContext';
 import { useUserUpdate, type UpdateUserPayload } from '../hooks/useUserUpdate';
 import { emailValidation } from '../forms/validations/emailValidation';
 import { phoneValidation } from '../forms/validations/phoneValidation';
@@ -28,7 +28,7 @@ type AccountFormValues = UpdateUserPayload & {
 };
 
 export function AccountEditForm() {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser } = useAuthContext();
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const mutation = useUserUpdate();
