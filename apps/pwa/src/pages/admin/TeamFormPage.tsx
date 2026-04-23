@@ -13,7 +13,12 @@ import { notifications } from '@mantine/notifications';
 import { useNavigate, useParams } from 'react-router';
 import { FormWrapper } from '../../layout/FormWrapper';
 import { PageTitle } from '../../layout/PageTitle';
-import { useTeam, useCreateTeam, useUpdateTeam } from '../../hooks/useTeams';
+import {
+  useTeam,
+  useCreateTeam,
+  useUpdateTeam,
+  type TeamGender,
+} from '../../hooks/useTeams';
 import { useClubs } from '../../hooks/useClubs';
 import { useTeamCategories } from '../../hooks/useTeamCategories';
 
@@ -30,7 +35,13 @@ export function TeamFormPage() {
   const clubOptions =
     clubs?.data.map((c) => ({ value: c.id, label: c.name })) ?? [];
 
-  const form = useForm({
+  const form = useForm<{
+    label: string;
+    clubId: string;
+    gender: TeamGender | '';
+    description: string;
+    categoryId: string;
+  }>({
     initialValues: {
       label: '',
       clubId: '',
@@ -68,6 +79,7 @@ export function TeamFormPage() {
   const handleSubmit = (values: typeof form.values) => {
     const payload = {
       ...values,
+      gender: values.gender as TeamGender,
       description: values.description || null,
       categoryId: values.categoryId || null,
     };
@@ -149,7 +161,7 @@ export function TeamFormPage() {
                 data={[
                   { value: 'male', label: 'Male' },
                   { value: 'female', label: 'Female' },
-                  { value: 'both', label: 'Both' },
+                  { value: 'mixed', label: 'Mixed' },
                 ]}
                 required
                 {...form.getInputProps('gender')}
