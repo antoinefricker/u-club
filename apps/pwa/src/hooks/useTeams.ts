@@ -10,20 +10,7 @@ import {
   type Paginated,
   type PaginationArgs,
 } from '../utils/pagination';
-
-export type TeamGender = 'male' | 'female' | 'mixed';
-
-interface Team {
-  id: string;
-  clubId: string;
-  categoryId: string | null;
-  label: string;
-  gender: TeamGender;
-  description: string | null;
-  categoryLabel: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
+import type { Team, TeamGender } from '../types/Team';
 
 interface UseTeamsArgs extends PaginationArgs {
   clubId?: string;

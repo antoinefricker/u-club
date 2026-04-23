@@ -10,15 +10,7 @@ import {
   type Paginated,
   type PaginationArgs,
 } from '../utils/pagination';
-
-interface Club {
-  id: string;
-  name: string;
-  code: string;
-  description: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
+import type { Club } from '../types/Club';
 
 function useAuthHeaders() {
   const { token } = useAuthContext();

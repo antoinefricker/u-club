@@ -10,14 +10,7 @@ import {
   type Paginated,
   type PaginationArgs,
 } from '../utils/pagination';
-
-interface TeamCategory {
-  id: string;
-  clubId: string;
-  label: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import type { TeamCategory } from '../types/TeamCategory';
 
 interface UseTeamCategoriesArgs extends PaginationArgs {
   clubId?: string;

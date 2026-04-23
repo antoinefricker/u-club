@@ -5,11 +5,7 @@ import {
   type Paginated,
   type PaginationArgs,
 } from '../utils/pagination';
-
-interface MemberStatus {
-  id: string;
-  label: string;
-}
+import type { MemberStatus } from '../types/MemberStatus';
 
 function useAuthHeaders() {
   const { token } = useAuthContext();

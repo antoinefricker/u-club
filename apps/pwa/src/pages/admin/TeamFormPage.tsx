@@ -13,12 +13,8 @@ import { notifications } from '@mantine/notifications';
 import { useNavigate, useParams } from 'react-router';
 import { FormWrapper } from '../../layout/FormWrapper';
 import { PageTitle } from '../../layout/PageTitle';
-import {
-  useTeam,
-  useCreateTeam,
-  useUpdateTeam,
-  type TeamGender,
-} from '../../hooks/useTeams';
+import { useTeam, useCreateTeam, useUpdateTeam } from '../../hooks/useTeams';
+import type { TeamGender } from '../../types/Team';
 import { useClubs } from '../../hooks/useClubs';
 import { useTeamCategories } from '../../hooks/useTeamCategories';
 

@@ -10,17 +10,7 @@ import {
   type Paginated,
   type PaginationArgs,
 } from '../utils/pagination';
-
-interface UserMember {
-  id: string;
-  userId: string;
-  memberId: string;
-  type: string;
-  description: string | null;
-  createdAt: string;
-  memberFirstName: string;
-  memberLastName: string;
-}
+import type { UserMember } from '../types/UserMember';
 
 interface UseUserMembersArgs extends PaginationArgs {
   userId?: string;
