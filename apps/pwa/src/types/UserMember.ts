@@ -7,4 +7,6 @@ export interface UserMember {
   createdAt: string;
   memberFirstName: string;
   memberLastName: string;
+  userDisplayName: string;
+  userEmail: string;
 }
