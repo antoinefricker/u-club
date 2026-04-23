@@ -1,6 +1,6 @@
 import { Title } from '@mantine/core';
-import { PageTitle } from '../layout/PageTitle';
-import { FormWrapper } from '../layout/FormWrapper';
+import { PageTitle } from '../components/layout/PageTitle';
+import { FormWrapper } from '../components/admin/forms/FormWrapper';
 import { AccountEditForm } from './AccountEditForm';
 import { UserRelationships } from './UserRelationships';
 

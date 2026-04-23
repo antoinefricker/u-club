@@ -8,23 +8,22 @@ import {
   Table,
 } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
-import { PageTitle } from '../../layout/PageTitle';
-import { ListFilters } from '../../layout/ListFilters';
-import { ListPagination } from '../../layout/ListPagination';
-import { EmptyListRow } from '../../layout/EmptyListRow';
+import { PageTitle } from '../../components/layout/PageTitle';
+import { ListFilters } from '../../components/admin/lists/ListFilters';
+import { ListPagination } from '../../components/admin/lists/ListPagination';
+import { EmptyListRow } from '../../components/admin/lists/EmptyListRow';
 import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
-import { useTeams, useDeleteTeam, type TeamGender } from '../../hooks/useTeams';
+import { useTeams, useDeleteTeam } from '../../hooks/useTeams';
+import {
+  TEAM_GENDER_LABELS,
+  TEAM_GENDER_OPTIONS,
+  type TeamGender,
+} from '../../types/Team';
 import { useClubs } from '../../hooks/useClubs';
 import { useTeamCategories } from '../../hooks/useTeamCategories';
 import { usePagination } from '../../hooks/usePagination';
 import { useListFilters } from '../../hooks/useListFilters';
-
-const GENDER_OPTIONS: { value: TeamGender; label: string }[] = [
-  { value: 'male', label: 'Male' },
-  { value: 'female', label: 'Female' },
-  { value: 'mixed', label: 'Mixed' },
-];
 
 const TEAMS_FILTER_KEYS = ['clubId', 'categoryId', 'gender'] as const;
 
@@ -122,7 +121,7 @@ export function TeamsListPage() {
         <Select
           label="Filter by gender"
           placeholder="All genders"
-          data={GENDER_OPTIONS}
+          data={TEAM_GENDER_OPTIONS}
           value={gender}
           onChange={(v) => setFilter('gender', v)}
           clearable
@@ -149,7 +148,7 @@ export function TeamsListPage() {
                 {clubNameById.get(team.clubId) ?? team.clubId}
               </Table.Td>
               <Table.Td>{team.categoryLabel ?? '—'}</Table.Td>
-              <Table.Td>{team.gender}</Table.Td>
+              <Table.Td>{TEAM_GENDER_LABELS[team.gender]}</Table.Td>
               <Table.Td>
                 <Group gap="xs" justify="flex-end">
                   <ActionIcon

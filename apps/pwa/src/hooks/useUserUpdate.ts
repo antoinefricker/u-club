@@ -1,6 +1,6 @@
 import { useMutation, type UseMutationResult } from '@tanstack/react-query';
 import type { User } from '../types/User';
-import { useAuth } from '../auth/useAuth';
+import { useAuthContext } from '../auth/useAuthContext';
 
 export type UpdateUserPayload = Omit<
   User,
@@ -14,7 +14,7 @@ export function useUserUpdate(): UseMutationResult<
   Error,
   UpdateUserPayload
 > {
-  const { user, token } = useAuth();
+  const { user, token } = useAuthContext();
 
   return useMutation<User, Error, UpdateUserPayload>({
     mutationFn: async (values) => {

@@ -12,7 +12,7 @@ import {
   Title,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useAuth } from '../auth/useAuth';
+import { useAuthContext } from '../auth/useAuthContext';
 
 interface InvitationDetails {
   id: string;
@@ -26,7 +26,7 @@ interface InvitationDetails {
 export function InvitationPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { token: authToken, isAuthenticated } = useAuth();
+  const { token: authToken, isAuthenticated } = useAuthContext();
 
   const invitationToken = searchParams.get('token');
   const email = searchParams.get('email');

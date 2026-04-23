@@ -42,7 +42,7 @@ const theme = createTheme({
   },
 });
 import { Notifications } from '@mantine/notifications';
-import { AuthProvider } from './auth/AuthContext.tsx';
+import { AuthContextProvider } from './auth/AuthContextProvider.tsx';
 import { DashboardPage } from './pages/DashboardPage.tsx';
 import './main.css';
 import '@mantine/core/styles.css';
@@ -74,7 +74,7 @@ createRoot(document.getElementById('root')!).render(
     <MantineProvider theme={theme}>
       <Notifications />
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
+        <AuthContextProvider>
           <BrowserRouter>
             <Routes>
               <Route path="verify-email" element={<ConfirmEmailPage />} />
@@ -113,7 +113,7 @@ createRoot(document.getElementById('root')!).render(
               </Route>
             </Routes>
           </BrowserRouter>
-        </AuthProvider>
+        </AuthContextProvider>
       </QueryClientProvider>
     </MantineProvider>
   </StrictMode>,

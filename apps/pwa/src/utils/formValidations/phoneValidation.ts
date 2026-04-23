@@ -1,5 +1,7 @@
-export function phoneValidation(v: string) {
-  if (!v) return null;
+export function phoneValidation(v: string | null) {
+  if (!v) {
+    return null;
+  }
   const digits = v.replace(/\s/g, '');
   return /^\d{10}$/.test(digits) ? null : 'Enter 10 digits';
 }

@@ -14,7 +14,7 @@ import {
 } from '@tabler/icons-react';
 import { Box, Title } from '@mantine/core';
 import classes from './AppNavigation.module.css';
-import { useAuth } from '../auth/useAuth';
+import { useAuthContext } from '../auth/useAuthContext';
 import { useNavigate } from 'react-router';
 import type { MouseEvent } from 'react';
 
@@ -23,7 +23,7 @@ interface AppNavigationProps {
 }
 
 export function AppNavigation({ onNavigate }: AppNavigationProps) {
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuthContext();
   const navigate = useNavigate();
 
   const navigateSection =

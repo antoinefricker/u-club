@@ -4,24 +4,16 @@ import {
   useQueryClient,
   keepPreviousData,
 } from '@tanstack/react-query';
-import { useAuth } from '../auth/useAuth';
+import { useAuthContext } from '../auth/useAuthContext';
 import {
   buildListQueryString,
   type Paginated,
   type PaginationArgs,
-} from './pagination';
-
-interface Club {
-  id: string;
-  name: string;
-  code: string;
-  description: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
+} from '../utils/pagination';
+import type { Club } from '../types/Club';
 
 function useAuthHeaders() {
-  const { token } = useAuth();
+  const { token } = useAuthContext();
   return {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,

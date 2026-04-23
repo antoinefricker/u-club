@@ -5,8 +5,8 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { AuthContext } from './authContextValue';
 import type { User } from '../types/User';
+import { AuthContext } from './useAuthContext';
 
 const TOKEN_KEY = 'access_token';
 
@@ -26,7 +26,7 @@ async function fetchUser(userId: string, token: string): Promise<User> {
   return res.json();
 }
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthContextProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(() =>
     localStorage.getItem(TOKEN_KEY),
   );

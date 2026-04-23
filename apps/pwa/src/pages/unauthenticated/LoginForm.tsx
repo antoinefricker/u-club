@@ -11,8 +11,8 @@ import {
   Text,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useAuth } from '../auth/useAuth';
-import { emailValidation } from '../forms/validations/emailValidation';
+import { useAuthContext } from '../../auth/useAuthContext';
+import { emailValidation } from '../../utils/formValidations/emailValidation';
 
 interface LoginFormProps {
   onSwitchMode: () => void;
@@ -20,7 +20,7 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ onSwitchMode, onForgotPassword }: LoginFormProps) {
-  const { login } = useAuth();
+  const { login } = useAuthContext();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);

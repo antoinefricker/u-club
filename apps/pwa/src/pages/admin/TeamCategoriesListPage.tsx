@@ -8,10 +8,10 @@ import {
   Table,
 } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
-import { PageTitle } from '../../layout/PageTitle';
-import { ListFilters } from '../../layout/ListFilters';
-import { ListPagination } from '../../layout/ListPagination';
-import { EmptyListRow } from '../../layout/EmptyListRow';
+import { PageTitle } from '../../components/layout/PageTitle';
+import { ListFilters } from '../../components/admin/lists/ListFilters';
+import { ListPagination } from '../../components/admin/lists/ListPagination';
+import { EmptyListRow } from '../../components/admin/lists/EmptyListRow';
 import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import {

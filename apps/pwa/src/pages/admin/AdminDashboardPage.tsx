@@ -1,5 +1,5 @@
 import { SimpleGrid, Paper, Stack, Text } from '@mantine/core';
-import { PageTitle } from '../../layout/PageTitle';
+import { PageTitle } from '../../components/layout/PageTitle';
 import { IconShieldHalf, IconUsers, IconShirtSport } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
 

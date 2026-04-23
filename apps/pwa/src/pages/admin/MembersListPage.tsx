@@ -12,13 +12,15 @@ import { useDebouncedValue } from '@mantine/hooks';
 import { IconEdit, IconSearch, IconTrash, IconX } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { useEffect, useRef, useState } from 'react';
-import { PageTitle } from '../../layout/PageTitle';
-import { ListFilters } from '../../layout/ListFilters';
-import { ListPagination } from '../../layout/ListPagination';
+import { PageTitle } from '../../components/layout/PageTitle';
+import { ListFilters } from '../../components/admin/lists/ListFilters';
+import { ListPagination } from '../../components/admin/lists/ListPagination';
+import { EmptyListRow } from '../../components/admin/lists/EmptyListRow';
 import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import { useMembers, useDeleteMember } from '../../hooks/useMembers';
 import { useTeams } from '../../hooks/useTeams';
+import { MEMBER_GENDER_LABELS } from '../../types/Member';
 import { usePagination } from '../../hooks/usePagination';
 import { useListFilters } from '../../hooks/useListFilters';
 
@@ -139,6 +141,7 @@ export function MembersListPage() {
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
+          {members?.length === 0 && <EmptyListRow colSpan={6} />}
           {members?.map((member) => (
             <Table.Tr key={member.id}>
               <Table.Td>{member.firstName}</Table.Td>
@@ -148,7 +151,7 @@ export function MembersListPage() {
                   ? dayjs(member.birthdate).format('DD/MM/YYYY')
                   : '—'}
               </Table.Td>
-              <Table.Td>{member.gender}</Table.Td>
+              <Table.Td>{MEMBER_GENDER_LABELS[member.gender]}</Table.Td>
               <Table.Td>{member.statusLabel ?? ''}</Table.Td>
               <Table.Td>
                 <Group gap="xs" justify="flex-end">

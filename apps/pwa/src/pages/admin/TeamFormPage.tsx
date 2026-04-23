@@ -11,9 +11,10 @@ import {
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useNavigate, useParams } from 'react-router';
-import { FormWrapper } from '../../layout/FormWrapper';
-import { PageTitle } from '../../layout/PageTitle';
+import { FormWrapper } from '../../components/admin/forms/FormWrapper';
+import { PageTitle } from '../../components/layout/PageTitle';
 import { useTeam, useCreateTeam, useUpdateTeam } from '../../hooks/useTeams';
+import { TEAM_GENDER_OPTIONS, type TeamGender } from '../../types/Team';
 import { useClubs } from '../../hooks/useClubs';
 import { useTeamCategories } from '../../hooks/useTeamCategories';
 
@@ -30,7 +31,13 @@ export function TeamFormPage() {
   const clubOptions =
     clubs?.data.map((c) => ({ value: c.id, label: c.name })) ?? [];
 
-  const form = useForm({
+  const form = useForm<{
+    label: string;
+    clubId: string;
+    gender: TeamGender | '';
+    description: string;
+    categoryId: string;
+  }>({
     initialValues: {
       label: '',
       clubId: '',
@@ -68,6 +75,7 @@ export function TeamFormPage() {
   const handleSubmit = (values: typeof form.values) => {
     const payload = {
       ...values,
+      gender: values.gender as TeamGender,
       description: values.description || null,
       categoryId: values.categoryId || null,
     };
@@ -146,11 +154,7 @@ export function TeamFormPage() {
               <Select
                 label="Gender"
                 placeholder="Select gender"
-                data={[
-                  { value: 'male', label: 'Male' },
-                  { value: 'female', label: 'Female' },
-                  { value: 'both', label: 'Both' },
-                ]}
+                data={TEAM_GENDER_OPTIONS}
                 required
                 {...form.getInputProps('gender')}
               />

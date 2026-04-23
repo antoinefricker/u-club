@@ -161,7 +161,7 @@ const options: swaggerJsdoc.Options = {
             birthdate: { type: 'string', format: 'date', nullable: true },
             gender: {
               type: 'string',
-              enum: ['male', 'female', 'mixed'],
+              enum: ['male', 'female'],
             },
             createdAt: { type: 'string', format: 'date-time' },
             updatedAt: { type: 'string', format: 'date-time' },
@@ -177,7 +177,7 @@ const options: swaggerJsdoc.Options = {
             birthdate: { type: 'string', format: 'date', nullable: true },
             gender: {
               type: 'string',
-              enum: ['male', 'female', 'mixed'],
+              enum: ['male', 'female'],
             },
           },
         },
@@ -190,7 +190,7 @@ const options: swaggerJsdoc.Options = {
             birthdate: { type: 'string', format: 'date', nullable: true },
             gender: {
               type: 'string',
-              enum: ['male', 'female', 'mixed'],
+              enum: ['male', 'female'],
             },
           },
         },

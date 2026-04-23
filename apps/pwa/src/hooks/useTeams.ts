@@ -4,26 +4,13 @@ import {
   useQueryClient,
   keepPreviousData,
 } from '@tanstack/react-query';
-import { useAuth } from '../auth/useAuth';
+import { useAuthContext } from '../auth/useAuthContext';
 import {
   buildListQueryString,
   type Paginated,
   type PaginationArgs,
-} from './pagination';
-
-export type TeamGender = 'male' | 'female' | 'mixed';
-
-interface Team {
-  id: string;
-  clubId: string;
-  categoryId: string | null;
-  label: string;
-  gender: TeamGender;
-  description: string | null;
-  categoryLabel: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
+} from '../utils/pagination';
+import type { Team, TeamGender } from '../types/Team';
 
 interface UseTeamsArgs extends PaginationArgs {
   clubId?: string;
@@ -32,7 +19,7 @@ interface UseTeamsArgs extends PaginationArgs {
 }
 
 function useAuthHeaders() {
-  const { token } = useAuth();
+  const { token } = useAuthContext();
   return {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,

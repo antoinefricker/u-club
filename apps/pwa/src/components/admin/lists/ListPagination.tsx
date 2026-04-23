@@ -1,5 +1,5 @@
 import { Group, Pagination, Select, Space, Text } from '@mantine/core';
-import { usePagination } from '../hooks/usePagination';
+import { usePagination } from '../../../hooks/usePagination';
 
 interface ListPaginationProps {
   totalPages: number;

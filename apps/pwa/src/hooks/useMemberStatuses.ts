@@ -1,18 +1,14 @@
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { useAuth } from '../auth/useAuth';
+import { useAuthContext } from '../auth/useAuthContext';
 import {
   buildListQueryString,
   type Paginated,
   type PaginationArgs,
-} from './pagination';
-
-interface MemberStatus {
-  id: string;
-  label: string;
-}
+} from '../utils/pagination';
+import type { MemberStatus } from '../types/MemberStatus';
 
 function useAuthHeaders() {
-  const { token } = useAuth();
+  const { token } = useAuthContext();
   return {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,
