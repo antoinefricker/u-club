@@ -12,6 +12,7 @@ import {
   useUpdateMember,
 } from '../../hooks/useMembers';
 import { useMemberStatuses } from '../../hooks/useMemberStatuses';
+import { MEMBER_GENDER_OPTIONS, type MemberGender } from '../../types/Member';
 
 export function MemberFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -26,7 +27,13 @@ export function MemberFormPage() {
   const statusOptions =
     statusesData?.data.map((s) => ({ value: s.id, label: s.label })) ?? [];
 
-  const form = useForm({
+  const form = useForm<{
+    firstName: string;
+    lastName: string;
+    gender: MemberGender | '';
+    birthdate: string;
+    statusId: string;
+  }>({
     initialValues: {
       firstName: '',
       lastName: '',
@@ -59,6 +66,7 @@ export function MemberFormPage() {
   const handleSubmit = (values: typeof form.values) => {
     const payload = {
       ...values,
+      gender: values.gender as MemberGender,
       birthdate: values.birthdate || null,
       statusId: values.statusId || null,
     };
@@ -122,11 +130,7 @@ export function MemberFormPage() {
               <Select
                 label="Gender"
                 placeholder="Select gender"
-                data={[
-                  { value: 'male', label: 'Male' },
-                  { value: 'female', label: 'Female' },
-                  { value: 'mixed', label: 'Mixed' },
-                ]}
+                data={MEMBER_GENDER_OPTIONS}
                 required
                 {...form.getInputProps('gender')}
               />

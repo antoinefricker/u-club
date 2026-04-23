@@ -20,6 +20,7 @@ import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import { useMembers, useDeleteMember } from '../../hooks/useMembers';
 import { useTeams } from '../../hooks/useTeams';
+import { MEMBER_GENDER_LABELS } from '../../types/Member';
 import { usePagination } from '../../hooks/usePagination';
 import { useListFilters } from '../../hooks/useListFilters';
 
@@ -150,7 +151,7 @@ export function MembersListPage() {
                   ? dayjs(member.birthdate).format('DD/MM/YYYY')
                   : '—'}
               </Table.Td>
-              <Table.Td>{member.gender}</Table.Td>
+              <Table.Td>{MEMBER_GENDER_LABELS[member.gender]}</Table.Td>
               <Table.Td>{member.statusLabel ?? ''}</Table.Td>
               <Table.Td>
                 <Group gap="xs" justify="flex-end">
