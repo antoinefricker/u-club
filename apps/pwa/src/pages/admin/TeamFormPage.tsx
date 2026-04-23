@@ -14,7 +14,7 @@ import { useNavigate, useParams } from 'react-router';
 import { FormWrapper } from '../../layout/FormWrapper';
 import { PageTitle } from '../../layout/PageTitle';
 import { useTeam, useCreateTeam, useUpdateTeam } from '../../hooks/useTeams';
-import type { TeamGender } from '../../types/Team';
+import { TEAM_GENDER_OPTIONS, type TeamGender } from '../../types/Team';
 import { useClubs } from '../../hooks/useClubs';
 import { useTeamCategories } from '../../hooks/useTeamCategories';
 
@@ -154,11 +154,7 @@ export function TeamFormPage() {
               <Select
                 label="Gender"
                 placeholder="Select gender"
-                data={[
-                  { value: 'male', label: 'Male' },
-                  { value: 'female', label: 'Female' },
-                  { value: 'mixed', label: 'Mixed' },
-                ]}
+                data={TEAM_GENDER_OPTIONS}
                 required
                 {...form.getInputProps('gender')}
               />
