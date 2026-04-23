@@ -30,6 +30,7 @@ interface RowEdit {
 
 export function UserRelationships({
   userId,
+  useUserPointOfView,
   memberId,
 }: UserRelationshipsProps) {
   const bothProvided = !!(userId && memberId);
@@ -143,16 +144,15 @@ export function UserRelationships({
       </Alert>
     );
 
-  const typeOptions =
-    mode === 'member'
-      ? [
-          { value: 'self', label: 'This is them' },
-          { value: 'relative', label: 'This is a relative' },
-        ]
-      : [
-          { value: 'self', label: "It's me!" },
-          { value: 'relative', label: "It's a relative" },
-        ];
+  const typeOptions = useUserPointOfView
+    ? [
+        { value: 'self', label: "It's me!" },
+        { value: 'relative', label: "It's a relative" },
+      ]
+    : [
+        { value: 'self', label: 'This is them' },
+        { value: 'relative', label: 'This is a relative' },
+      ];
 
   return (
     <Table>
@@ -160,7 +160,7 @@ export function UserRelationships({
         <Table.Tr>
           <Table.Th w={24}>#</Table.Th>
           <Table.Th>{mode === 'member' ? 'User' : 'Member'}</Table.Th>
-          <Table.Th w={180}>Type</Table.Th>
+          <Table.Th w={240}>Type</Table.Th>
           <Table.Th w={80} />
         </Table.Tr>
       </Table.Thead>
@@ -269,9 +269,9 @@ export function UserRelationships({
                       size="sm"
                       style={{ flexShrink: 0, flexBasis: 'auto' }}
                     >
-                      {mode === 'member'
-                        ? `${rel.userDisplayName} is ${rel.memberFirstName}'s`
-                        : `I am ${rel.memberFirstName}'s`}
+                      {useUserPointOfView
+                        ? `I am ${rel.memberFirstName}'s`
+                        : `${rel.userDisplayName} is ${rel.memberFirstName}'s`}
                     </Text>
                     <TextInput
                       size="sm"
@@ -298,5 +298,6 @@ export function UserRelationships({
 
 type UserRelationshipsProps = {
   userId?: string;
+  useUserPointOfView: boolean;
   memberId?: string;
 };

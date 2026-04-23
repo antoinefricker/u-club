@@ -9,18 +9,18 @@ export function AccountPage() {
     <>
       <PageTitle label="My account" />
 
-      <Title order={3} mt="xl" mb="md">
-        Account details
-      </Title>
       <FormWrapper>
+        <Title order={3} mt="xl" mb="md">
+          Account details
+        </Title>
         <AccountEditForm />
       </FormWrapper>
 
-      <Title order={3} mt="xl" mb="md">
-        Family & members
-      </Title>
       <FormWrapper>
-        <UserRelationships />
+        <Title order={3} mt="xl" mb="md">
+          Family & members
+        </Title>
+        <UserRelationships useUserPointOfView={true} />
       </FormWrapper>
     </>
   );

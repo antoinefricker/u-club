@@ -1,5 +1,13 @@
 import { useEffect } from 'react';
-import { Button, Grid, Group, Loader, Select, TextInput } from '@mantine/core';
+import {
+  Button,
+  Grid,
+  Group,
+  Loader,
+  Select,
+  TextInput,
+  Title,
+} from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import dayjs from 'dayjs';
@@ -173,7 +181,10 @@ export function MemberFormPage() {
         </form>
       </FormWrapper>
       <FormWrapper>
-        <UserRelationships memberId={member?.id} />
+        <Title order={3} mt="xl" mb="md">
+          Family & members
+        </Title>
+        <UserRelationships memberId={member?.id} useUserPointOfView={false} />
       </FormWrapper>
     </>
   );
