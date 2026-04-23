@@ -59,6 +59,14 @@ When creating or editing views in the PWA app:
 - Resource fetching hooks use `placeholderData: keepPreviousData` and include pagination + filters in the query key (`['<resource>', { page, itemsPerPage, ...filters }]`).
 - Changing a filter must reset `page` to 1 (naturally handled by `useListFilters` stripping `page` from the URL on filter change).
 
+### React contexts
+
+When creating or refactoring a React context, follow the `AuthContextProvider` / `useAuthContext` pattern:
+
+- Provider component: `XxxContextProvider` (not `XxxProvider`), in `XxxContextProvider.tsx`.
+- Hook: `useXxxContext` (not `useXxx`), co-located with the `XxxContextValue` type and `createContext` call in `useXxxContext.ts` — all three live together, no separate `xxxContextValue.ts` file.
+- The hook throws when used outside the provider, with a message naming both `useXxxContext` and `XxxContextProvider`.
+
 ## Pull Requests
 
 - Do not create a PR unless the user explicitly asks for it.
