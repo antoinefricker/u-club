@@ -2,7 +2,7 @@ import { Title } from '@mantine/core';
 import { PageTitle } from '../components/layout/PageTitle';
 import { FormWrapper } from '../components/admin/forms/FormWrapper';
 import { AccountEditForm } from './AccountEditForm';
-import { UserRelationships } from '../components/admin/user/UserRelationships';
+import { UserMemberLinks } from '../components/admin/user/UserMemberLinks';
 
 export function AccountPage() {
   return (
@@ -20,7 +20,7 @@ export function AccountPage() {
         <Title order={3} mt="xl" mb="md">
           Family & members
         </Title>
-        <UserRelationships useUserPointOfView={true} />
+        <UserMemberLinks useUserPointOfView={true} />
       </FormWrapper>
     </>
   );

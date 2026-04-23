@@ -28,11 +28,11 @@ interface RowEdit {
   description: string;
 }
 
-export function UserRelationships({
+export function UserMemberLinks({
   userId,
   useUserPointOfView,
   memberId,
-}: UserRelationshipsProps) {
+}: UserMemberLinksProps) {
   const bothProvided = !!(userId && memberId);
   const mode: 'user' | 'member' = memberId ? 'member' : 'user';
   const { data, isLoading, error } = useUserMembers({
@@ -46,9 +46,7 @@ export function UserRelationships({
   const [edits, setEdits] = useState<Record<string, RowEdit>>({});
 
   if (bothProvided) {
-    console.warn(
-      'UserRelationships: pass either userId or memberId, not both.',
-    );
+    console.warn('UserMemberLinks: pass either userId or memberId, not both.');
     return null;
   }
 
@@ -296,7 +294,7 @@ export function UserRelationships({
   );
 }
 
-type UserRelationshipsProps = {
+type UserMemberLinksProps = {
   userId?: string;
   useUserPointOfView: boolean;
   memberId?: string;

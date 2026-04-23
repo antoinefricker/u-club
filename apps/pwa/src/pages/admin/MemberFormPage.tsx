@@ -21,7 +21,7 @@ import {
 } from '../../hooks/useMembers';
 import { useMemberStatuses } from '../../hooks/useMemberStatuses';
 import { MEMBER_GENDER_OPTIONS, type MemberGender } from '../../types/Member';
-import { UserRelationships } from '../../components/admin/user/UserRelationships';
+import { UserMemberLinks } from '../../components/admin/user/UserMemberLinks';
 
 export function MemberFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -184,7 +184,7 @@ export function MemberFormPage() {
         <Title order={3} mt="xl" mb="md">
           Family & members
         </Title>
-        <UserRelationships memberId={member?.id} useUserPointOfView={false} />
+        <UserMemberLinks memberId={member?.id} useUserPointOfView={false} />
       </FormWrapper>
     </>
   );
