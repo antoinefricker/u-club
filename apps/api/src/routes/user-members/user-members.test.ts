@@ -59,6 +59,10 @@ const { default: app } = await import('../../app.js');
 const adminToken = createTestToken('uuid-admin', 'admin@example.com', 'admin');
 const userToken = createTestToken('uuid-1', 'user@example.com', 'user');
 
+const USER_UUID_1 = '11111111-1111-1111-8111-111111111111';
+const USER_UUID_OTHER = '22222222-2222-2222-8222-222222222222';
+const MEMBER_UUID_1 = '33333333-3333-3333-8333-333333333333';
+
 const sampleUserMember = {
   id: 'um-1',
   userId: 'uuid-1',
@@ -116,25 +120,128 @@ describe('GET /user-members', () => {
     mockList([sampleUserMember], 1);
 
     const res = await request(app)
-      .get('/user-members?userId=uuid-1')
+      .get(`/user-members?userId=${USER_UUID_1}`)
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(res.status).toBe(200);
-    expect(mockWhere).toHaveBeenCalledWith('userMembers.userId', 'uuid-1');
+    expect(mockWhere).toHaveBeenCalledWith('userMembers.userId', USER_UUID_1);
+  });
+
+  it('applies memberId filter when admin passes it', async () => {
+    mockList([sampleUserMember], 1);
+
+    const res = await request(app)
+      .get(`/user-members?memberId=${MEMBER_UUID_1}`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(mockWhere).toHaveBeenCalledWith(
+      'userMembers.memberId',
+      MEMBER_UUID_1,
+    );
+  });
+
+  it('applies memberId filter when manager passes it', async () => {
+    const managerToken = createTestToken(
+      'uuid-manager',
+      'manager@example.com',
+      'manager',
+    );
+    mockList([sampleUserMember], 1);
+
+    const res = await request(app)
+      .get(`/user-members?memberId=${MEMBER_UUID_1}`)
+      .set('Authorization', `Bearer ${managerToken}`);
+
+    expect(res.status).toBe(200);
+    expect(mockWhere).toHaveBeenCalledWith(
+      'userMembers.memberId',
+      MEMBER_UUID_1,
+    );
+  });
+
+  it('returns 400 when userId and memberId are both provided', async () => {
+    const res = await request(app)
+      .get(`/user-members?userId=${USER_UUID_1}&memberId=${MEMBER_UUID_1}`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'validation error');
+    expect(res.body.details).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          message: 'userId and memberId are mutually exclusive',
+        }),
+      ]),
+    );
+  });
+
+  it('returns 400 when userId is not a UUID', async () => {
+    const res = await request(app)
+      .get('/user-members?userId=not-a-uuid')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'validation error');
+  });
+
+  it('returns 400 when memberId is not a UUID', async () => {
+    const res = await request(app)
+      .get('/user-members?memberId=not-a-uuid')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'validation error');
+  });
+
+  it('selects joined user and member identity fields', async () => {
+    mockList([sampleUserMember], 1);
+
+    await request(app)
+      .get('/user-members')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(mockSelect).toHaveBeenCalledWith(
+      'userMembers.id',
+      'userMembers.userId',
+      'userMembers.memberId',
+      'userMembers.type',
+      'userMembers.description',
+      'userMembers.createdAt',
+      'members.firstName as memberFirstName',
+      'members.lastName as memberLastName',
+      'users.displayName as userDisplayName',
+      'users.email as userEmail',
+    );
   });
 
   it('restricts regular users to their own userId and ignores userId query param', async () => {
     mockList([sampleUserMember], 1);
 
     const res = await request(app)
-      .get('/user-members?userId=uuid-other')
+      .get(`/user-members?userId=${USER_UUID_OTHER}`)
       .set('Authorization', `Bearer ${userToken}`);
 
     expect(res.status).toBe(200);
     expect(mockWhere).toHaveBeenCalledWith('userMembers.userId', 'uuid-1');
     expect(mockWhere).not.toHaveBeenCalledWith(
       'userMembers.userId',
-      'uuid-other',
+      USER_UUID_OTHER,
+    );
+  });
+
+  it('restricts regular users to their own userId and ignores memberId query param', async () => {
+    mockList([sampleUserMember], 1);
+
+    const res = await request(app)
+      .get(`/user-members?memberId=${MEMBER_UUID_1}`)
+      .set('Authorization', `Bearer ${userToken}`);
+
+    expect(res.status).toBe(200);
+    expect(mockWhere).toHaveBeenCalledWith('userMembers.userId', 'uuid-1');
+    expect(mockWhere).not.toHaveBeenCalledWith(
+      'userMembers.memberId',
+      MEMBER_UUID_1,
     );
   });
 
