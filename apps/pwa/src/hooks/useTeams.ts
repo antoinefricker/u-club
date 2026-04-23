@@ -9,7 +9,7 @@ import {
   buildListQueryString,
   type Paginated,
   type PaginationArgs,
-} from './pagination';
+} from '../utils/pagination';
 
 export type TeamGender = 'male' | 'female' | 'mixed';
 

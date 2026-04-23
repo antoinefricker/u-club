@@ -4,7 +4,7 @@ import {
   buildListQueryString,
   type Paginated,
   type PaginationArgs,
-} from './pagination';
+} from '../utils/pagination';
 
 interface MemberStatus {
   id: string;
