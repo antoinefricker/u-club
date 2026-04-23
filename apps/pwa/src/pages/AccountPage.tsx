@@ -2,7 +2,7 @@ import { Title } from '@mantine/core';
 import { PageTitle } from '../components/layout/PageTitle';
 import { FormWrapper } from '../components/admin/forms/FormWrapper';
 import { AccountEditForm } from './AccountEditForm';
-import { UserRelationships } from './UserRelationships';
+import { UserRelationships } from '../components/admin/user/UserRelationships';
 
 export function AccountPage() {
   return (

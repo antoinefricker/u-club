@@ -21,15 +21,18 @@ import {
   useUserMembers,
   useUpdateUserMember,
   useDeleteUserMember,
-} from '../hooks/useUserMembers';
+} from '../../../hooks/useUserMembers';
 
 interface RowEdit {
   type: string;
   description: string;
 }
 
-export function UserRelationships() {
-  const { data, isLoading, error } = useUserMembers({ itemsPerPage: 100 });
+export function UserRelationships({ userId }: UserRelationshipsProps) {
+  const { data, isLoading, error } = useUserMembers({
+    itemsPerPage: 100,
+    userId,
+  });
   const relationships = data?.data;
   const updateMutation = useUpdateUserMember();
   const deleteMutation = useDeleteUserMember();
@@ -260,3 +263,7 @@ export function UserRelationships() {
     </Table>
   );
 }
+
+type UserRelationshipsProps = {
+  userId?: string;
+};
