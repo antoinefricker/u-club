@@ -3,7 +3,7 @@ import { AppShell, Burger, Group } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { AppNavigation } from './AppNavigation';
 import { useAuthContext } from '../auth/useAuthContext';
-import { Unauthenticated } from './Unauthenticated';
+import { Unauthenticated } from '../pages/unauthenticated/Unauthenticated';
 
 interface PageLayoutProps {
   children: ReactNode;

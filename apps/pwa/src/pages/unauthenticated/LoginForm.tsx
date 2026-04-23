@@ -11,8 +11,8 @@ import {
   Text,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useAuthContext } from '../auth/useAuthContext';
-import { emailValidation } from '../utils/formValidations/emailValidation';
+import { useAuthContext } from '../../auth/useAuthContext';
+import { emailValidation } from '../../utils/formValidations/emailValidation';
 
 interface LoginFormProps {
   onSwitchMode: () => void;

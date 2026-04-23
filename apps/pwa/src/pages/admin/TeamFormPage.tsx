@@ -11,8 +11,8 @@ import {
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useNavigate, useParams } from 'react-router';
-import { FormWrapper } from '../../layout/FormWrapper';
-import { PageTitle } from '../../layout/PageTitle';
+import { FormWrapper } from '../../components/admin/forms/FormWrapper';
+import { PageTitle } from '../../components/layout/PageTitle';
 import { useTeam, useCreateTeam, useUpdateTeam } from '../../hooks/useTeams';
 import { TEAM_GENDER_OPTIONS, type TeamGender } from '../../types/Team';
 import { useClubs } from '../../hooks/useClubs';

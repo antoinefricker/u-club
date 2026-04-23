@@ -4,8 +4,8 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import dayjs from 'dayjs';
 import { useNavigate, useParams } from 'react-router';
-import { FormWrapper } from '../../layout/FormWrapper';
-import { PageTitle } from '../../layout/PageTitle';
+import { FormWrapper } from '../../components/admin/forms/FormWrapper';
+import { PageTitle } from '../../components/layout/PageTitle';
 import {
   useMember,
   useCreateMember,

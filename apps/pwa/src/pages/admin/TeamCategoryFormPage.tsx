@@ -3,8 +3,8 @@ import { Button, Grid, Group, Loader, Select, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useNavigate, useParams } from 'react-router';
-import { FormWrapper } from '../../layout/FormWrapper';
-import { PageTitle } from '../../layout/PageTitle';
+import { FormWrapper } from '../../components/admin/forms/FormWrapper';
+import { PageTitle } from '../../components/layout/PageTitle';
 import {
   useTeamCategory,
   useCreateTeamCategory,
