@@ -11,7 +11,7 @@ import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { PageTitle } from '../../layout/PageTitle';
 import { ListFilters } from '../../layout/ListFilters';
 import { ListPagination } from '../../layout/ListPagination';
-import { EmptyListRow } from '../../layout/EmptyListRow';
+import { EmptyListRow } from '../../components/admin/list/EmptyListRow';
 import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import {
