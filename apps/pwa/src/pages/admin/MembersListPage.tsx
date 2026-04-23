@@ -15,6 +15,7 @@ import { useEffect, useRef, useState } from 'react';
 import { PageTitle } from '../../layout/PageTitle';
 import { ListFilters } from '../../layout/ListFilters';
 import { ListPagination } from '../../layout/ListPagination';
+import { EmptyListRow } from '../../components/admin/list/EmptyListRow';
 import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import { useMembers, useDeleteMember } from '../../hooks/useMembers';
@@ -139,6 +140,7 @@ export function MembersListPage() {
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
+          {members?.length === 0 && <EmptyListRow colSpan={6} />}
           {members?.map((member) => (
             <Table.Tr key={member.id}>
               <Table.Td>{member.firstName}</Table.Td>

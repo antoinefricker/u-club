@@ -2,6 +2,7 @@ import { ActionIcon, Alert, Button, Group, Loader, Table } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { PageTitle } from '../../layout/PageTitle';
 import { ListPagination } from '../../layout/ListPagination';
+import { EmptyListRow } from '../../components/admin/list/EmptyListRow';
 import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import { useClubs, useDeleteClub } from '../../hooks/useClubs';
@@ -51,6 +52,7 @@ export function ClubsListPage() {
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
+          {clubs?.length === 0 && <EmptyListRow colSpan={4} />}
           {clubs?.map((club) => (
             <Table.Tr key={club.id}>
               <Table.Td>{club.name}</Table.Td>
