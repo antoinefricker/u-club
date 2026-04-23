@@ -1,19 +1,45 @@
 # Roadmap
 
-## Bugfixes
+## Prioritized
 
-- [ ] Can't define team category in team create/update form
-- [ ] Admin/member: (edit/show) display relationships, invite CTA, pending invitations
+### 1. Rearrange PWA folders structure
 
-## Architecture & Data model
+- create a `components` folder
+  - forms
+  - users
+  - members
+  - teams
+  - clubs
+  - events
 
-- Teams categories CRUD
+### 2. Admin
+
+- Member
+  - Show member related team assignements
+  - Create/Edit/Delete member team assignements
+  - Show member relationships
+  - Create/edit/delete member relationships
+  - Show member pending invitations
+  - Send invite
 - Member statuses CRUD
-- **Complex users**
-  - users that are not members (parents or relative)
-  - club_users` join table to link users directly to clubs without being members (janitor, secretary, volunteer). Gives non-member users a club context.
-- **Create events entity**
-  — core version
+
+### 3. User
+
+- Remove my clubs page
+- Remove my teams page
+- Implement dashboard
+  - Show self team assignements
+  - Show self relationships
+  - Show pending invitations
+- Team page
+  - Info
+  - Members and roles
+  - Add one entry per team in the menu
+  - Add links to teams pages in user dashboard
+
+### 4. Events
+
+- Events CRUD
   - linked to a club or a team
   - columns:
     - label
@@ -22,6 +48,38 @@
   - out of scope
     - recurring events
     - events templates
+- Timeline display
+- Teams filters
+- Relationships filters
+- Add events preview in team page
+- Add events preview in dashboard
+
+### 5. Pages
+
+- Markdown editor
+  - typography
+  - separator
+  - download link
+  - grid
+
+### 6. Media library
+
+- CRUD images
+- CRUD files
+- insert image in markdown
+
+### 7. Publication
+
+- Internationalization with react-i18next (French/English)
+- Production env
+
+## Later features
+
+### Architecture & Data model
+
+- **Complex users**
+  - users that are not members (parents or relative)
+  - club_users` join table to link users directly to clubs without being members (janitor, secretary, volunteer). Gives non-member users a club context.
 - **Recurring events**
   — deal with weekly trainings
 - **Events templates**
@@ -44,22 +102,17 @@
 - **Protected route wrapper (PWA)**
   — Redirect unauthenticated users on the React side instead of relying on API 401s
 
-## Testing
+### Testing & documentation
 
+- documentation/bruno/ has no members/ or member-statuses/ directories, so those routes still lack Bruno coverage
 - **E2e auth tests** — Cover email confirmation flow and role-based access denial in Playwright
 - **E2e registration & invitation tests** — Full registration flow (register → verify email → login) and invitation flow (send invite → accept → relationship created) in Playwright
 - **Screenshot script** — Playwright script to take authenticated screenshots of PWA pages for PR descriptions
 - **Integration test suite** — Tests hitting a real test database to complement unit tests with mocks
 - **Database seeding for tests** — Shared fixtures for consistent test data
 
-## Developer experience
+### PWA
 
-- **API client generation** — Auto-generate a typed API client from Swagger spec for the PWA
-
-## PWA
-
-- Add search filter (last name, first name/ birthdate) in MEMBERS list
-- documentation/bruno/ has no members/ or member-statuses/ directories, so those routes still lack Bruno coverage
 - apps/pwa has no test framework, so usePagination / useListFilters rely on type safety + integration-level verification
 - **One time password**
 - **PWA polish**
@@ -67,13 +120,6 @@
   - offline fallback page
   - theme color / splash screen
   - push notifications
-- **Club page**
-  - events
-  - teams
-- **Team page**
-  - events
-  - members
-  - todos
 - **Calendar page**
   - filter by club
   - filter by date range
@@ -81,4 +127,3 @@
   - export
 - **i18n** — Internationalization with react-i18next (French/English)
 - **Loading/error states** — Add loading skeletons and error boundaries to pages
-- **Admin teams — category filter** — Add a category filter on `/admin/teams` (may require team_categories endpoints: list at minimum, possibly CRUD)
