@@ -13,6 +13,7 @@ import {
 } from '../../hooks/useMembers';
 import { useMemberStatuses } from '../../hooks/useMemberStatuses';
 import { MEMBER_GENDER_OPTIONS, type MemberGender } from '../../types/Member';
+import { UserRelationships } from '../../components/admin/user/UserRelationships';
 
 export function MemberFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -170,6 +171,9 @@ export function MemberFormPage() {
             </Grid.Col>
           </Grid>
         </form>
+      </FormWrapper>
+      <FormWrapper>
+        <UserRelationships memberId={member?.id} />
       </FormWrapper>
     </>
   );

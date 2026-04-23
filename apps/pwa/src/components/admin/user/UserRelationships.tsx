@@ -28,15 +28,28 @@ interface RowEdit {
   description: string;
 }
 
-export function UserRelationships({ userId }: UserRelationshipsProps) {
+export function UserRelationships({
+  userId,
+  memberId,
+}: UserRelationshipsProps) {
+  const bothProvided = !!(userId && memberId);
+  const mode: 'user' | 'member' = memberId ? 'member' : 'user';
   const { data, isLoading, error } = useUserMembers({
     itemsPerPage: 100,
-    userId,
+    userId: bothProvided ? undefined : userId,
+    memberId: bothProvided ? undefined : memberId,
   });
   const relationships = data?.data;
   const updateMutation = useUpdateUserMember();
   const deleteMutation = useDeleteUserMember();
   const [edits, setEdits] = useState<Record<string, RowEdit>>({});
+
+  if (bothProvided) {
+    console.warn(
+      'UserRelationships: pass either userId or memberId, not both.',
+    );
+    return null;
+  }
 
   const getEdit = (rel: {
     id: string;
@@ -126,16 +139,27 @@ export function UserRelationships({ userId }: UserRelationshipsProps) {
   if (!relationships?.length)
     return (
       <Alert color="blue" variant="light">
-        No linked members yet.
+        {mode === 'member' ? 'No linked users yet.' : 'No linked members yet.'}
       </Alert>
     );
+
+  const typeOptions =
+    mode === 'member'
+      ? [
+          { value: 'self', label: 'This is them' },
+          { value: 'relative', label: 'This is a relative' },
+        ]
+      : [
+          { value: 'self', label: "It's me!" },
+          { value: 'relative', label: "It's a relative" },
+        ];
 
   return (
     <Table>
       <Table.Thead>
         <Table.Tr>
           <Table.Th w={24}>#</Table.Th>
-          <Table.Th>Member</Table.Th>
+          <Table.Th>{mode === 'member' ? 'User' : 'Member'}</Table.Th>
           <Table.Th w={180}>Type</Table.Th>
           <Table.Th w={80} />
         </Table.Tr>
@@ -165,18 +189,24 @@ export function UserRelationships({ userId }: UserRelationshipsProps) {
                 <Table.Td
                   style={{ paddingBottom: showDescription ? 4 : undefined }}
                 >
-                  <Text fw={700}>
-                    {rel.memberFirstName} {rel.memberLastName}
-                  </Text>
+                  {mode === 'member' ? (
+                    <>
+                      <Text fw={700}>{rel.userDisplayName}</Text>
+                      <Text size="xs" c="dimmed">
+                        {rel.userEmail}
+                      </Text>
+                    </>
+                  ) : (
+                    <Text fw={700}>
+                      {rel.memberFirstName} {rel.memberLastName}
+                    </Text>
+                  )}
                 </Table.Td>
                 <Table.Td
                   style={{ paddingBottom: showDescription ? 4 : undefined }}
                 >
                   <Select
-                    data={[
-                      { value: 'self', label: "It's me!" },
-                      { value: 'relative', label: "It's a relative" },
-                    ]}
+                    data={typeOptions}
                     value={edit.type}
                     onChange={(v) =>
                       v && setEdit(rel.id, { type: v, description: '' })
@@ -239,7 +269,9 @@ export function UserRelationships({ userId }: UserRelationshipsProps) {
                       size="sm"
                       style={{ flexShrink: 0, flexBasis: 'auto' }}
                     >
-                      I am {rel.memberFirstName}'s
+                      {mode === 'member'
+                        ? `${rel.userDisplayName} is ${rel.memberFirstName}'s`
+                        : `I am ${rel.memberFirstName}'s`}
                     </Text>
                     <TextInput
                       size="sm"
@@ -266,4 +298,5 @@ export function UserRelationships({ userId }: UserRelationshipsProps) {
 
 type UserRelationshipsProps = {
   userId?: string;
+  memberId?: string;
 };
