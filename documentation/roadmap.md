@@ -2,57 +2,49 @@
 
 ## Prioritized
 
-### 1. Rearrange PWA folders structure
+### 1. ~~Rearrange PWA folders structure~~
 
-- create a `components` folder
-  - forms
-  - users
-  - members
-  - teams
-  - clubs
-  - events
+- [x] create a `components` folder to locate reusable components
+- [x] extract resource/domain types and constants to types folder
+- [x] general boyscouting
 
 ### 2. Admin
 
-- Member
-  - Show member related team assignements
-  - Create/Edit/Delete member team assignements
-  - Show member relationships
-  - Create/edit/delete member relationships
-  - Show member pending invitations
-  - Send invite
-- Member statuses CRUD
+- [ ] Member list
+  - [ ] Fix search filter UI
+  - [ ] Show member related team assignements
+  - [ ] Create/Edit/Delete member team assignements
+  - [ ] Show member relationships
+  - [ ] Create/edit/delete member relationships
+  - [ ] Show member pending invitations
+  - [ ] Send invite
+- [ ] Member statuses CRUD
 
 ### 3. User
 
-- Remove my clubs page
-- Remove my teams page
-- Implement dashboard
-  - Show self team assignements
-  - Show self relationships
-  - Show pending invitations
-- Team page
-  - Info
-  - Members and roles
-  - Add one entry per team in the menu
-  - Add links to teams pages in user dashboard
+- [ ] Remove my clubs page
+- [ ] Remove my teams page
+- [ ] Implement dashboard
+  - [ ] Show self team assignements
+  - [ ] Show self relationships
+  - [ ] Show pending invitations
+- [ ] Team page
+  - [ ] Info
+  - [ ] Members and roles
+  - [ ] Add one entry per team in the menu
+  - [ ] Add links to teams pages in user dashboard
 
 ### 4. Events
 
-- Events CRUD
-  - linked to a club or a team
-  - columns:
-    - label
-    - date
-    - place
-  - out of scope
-    - recurring events
-    - events templates
-- Timeline display
-- Teams filters
-- Relationships filters
-- Add events preview in team page
-- Add events preview in dashboard
+- [ ] Events CRUD
+  - [ ] linked to a club or a team
+  - [ ] columns: label/date/place/visibility(team/relationships/...)
+  - out of scope: recurring events and events templates
+- [ ] Timeline display
+- [ ] Teams filters
+- [ ] Relationships filters
+- [ ] Add events preview in team page
+- [ ] Add events preview in dashboard
 
 ### 5. Pages
 
