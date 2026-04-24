@@ -18,9 +18,9 @@ function useAuthHeaders() {
 
 export function useMembers(args: UseMembersArgs = {}) {
     const { page, itemsPerPage, teamId, search } = args;
-    const headers = useAuthHeaders();
+    const { token } = useAuthContext();
     return useQuery<Paginated<Member>>({
-        queryKey: ['members', { page, itemsPerPage, teamId, search }],
+        queryKey: ['members', { page, itemsPerPage, teamId, search, token }],
         queryFn: async () => {
             const qs = buildListQueryString({
                 page,
@@ -28,7 +28,12 @@ export function useMembers(args: UseMembersArgs = {}) {
                 teamId,
                 search,
             });
-            const res = await fetch(`/api/members${qs}`, { headers });
+            const res = await fetch(`/api/members${qs}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             if (!res.ok) throw new Error('Failed to fetch members');
             return res.json();
         },
@@ -37,11 +42,16 @@ export function useMembers(args: UseMembersArgs = {}) {
 }
 
 export function useMember(id: string) {
-    const headers = useAuthHeaders();
+    const { token } = useAuthContext();
     return useQuery<Member>({
-        queryKey: ['members', 'detail', id],
+        queryKey: ['members', 'detail', id, token],
         queryFn: async () => {
-            const res = await fetch(`/api/members/${id}`, { headers });
+            const res = await fetch(`/api/members/${id}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             if (!res.ok) throw new Error('Failed to fetch member');
             return res.json();
         },

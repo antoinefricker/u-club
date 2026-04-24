@@ -17,12 +17,17 @@ function useAuthHeaders() {
 
 export function useTeamCategories(args: UseTeamCategoriesArgs = {}) {
     const { page, itemsPerPage, clubId } = args;
-    const headers = useAuthHeaders();
+    const { token } = useAuthContext();
     return useQuery<Paginated<TeamCategory>>({
-        queryKey: ['team-categories', { page, itemsPerPage, clubId }],
+        queryKey: ['team-categories', { page, itemsPerPage, clubId, token }],
         queryFn: async () => {
             const qs = buildListQueryString({ page, itemsPerPage, clubId });
-            const res = await fetch(`/api/team-categories${qs}`, { headers });
+            const res = await fetch(`/api/team-categories${qs}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             if (!res.ok) throw new Error('Failed to fetch team categories');
             return res.json();
         },
@@ -31,11 +36,16 @@ export function useTeamCategories(args: UseTeamCategoriesArgs = {}) {
 }
 
 export function useTeamCategory(id: string) {
-    const headers = useAuthHeaders();
+    const { token } = useAuthContext();
     return useQuery<TeamCategory>({
-        queryKey: ['team-categories', id],
+        queryKey: ['team-categories', id, token],
         queryFn: async () => {
-            const res = await fetch(`/api/team-categories/${id}`, { headers });
+            const res = await fetch(`/api/team-categories/${id}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             if (!res.ok) throw new Error('Failed to fetch team category');
             return res.json();
         },

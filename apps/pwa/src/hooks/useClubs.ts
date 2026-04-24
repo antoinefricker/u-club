@@ -13,12 +13,17 @@ function useAuthHeaders() {
 
 export function useClubs(args: PaginationArgs = {}) {
     const { page, itemsPerPage } = args;
-    const headers = useAuthHeaders();
+    const { token } = useAuthContext();
     return useQuery<Paginated<Club>>({
-        queryKey: ['clubs', { page, itemsPerPage }],
+        queryKey: ['clubs', { page, itemsPerPage, token }],
         queryFn: async () => {
             const qs = buildListQueryString({ page, itemsPerPage });
-            const res = await fetch(`/api/clubs${qs}`, { headers });
+            const res = await fetch(`/api/clubs${qs}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             if (!res.ok) throw new Error('Failed to fetch clubs');
             return res.json();
         },
@@ -27,11 +32,16 @@ export function useClubs(args: PaginationArgs = {}) {
 }
 
 export function useClub(id: string) {
-    const headers = useAuthHeaders();
+    const { token } = useAuthContext();
     return useQuery<Club>({
-        queryKey: ['clubs', id],
+        queryKey: ['clubs', id, token],
         queryFn: async () => {
-            const res = await fetch(`/api/clubs/${id}`, { headers });
+            const res = await fetch(`/api/clubs/${id}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             if (!res.ok) throw new Error('Failed to fetch club');
             return res.json();
         },

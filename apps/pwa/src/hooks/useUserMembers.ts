@@ -18,14 +18,10 @@ function useAuthHeaders() {
 
 export function useUserMembers(args: UseUserMembersArgs = {}) {
     const { token, user } = useAuthContext();
-    const headers = {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-    };
     const { page, itemsPerPage, memberId } = args;
     const userId = memberId ? args.userId : (args.userId ?? user?.id);
     return useQuery<Paginated<UserMember>>({
-        queryKey: ['user-members', { page, itemsPerPage, userId, memberId }],
+        queryKey: ['user-members', { page, itemsPerPage, userId, memberId, token }],
         queryFn: async () => {
             const qs = buildListQueryString({
                 page,
@@ -33,7 +29,12 @@ export function useUserMembers(args: UseUserMembersArgs = {}) {
                 userId,
                 memberId,
             });
-            const res = await fetch(`/api/user-members${qs}`, { headers });
+            const res = await fetch(`/api/user-members${qs}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             if (!res.ok) throw new Error('Failed to fetch relationships');
             return res.json();
         },
