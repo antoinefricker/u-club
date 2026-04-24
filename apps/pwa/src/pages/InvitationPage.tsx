@@ -118,7 +118,7 @@ export function InvitationPage() {
                 <Paper shadow="sm" p="xl" radius="md" w="100%" maw={400}>
                     <Stack>
                         <Title order={3} ta="center">
-                            You've been invited!
+                            You&apos;ve been invited!
                         </Title>
                         <Alert color="blue" variant="light">
                             Please log in or create an account to accept this invitation.
@@ -172,7 +172,7 @@ export function InvitationPage() {
 
                         {invitation && (
                             <Alert color="blue" variant="light">
-                                You've been invited to link with{' '}
+                                You&apos;ve been invited to link with{' '}
                                 <strong>
                                     {invitation.memberFirstName} {invitation.memberLastName}
                                 </strong>
