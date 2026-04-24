@@ -1,26 +1,14 @@
 import { useState } from 'react';
 import { IconMail } from '@tabler/icons-react';
 import { PhoneInput } from '../components/inputs/PhoneInput';
-import {
-    Alert,
-    Anchor,
-    Button,
-    Grid,
-    PasswordInput,
-    Text,
-    TextInput,
-    Textarea,
-} from '@mantine/core';
+import { Alert, Anchor, Button, Grid, PasswordInput, Text, TextInput, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useAuthContext } from '../auth/useAuthContext';
 import { useUserUpdate, type UpdateUserPayload } from '../hooks/useUserUpdate';
 import { emailValidation } from '../utils/formValidations/emailValidation';
 import { phoneValidation } from '../utils/formValidations/phoneValidation';
-import {
-    passwordValidation,
-    confirmPasswordValidation,
-} from '../utils/formValidations/passwordValidation';
+import { passwordValidation, confirmPasswordValidation } from '../utils/formValidations/passwordValidation';
 
 type AccountFormValues = UpdateUserPayload & {
     password: string;
@@ -43,8 +31,7 @@ export function AccountEditForm() {
             confirmPassword: '',
         },
         validate: {
-            displayName: (v) =>
-                v.trim().length > 0 ? null : 'Display name is required',
+            displayName: (v) => (v.trim().length > 0 ? null : 'Display name is required'),
             email: emailValidation,
             phone: phoneValidation,
             password: passwordValidation,
@@ -84,11 +71,7 @@ export function AccountEditForm() {
                 )}
 
                 <Grid.Col span={{ base: 12, sm: 6 }}>
-                    <TextInput
-                        label="Display name"
-                        required
-                        {...form.getInputProps('displayName')}
-                    />
+                    <TextInput label="Display name" required {...form.getInputProps('displayName')} />
                 </Grid.Col>
                 {user?.role !== 'user' && (
                     <Grid.Col span={{ base: 12, sm: 6 }}>
@@ -107,19 +90,11 @@ export function AccountEditForm() {
                 </Grid.Col>
 
                 <Grid.Col span={{ base: 12, sm: 6 }}>
-                    <PhoneInput
-                        {...form.getInputProps('phone')}
-                        onChange={(v) => form.setFieldValue('phone', v)}
-                    />
+                    <PhoneInput {...form.getInputProps('phone')} onChange={(v) => form.setFieldValue('phone', v)} />
                 </Grid.Col>
 
                 <Grid.Col span={12}>
-                    <Textarea
-                        label="Bio"
-                        rows={3}
-                        resize="vertical"
-                        {...form.getInputProps('bio')}
-                    />
+                    <Textarea label="Bio" rows={3} resize="vertical" {...form.getInputProps('bio')} />
                 </Grid.Col>
 
                 <Grid.Col span={12}>
@@ -132,9 +107,7 @@ export function AccountEditForm() {
                         fw="bold"
                         onClick={() => setShowPassword(!showPassword)}
                     >
-                        {showPassword
-                            ? 'Cancel password change'
-                            : 'Change password'}
+                        {showPassword ? 'Cancel password change' : 'Change password'}
                     </Anchor>
                     {showPassword && (
                         <Text size="sm" c="dimmed" mt={-10}>
@@ -145,29 +118,16 @@ export function AccountEditForm() {
                 {showPassword && (
                     <>
                         <Grid.Col span={{ base: 12, sm: 6 }}>
-                            <PasswordInput
-                                label="New password"
-                                {...form.getInputProps('password')}
-                            />
+                            <PasswordInput label="New password" {...form.getInputProps('password')} />
                         </Grid.Col>
                         <Grid.Col span={{ base: 12, sm: 6 }}>
-                            <PasswordInput
-                                label="Confirm password"
-                                {...form.getInputProps('confirmPassword')}
-                            />
+                            <PasswordInput label="Confirm password" {...form.getInputProps('confirmPassword')} />
                         </Grid.Col>
                     </>
                 )}
 
-                <Grid.Col
-                    span={12}
-                    style={{ display: 'flex', justifyContent: 'flex-end' }}
-                >
-                    <Button
-                        type="submit"
-                        color="success"
-                        loading={mutation.isPending}
-                    >
+                <Grid.Col span={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button type="submit" color="success" loading={mutation.isPending}>
                         Save changes
                     </Button>
                 </Grid.Col>

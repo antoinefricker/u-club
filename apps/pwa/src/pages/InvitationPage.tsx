@@ -1,16 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router';
-import {
-    Alert,
-    Button,
-    Loader,
-    Paper,
-    Select,
-    Stack,
-    Text,
-    TextInput,
-    Title,
-} from '@mantine/core';
+import { Alert, Button, Loader, Paper, Select, Stack, Text, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useAuthContext } from '../auth/useAuthContext';
 
@@ -34,9 +24,7 @@ export function InvitationPage() {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [invitation, setInvitation] = useState<InvitationDetails | null>(
-        null,
-    );
+    const [invitation, setInvitation] = useState<InvitationDetails | null>(null);
     const [accepted, setAccepted] = useState(false);
     const [accepting, setAccepting] = useState(false);
 
@@ -84,20 +72,17 @@ export function InvitationPage() {
         setError(null);
 
         try {
-            const res = await fetch(
-                `/api/invitations/${invitation.id}/accept`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${authToken}`,
-                    },
-                    body: JSON.stringify({
-                        type: values.type,
-                        description: values.description || null,
-                    }),
+            const res = await fetch(`/api/invitations/${invitation.id}/accept`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${authToken}`,
                 },
-            );
+                body: JSON.stringify({
+                    type: values.type,
+                    description: values.description || null,
+                }),
+            });
 
             if (!res.ok) {
                 const body = await res.json();
@@ -136,8 +121,7 @@ export function InvitationPage() {
                             You've been invited!
                         </Title>
                         <Alert color="blue" variant="light">
-                            Please log in or create an account to accept this
-                            invitation.
+                            Please log in or create an account to accept this invitation.
                         </Alert>
                         <Button fullWidth onClick={() => navigate('/')}>
                             Log in or Register
@@ -190,8 +174,7 @@ export function InvitationPage() {
                             <Alert color="blue" variant="light">
                                 You've been invited to link with{' '}
                                 <strong>
-                                    {invitation.memberFirstName}{' '}
-                                    {invitation.memberLastName}
+                                    {invitation.memberFirstName} {invitation.memberLastName}
                                 </strong>
                             </Alert>
                         )}

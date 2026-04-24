@@ -20,9 +20,7 @@ export async function seedClear(force: boolean) {
     await checkDbConnection();
 
     if (!force) {
-        const shouldContinue = await confirm(
-            'This will delete ALL data. Continue?',
-        );
+        const shouldContinue = await confirm('This will delete ALL data. Continue?');
         if (!shouldContinue) {
             Logger.info('Aborted.');
             await db.destroy();

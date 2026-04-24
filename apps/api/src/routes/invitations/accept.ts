@@ -1,9 +1,6 @@
 import { Router, Request, Response } from 'express';
 import db from '../../db.js';
-import {
-    requireAuth,
-    type AuthenticatedRequest,
-} from '../../middleware/auth.js';
+import { requireAuth, type AuthenticatedRequest } from '../../middleware/auth.js';
 import { validate } from '../../middleware/validate.js';
 import { acceptInvitationSchema } from '../../schemas/invitation.js';
 
@@ -65,52 +62,47 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post(
-    '/:id/accept',
-    requireAuth,
-    validate(acceptInvitationSchema),
-    async (req: Request, res: Response) => {
-        const user = (req as AuthenticatedRequest).user;
-        const { id } = req.params;
-        const { type, description } = req.body;
+router.post('/:id/accept', requireAuth, validate(acceptInvitationSchema), async (req: Request, res: Response) => {
+    const user = (req as AuthenticatedRequest).user;
+    const { id } = req.params;
+    const { type, description } = req.body;
 
-        const invitation = await db('memberInvitations').where({ id }).first();
-        if (!invitation) {
-            res.status(404).json({ error: 'invitation not found' });
-            return;
-        }
+    const invitation = await db('memberInvitations').where({ id }).first();
+    if (!invitation) {
+        res.status(404).json({ error: 'invitation not found' });
+        return;
+    }
 
-        if (invitation.acceptedAt) {
-            res.status(400).json({ error: 'invitation already accepted' });
-            return;
-        }
+    if (invitation.acceptedAt) {
+        res.status(400).json({ error: 'invitation already accepted' });
+        return;
+    }
 
-        if (new Date(invitation.expiresAt) < new Date()) {
-            res.status(400).json({ error: 'invitation has expired' });
-            return;
-        }
+    if (new Date(invitation.expiresAt) < new Date()) {
+        res.status(400).json({ error: 'invitation has expired' });
+        return;
+    }
 
-        const userRecord = await db('users').where({ id: user.id }).first();
-        if (!userRecord || userRecord.email !== invitation.email) {
-            res.status(403).json({ error: 'email does not match invitation' });
-            return;
-        }
+    const userRecord = await db('users').where({ id: user.id }).first();
+    if (!userRecord || userRecord.email !== invitation.email) {
+        res.status(403).json({ error: 'email does not match invitation' });
+        return;
+    }
 
-        await db.transaction(async (trx) => {
-            await trx('userMembers').insert({
-                userId: user.id,
-                memberId: invitation.memberId,
-                type: type ?? invitation.type,
-                description: description ?? invitation.description ?? null,
-            });
-
-            await trx('memberInvitations').where({ id }).update({
-                acceptedAt: new Date(),
-            });
+    await db.transaction(async (trx) => {
+        await trx('userMembers').insert({
+            userId: user.id,
+            memberId: invitation.memberId,
+            type: type ?? invitation.type,
+            description: description ?? invitation.description ?? null,
         });
 
-        res.json({ message: 'invitation accepted' });
-    },
-);
+        await trx('memberInvitations').where({ id }).update({
+            acceptedAt: new Date(),
+        });
+    });
+
+    res.json({ message: 'invitation accepted' });
+});
 
 export default router;

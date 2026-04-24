@@ -1,14 +1,4 @@
-import {
-    ActionIcon,
-    Alert,
-    Anchor,
-    Button,
-    Group,
-    Loader,
-    Select,
-    Table,
-    TextInput,
-} from '@mantine/core';
+import { ActionIcon, Alert, Anchor, Button, Group, Loader, Select, Table, TextInput } from '@mantine/core';
 import { useDebouncedValue } from '@mantine/hooks';
 import { IconEdit, IconSearch, IconTrash, IconX } from '@tabler/icons-react';
 import dayjs from 'dayjs';
@@ -71,8 +61,7 @@ export function MembersListPage() {
     const members = membersData?.data;
     const pagination = membersData?.pagination;
 
-    const teamOptions =
-        teams?.map((t) => ({ value: t.id, label: t.label })) ?? [];
+    const teamOptions = teams?.map((t) => ({ value: t.id, label: t.label })) ?? [];
 
     const handleDelete = (id: string, name: string) => {
         if (!window.confirm(`Delete member "${name}"?`)) return;
@@ -93,9 +82,7 @@ export function MembersListPage() {
     return (
         <>
             <PageTitle label="Members">
-                <Button onClick={() => navigate('/admin/members/new')}>
-                    New member
-                </Button>
+                <Button onClick={() => navigate('/admin/members/new')}>New member</Button>
             </PageTitle>
 
             <ListFilters>
@@ -154,26 +141,14 @@ export function MembersListPage() {
                                     {member.firstName} {member.lastName}
                                 </Anchor>
                             </Table.Td>
-                            <Table.Td>
-                                {member.birthdate
-                                    ? dayjs(member.birthdate).format(
-                                          'DD/MM/YYYY',
-                                      )
-                                    : '—'}
-                            </Table.Td>
-                            <Table.Td>
-                                {MEMBER_GENDER_LABELS[member.gender]}
-                            </Table.Td>
+                            <Table.Td>{member.birthdate ? dayjs(member.birthdate).format('DD/MM/YYYY') : '—'}</Table.Td>
+                            <Table.Td>{MEMBER_GENDER_LABELS[member.gender]}</Table.Td>
                             <Table.Td>{member.statusLabel ?? ''}</Table.Td>
                             <Table.Td>
                                 <Group gap="xs" justify="flex-end">
                                     <ActionIcon
                                         variant="subtle"
-                                        onClick={() =>
-                                            navigate(
-                                                `/admin/members/${member.id}`,
-                                            )
-                                        }
+                                        onClick={() => navigate(`/admin/members/${member.id}`)}
                                     >
                                         <IconEdit size={18} />
                                     </ActionIcon>
@@ -181,10 +156,7 @@ export function MembersListPage() {
                                         variant="subtle"
                                         color="red"
                                         onClick={() =>
-                                            handleDelete(
-                                                member.id,
-                                                `${member.firstName} ${member.lastName}`,
-                                            )
+                                            handleDelete(member.id, `${member.firstName} ${member.lastName}`)
                                         }
                                     >
                                         <IconTrash size={18} />

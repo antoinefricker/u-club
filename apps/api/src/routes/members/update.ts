@@ -60,16 +60,7 @@ router.put(
         const [member] = await db('members')
             .where({ id })
             .update(updates)
-            .returning([
-                'id',
-                'statusId',
-                'firstName',
-                'lastName',
-                'birthdate',
-                'gender',
-                'createdAt',
-                'updatedAt',
-            ]);
+            .returning(['id', 'statusId', 'firstName', 'lastName', 'birthdate', 'gender', 'createdAt', 'updatedAt']);
 
         if (!member) {
             res.status(404).json({ error: 'member not found' });

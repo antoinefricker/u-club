@@ -41,9 +41,7 @@ describe('POST /auth/forgot_password', () => {
     it('should return 200 if user not found (silent, no email sent)', async () => {
         mockFirst.mockResolvedValueOnce(undefined);
 
-        const res = await request(app)
-            .post('/auth/forgot_password')
-            .send({ email: 'nobody@example.com' });
+        const res = await request(app).post('/auth/forgot_password').send({ email: 'nobody@example.com' });
 
         expect(res.status).toBe(200);
         expect(res.body).toHaveProperty('message', 'password reset email sent');
@@ -56,9 +54,7 @@ describe('POST /auth/forgot_password', () => {
             email: 'test@example.com',
         });
 
-        const res = await request(app)
-            .post('/auth/forgot_password')
-            .send({ email: 'test@example.com' });
+        const res = await request(app).post('/auth/forgot_password').send({ email: 'test@example.com' });
 
         expect(res.status).toBe(200);
         expect(res.body).toHaveProperty('message', 'password reset email sent');
@@ -72,9 +68,7 @@ describe('POST /auth/forgot_password', () => {
             email: 'test@example.com',
         });
 
-        await request(app)
-            .post('/auth/forgot_password')
-            .send({ email: 'test@example.com' });
+        await request(app).post('/auth/forgot_password').send({ email: 'test@example.com' });
 
         expect(mockDel).toHaveBeenCalledTimes(1);
         expect(mockInsert).toHaveBeenCalledWith(
@@ -92,9 +86,7 @@ describe('POST /auth/forgot_password', () => {
         });
 
         const before = Date.now();
-        await request(app)
-            .post('/auth/forgot_password')
-            .send({ email: 'test@example.com' });
+        await request(app).post('/auth/forgot_password').send({ email: 'test@example.com' });
         const after = Date.now();
 
         const insertArg = mockInsert.mock.calls[0][0];
@@ -110,9 +102,7 @@ describe('POST /auth/forgot_password', () => {
             email: 'user+alias@example.com',
         });
 
-        await request(app)
-            .post('/auth/forgot_password')
-            .send({ email: 'user+alias@example.com' });
+        await request(app).post('/auth/forgot_password').send({ email: 'user+alias@example.com' });
 
         const mailArg = mockSendMail.mock.calls[0][0];
         expect(mailArg.to).toBe('user+alias@example.com');

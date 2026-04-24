@@ -1,9 +1,6 @@
 import { z } from 'zod';
 
-const birthdateSchema = z.iso
-    .date({ error: 'birthdate must be a YYYY-MM-DD date' })
-    .nullable()
-    .optional();
+const birthdateSchema = z.iso.date({ error: 'birthdate must be a YYYY-MM-DD date' }).nullable().optional();
 
 export const createMemberSchema = z.object({
     firstName: z.string({ error: 'firstName is required' }),

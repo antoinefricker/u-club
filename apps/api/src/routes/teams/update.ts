@@ -60,16 +60,7 @@ router.put(
         const [team] = await db('teams')
             .where({ id })
             .update(updates)
-            .returning([
-                'id',
-                'clubId',
-                'categoryId',
-                'label',
-                'gender',
-                'description',
-                'createdAt',
-                'updatedAt',
-            ]);
+            .returning(['id', 'clubId', 'categoryId', 'label', 'gender', 'description', 'createdAt', 'updatedAt']);
 
         if (!team) {
             res.status(404).json({ error: 'team not found' });

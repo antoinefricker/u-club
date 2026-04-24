@@ -1,12 +1,5 @@
 import { useEffect } from 'react';
-import {
-    Button,
-    Grid,
-    Group,
-    Loader,
-    TextInput,
-    Textarea,
-} from '@mantine/core';
+import { Button, Grid, Group, Loader, TextInput, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useNavigate, useParams } from 'react-router';
@@ -89,20 +82,10 @@ export function ClubFormPage() {
                 <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
                     <Grid gutter="md">
                         <Grid.Col span={{ base: 12, sm: 6 }}>
-                            <TextInput
-                                label="Name"
-                                placeholder="Club name"
-                                required
-                                {...form.getInputProps('name')}
-                            />
+                            <TextInput label="Name" placeholder="Club name" required {...form.getInputProps('name')} />
                         </Grid.Col>
                         <Grid.Col span={{ base: 12, sm: 6 }}>
-                            <TextInput
-                                label="Code"
-                                placeholder="Club code"
-                                required
-                                {...form.getInputProps('code')}
-                            />
+                            <TextInput label="Code" placeholder="Club code" required {...form.getInputProps('code')} />
                         </Grid.Col>
                         <Grid.Col span={12}>
                             <Textarea
@@ -113,19 +96,10 @@ export function ClubFormPage() {
                         </Grid.Col>
                         <Grid.Col span={12}>
                             <Group>
-                                <Button
-                                    type="submit"
-                                    loading={
-                                        createClub.isPending ||
-                                        updateClub.isPending
-                                    }
-                                >
+                                <Button type="submit" loading={createClub.isPending || updateClub.isPending}>
                                     {isEdit ? 'Update' : 'Create'}
                                 </Button>
-                                <Button
-                                    variant="subtle"
-                                    onClick={() => navigate('/admin/clubs')}
-                                >
+                                <Button variant="subtle" onClick={() => navigate('/admin/clubs')}>
                                     Cancel
                                 </Button>
                             </Group>

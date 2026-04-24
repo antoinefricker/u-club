@@ -1,15 +1,6 @@
-import {
-    useQuery,
-    useMutation,
-    useQueryClient,
-    keepPreviousData,
-} from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { useAuthContext } from '../auth/useAuthContext';
-import {
-    buildListQueryString,
-    type Paginated,
-    type PaginationArgs,
-} from '../utils/pagination';
+import { buildListQueryString, type Paginated, type PaginationArgs } from '../utils/pagination';
 import type { Team, TeamGender } from '../types/Team';
 
 interface UseTeamsArgs extends PaginationArgs {

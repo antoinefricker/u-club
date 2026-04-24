@@ -1,14 +1,5 @@
 import { useState } from 'react';
-import {
-    TextInput,
-    Button,
-    Stack,
-    Title,
-    Alert,
-    Paper,
-    Anchor,
-    Text,
-} from '@mantine/core';
+import { TextInput, Button, Stack, Title, Alert, Paper, Anchor, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { emailValidation } from '../../utils/formValidations/emailValidation';
 
@@ -47,9 +38,7 @@ export function ForgotPasswordForm({ onSwitchMode }: ForgotPasswordFormProps) {
 
             setSubmitted(true);
         } catch (err) {
-            setError(
-                err instanceof Error ? err.message : 'Something went wrong',
-            );
+            setError(err instanceof Error ? err.message : 'Something went wrong');
         } finally {
             setLoading(false);
         }
@@ -64,15 +53,10 @@ export function ForgotPasswordForm({ onSwitchMode }: ForgotPasswordFormProps) {
                             Check your email
                         </Title>
                         <Alert color="blue" variant="light">
-                            If an account exists for that email, we sent a
-                            password reset link. Check your inbox.
+                            If an account exists for that email, we sent a password reset link. Check your inbox.
                         </Alert>
                         <Text size="sm" ta="center">
-                            <Anchor
-                                component="button"
-                                type="button"
-                                onClick={onSwitchMode}
-                            >
+                            <Anchor component="button" type="button" onClick={onSwitchMode}>
                                 Back to login
                             </Anchor>
                         </Text>
@@ -110,11 +94,7 @@ export function ForgotPasswordForm({ onSwitchMode }: ForgotPasswordFormProps) {
                         </Button>
 
                         <Text size="sm" ta="center">
-                            <Anchor
-                                component="button"
-                                type="button"
-                                onClick={onSwitchMode}
-                            >
+                            <Anchor component="button" type="button" onClick={onSwitchMode}>
                                 Back to login
                             </Anchor>
                         </Text>

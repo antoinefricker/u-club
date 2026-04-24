@@ -39,37 +39,24 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post(
-    '/',
-    requireAuth,
-    requireRole('admin'),
-    validate(createClubSchema),
-    async (req: Request, res: Response) => {
-        const { name, code, description } = req.body;
+router.post('/', requireAuth, requireRole('admin'), validate(createClubSchema), async (req: Request, res: Response) => {
+    const { name, code, description } = req.body;
 
-        const existing = await db('clubs').where({ code }).first();
-        if (existing) {
-            res.status(409).json({ error: 'code already in use' });
-            return;
-        }
+    const existing = await db('clubs').where({ code }).first();
+    if (existing) {
+        res.status(409).json({ error: 'code already in use' });
+        return;
+    }
 
-        const [club] = await db('clubs')
-            .insert({
-                name,
-                code,
-                description: description || null,
-            })
-            .returning([
-                'id',
-                'name',
-                'code',
-                'description',
-                'createdAt',
-                'updatedAt',
-            ]);
+    const [club] = await db('clubs')
+        .insert({
+            name,
+            code,
+            description: description || null,
+        })
+        .returning(['id', 'name', 'code', 'description', 'createdAt', 'updatedAt']);
 
-        res.status(201).json(club);
-    },
-);
+    res.status(201).json(club);
+});
 
 export default router;

@@ -84,9 +84,7 @@ describe('GET /member-statuses', () => {
     it('returns envelope with defaults when no query params', async () => {
         mockList([sampleStatus], 1);
 
-        const res = await request(app)
-            .get('/member-statuses')
-            .set('Authorization', `Bearer ${adminToken}`);
+        const res = await request(app).get('/member-statuses').set('Authorization', `Bearer ${adminToken}`);
 
         expect(res.status).toBe(200);
         expect(res.body).toEqual({
@@ -118,9 +116,7 @@ describe('GET /member-statuses', () => {
     it('returns empty envelope when no statuses', async () => {
         mockList([], 0);
 
-        const res = await request(app)
-            .get('/member-statuses')
-            .set('Authorization', `Bearer ${adminToken}`);
+        const res = await request(app).get('/member-statuses').set('Authorization', `Bearer ${adminToken}`);
 
         expect(res.body).toEqual({
             data: [],
@@ -135,30 +131,20 @@ describe('GET /member-statuses', () => {
 
     it('orders results by id ascending', async () => {
         mockList([sampleStatus], 1);
-        await request(app)
-            .get('/member-statuses')
-            .set('Authorization', `Bearer ${adminToken}`);
+        await request(app).get('/member-statuses').set('Authorization', `Bearer ${adminToken}`);
         expect(mockOrderBy).toHaveBeenCalledWith('id', 'asc');
     });
 
-    it.each([['page=0'], ['itemsPerPage=101']])(
-        'returns 400 for %s',
-        async (qs) => {
-            const res = await request(app)
-                .get(`/member-statuses?${qs}`)
-                .set('Authorization', `Bearer ${adminToken}`);
-            expect(res.status).toBe(400);
-            expect(res.body).toHaveProperty('error', 'validation error');
-        },
-    );
+    it.each([['page=0'], ['itemsPerPage=101']])('returns 400 for %s', async (qs) => {
+        const res = await request(app).get(`/member-statuses?${qs}`).set('Authorization', `Bearer ${adminToken}`);
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'validation error');
+    });
 });
 
 describe('POST /member-statuses', () => {
     it('should return 400 if label is missing', async () => {
-        const res = await request(app)
-            .post('/member-statuses')
-            .set('Authorization', `Bearer ${adminToken}`)
-            .send({});
+        const res = await request(app).post('/member-statuses').set('Authorization', `Bearer ${adminToken}`).send({});
 
         expect(res.status).toBe(400);
         expect(res.body).toHaveProperty('error', 'validation error');
@@ -254,9 +240,7 @@ describe('DELETE /member-statuses/:id', () => {
     it('should delete and return 204', async () => {
         mockDel.mockResolvedValueOnce(1);
 
-        const res = await request(app)
-            .delete('/member-statuses/status-1')
-            .set('Authorization', `Bearer ${adminToken}`);
+        const res = await request(app).delete('/member-statuses/status-1').set('Authorization', `Bearer ${adminToken}`);
 
         expect(res.status).toBe(204);
     });

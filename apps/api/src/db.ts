@@ -5,8 +5,7 @@ import knex from 'knex';
 const db = knex({
     client: 'pg',
     connection: process.env.DATABASE_URL,
-    wrapIdentifier: (value, origImpl) =>
-        origImpl(value === '*' ? value : snakeCase(value)),
+    wrapIdentifier: (value, origImpl) => origImpl(value === '*' ? value : snakeCase(value)),
     postProcessResponse: (result) => {
         if (Array.isArray(result)) {
             return result.map((row) =>

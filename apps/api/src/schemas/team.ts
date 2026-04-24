@@ -10,10 +10,7 @@ export const createTeamSchema = z.object({
     label: z.string({ error: 'label is required' }),
     gender: teamGenderSchema,
     description: z.string().nullable().optional(),
-    categoryId: z
-        .uuid({ error: 'categoryId must be a valid uuid' })
-        .nullable()
-        .optional(),
+    categoryId: z.uuid({ error: 'categoryId must be a valid uuid' }).nullable().optional(),
 });
 
 export const updateTeamSchema = z
@@ -21,10 +18,7 @@ export const updateTeamSchema = z
         label: z.string().optional(),
         gender: teamGenderSchema.optional(),
         description: z.string().nullable().optional(),
-        categoryId: z
-            .uuid({ error: 'categoryId must be a valid uuid' })
-            .nullable()
-            .optional(),
+        categoryId: z.uuid({ error: 'categoryId must be a valid uuid' }).nullable().optional(),
     })
     .refine((data) => Object.keys(data).length > 0, {
         message: 'no valid fields to update',

@@ -1,15 +1,6 @@
-import {
-    useQuery,
-    useMutation,
-    useQueryClient,
-    keepPreviousData,
-} from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { useAuthContext } from '../auth/useAuthContext';
-import {
-    buildListQueryString,
-    type Paginated,
-    type PaginationArgs,
-} from '../utils/pagination';
+import { buildListQueryString, type Paginated, type PaginationArgs } from '../utils/pagination';
 import type { TeamCategory } from '../types/TeamCategory';
 
 interface UseTeamCategoriesArgs extends PaginationArgs {
@@ -68,8 +59,7 @@ export function useCreateTeamCategory() {
             }
             return res.json();
         },
-        onSuccess: () =>
-            queryClient.invalidateQueries({ queryKey: ['team-categories'] }),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['team-categories'] }),
     });
 }
 
@@ -89,8 +79,7 @@ export function useUpdateTeamCategory() {
             }
             return res.json();
         },
-        onSuccess: () =>
-            queryClient.invalidateQueries({ queryKey: ['team-categories'] }),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['team-categories'] }),
     });
 }
 
@@ -105,7 +94,6 @@ export function useDeleteTeamCategory() {
             });
             if (!res.ok) throw new Error('Failed to delete team category');
         },
-        onSuccess: () =>
-            queryClient.invalidateQueries({ queryKey: ['team-categories'] }),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['team-categories'] }),
     });
 }

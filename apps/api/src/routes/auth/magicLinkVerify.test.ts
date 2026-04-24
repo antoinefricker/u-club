@@ -46,9 +46,7 @@ describe('POST /auth/magic_link_verify', () => {
     it('should return 401 if token is invalid or expired', async () => {
         mockFirst.mockResolvedValueOnce(undefined);
 
-        const res = await request(app)
-            .post('/auth/magic_link_verify')
-            .send({ token: 'invalid-token' });
+        const res = await request(app).post('/auth/magic_link_verify').send({ token: 'invalid-token' });
 
         expect(res.status).toBe(401);
         expect(res.body).toHaveProperty('error', 'invalid or expired token');
@@ -65,9 +63,7 @@ describe('POST /auth/magic_link_verify', () => {
         // Second call: users lookup returns nothing
         mockFirst.mockResolvedValueOnce(undefined);
 
-        const res = await request(app)
-            .post('/auth/magic_link_verify')
-            .send({ token: 'valid-token' });
+        const res = await request(app).post('/auth/magic_link_verify').send({ token: 'valid-token' });
 
         expect(res.status).toBe(401);
         expect(res.body).toHaveProperty('error', 'user not found');
@@ -88,9 +84,7 @@ describe('POST /auth/magic_link_verify', () => {
             emailVerifiedAt: null,
         });
 
-        const res = await request(app)
-            .post('/auth/magic_link_verify')
-            .send({ token: 'valid-token' });
+        const res = await request(app).post('/auth/magic_link_verify').send({ token: 'valid-token' });
 
         expect(res.status).toBe(200);
         expect(res.body).toHaveProperty('accessToken');
@@ -111,9 +105,7 @@ describe('POST /auth/magic_link_verify', () => {
             emailVerifiedAt: new Date('2026-01-01'),
         });
 
-        await request(app)
-            .post('/auth/magic_link_verify')
-            .send({ token: 'valid-token' });
+        await request(app).post('/auth/magic_link_verify').send({ token: 'valid-token' });
 
         expect(mockDel).toHaveBeenCalledTimes(1);
     });
@@ -131,13 +123,9 @@ describe('POST /auth/magic_link_verify', () => {
             emailVerifiedAt: null,
         });
 
-        await request(app)
-            .post('/auth/magic_link_verify')
-            .send({ token: 'valid-token' });
+        await request(app).post('/auth/magic_link_verify').send({ token: 'valid-token' });
 
-        expect(mockUpdate).toHaveBeenCalledWith(
-            expect.objectContaining({ emailVerifiedAt: expect.any(Date) }),
-        );
+        expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({ emailVerifiedAt: expect.any(Date) }));
     });
 
     it('should NOT update emailVerifiedAt for an already-verified user', async () => {
@@ -153,9 +141,7 @@ describe('POST /auth/magic_link_verify', () => {
             emailVerifiedAt: new Date('2026-01-01'),
         });
 
-        await request(app)
-            .post('/auth/magic_link_verify')
-            .send({ token: 'valid-token' });
+        await request(app).post('/auth/magic_link_verify').send({ token: 'valid-token' });
 
         expect(mockUpdate).not.toHaveBeenCalled();
     });
@@ -174,9 +160,7 @@ describe('POST /auth/magic_link_verify', () => {
             emailVerifiedAt: new Date('2026-01-01'),
         });
 
-        const res = await request(app)
-            .post('/auth/magic_link_verify')
-            .send({ token: 'valid-token' });
+        const res = await request(app).post('/auth/magic_link_verify').send({ token: 'valid-token' });
 
         expect(res.status).toBe(500);
         expect(res.body).toHaveProperty('error', 'server configuration error');

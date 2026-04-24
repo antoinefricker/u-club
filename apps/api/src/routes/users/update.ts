@@ -64,10 +64,7 @@ router.put(
         const updates: Record<string, unknown> = { ...req.body };
 
         if (updates.email) {
-            const existing = await db('users')
-                .where({ email: updates.email })
-                .whereNot({ id })
-                .first();
+            const existing = await db('users').where({ email: updates.email }).whereNot({ id }).first();
             if (existing) {
                 res.status(409).json({ error: 'email already in use' });
                 return;
@@ -83,16 +80,7 @@ router.put(
         const [user] = await db('users')
             .where({ id })
             .update(updates)
-            .returning([
-                'id',
-                'displayName',
-                'bio',
-                'phone',
-                'email',
-                'role',
-                'createdAt',
-                'updatedAt',
-            ]);
+            .returning(['id', 'displayName', 'bio', 'phone', 'email', 'role', 'createdAt', 'updatedAt']);
 
         if (!user) {
             res.status(404).json({ error: 'user not found' });

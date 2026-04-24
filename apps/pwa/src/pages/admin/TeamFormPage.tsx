@@ -1,13 +1,5 @@
 import { useEffect } from 'react';
-import {
-    Button,
-    Grid,
-    Group,
-    Loader,
-    Select,
-    TextInput,
-    Textarea,
-} from '@mantine/core';
+import { Button, Grid, Group, Loader, Select, TextInput, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useNavigate, useParams } from 'react-router';
@@ -28,8 +20,7 @@ export function TeamFormPage() {
     const createTeam = useCreateTeam();
     const updateTeam = useUpdateTeam();
 
-    const clubOptions =
-        clubs?.data.map((c) => ({ value: c.id, label: c.name })) ?? [];
+    const clubOptions = clubs?.data.map((c) => ({ value: c.id, label: c.name })) ?? [];
 
     const form = useForm<{
         label: string;
@@ -56,9 +47,7 @@ export function TeamFormPage() {
         clubId: form.values.clubId || undefined,
         itemsPerPage: 100,
     });
-    const categoryOptions =
-        categoriesData?.data.map((c) => ({ value: c.id, label: c.label })) ??
-        [];
+    const categoryOptions = categoriesData?.data.map((c) => ({ value: c.id, label: c.label })) ?? [];
 
     useEffect(() => {
         if (team) {
@@ -142,11 +131,7 @@ export function TeamFormPage() {
                         <Grid.Col span={{ base: 12, sm: 6 }}>
                             <Select
                                 label="Category"
-                                placeholder={
-                                    form.values.clubId
-                                        ? 'No category'
-                                        : 'Pick a club first'
-                                }
+                                placeholder={form.values.clubId ? 'No category' : 'Pick a club first'}
                                 data={categoryOptions}
                                 clearable
                                 disabled={!form.values.clubId}
@@ -171,19 +156,10 @@ export function TeamFormPage() {
                         </Grid.Col>
                         <Grid.Col span={12}>
                             <Group>
-                                <Button
-                                    type="submit"
-                                    loading={
-                                        createTeam.isPending ||
-                                        updateTeam.isPending
-                                    }
-                                >
+                                <Button type="submit" loading={createTeam.isPending || updateTeam.isPending}>
                                     {isEdit ? 'Update' : 'Create'}
                                 </Button>
-                                <Button
-                                    variant="subtle"
-                                    onClick={() => navigate('/admin/teams')}
-                                >
+                                <Button variant="subtle" onClick={() => navigate('/admin/teams')}>
                                     Cancel
                                 </Button>
                             </Group>

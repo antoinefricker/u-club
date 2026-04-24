@@ -12,9 +12,7 @@ type UseListFiltersReturn<K extends readonly string[]> = {
     clearFilters: () => void;
 };
 
-export function useListFilters<K extends readonly string[]>(
-    keys: K,
-): UseListFiltersReturn<K> {
+export function useListFilters<K extends readonly string[]>(keys: K): UseListFiltersReturn<K> {
     const [searchParams, setSearchParams] = useSearchParams();
 
     const filters = useMemo(() => {

@@ -47,9 +47,7 @@ router.post(
     async (req: Request, res: Response) => {
         const { clubId, label } = req.body;
 
-        const existing = await db('teamCategories')
-            .where({ clubId, label })
-            .first();
+        const existing = await db('teamCategories').where({ clubId, label }).first();
         if (existing) {
             res.status(409).json({
                 error: 'label already in use for this club',

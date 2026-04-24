@@ -1,10 +1,6 @@
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { useAuthContext } from '../auth/useAuthContext';
-import {
-    buildListQueryString,
-    type Paginated,
-    type PaginationArgs,
-} from '../utils/pagination';
+import { buildListQueryString, type Paginated, type PaginationArgs } from '../utils/pagination';
 import type { MemberStatus } from '../types/MemberStatus';
 
 function useAuthHeaders() {

@@ -34,9 +34,7 @@ export async function applyPagination<T>(
     const countRow = await countQuery.first<{ total: string | number }>();
     const totalItems = Number(countRow?.total ?? 0);
 
-    const data = (await query
-        .limit(itemsPerPage)
-        .offset((page - 1) * itemsPerPage)) as T[];
+    const data = (await query.limit(itemsPerPage).offset((page - 1) * itemsPerPage)) as T[];
 
     return { data, totalItems };
 }

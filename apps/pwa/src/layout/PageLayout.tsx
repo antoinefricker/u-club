@@ -32,20 +32,12 @@ export function PageLayout({ children }: PageLayoutProps) {
             }}
             padding="md"
         >
-            <AppShell.Header
-                hiddenFrom="sm"
-                bg="var(--mantine-primary-color-5)"
-            >
+            <AppShell.Header hiddenFrom="sm" bg="var(--mantine-primary-color-5)">
                 <Group h="100%" px="md" justify="space-between">
                     <Group gap="xs" align="center" c="white" fw={700} fz={20}>
                         🍆 eggplant
                     </Group>
-                    <Burger
-                        opened={opened}
-                        onClick={toggle}
-                        color="white"
-                        size="sm"
-                    />
+                    <Burger opened={opened} onClick={toggle} color="white" size="sm" />
                 </Group>
             </AppShell.Header>
 

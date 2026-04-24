@@ -11,11 +11,7 @@ import { usePagination } from '../../hooks/usePagination';
 export function ClubsListPage() {
     const navigate = useNavigate();
     const { page, itemsPerPage } = usePagination();
-    const {
-        data: clubsData,
-        isLoading,
-        error,
-    } = useClubs({ page, itemsPerPage });
+    const { data: clubsData, isLoading, error } = useClubs({ page, itemsPerPage });
     const deleteClub = useDeleteClub();
 
     const clubs = clubsData?.data;
@@ -40,9 +36,7 @@ export function ClubsListPage() {
     return (
         <>
             <PageTitle label="Clubs">
-                <Button onClick={() => navigate('/admin/clubs/new')}>
-                    New club
-                </Button>
+                <Button onClick={() => navigate('/admin/clubs/new')}>New club</Button>
             </PageTitle>
             <Table striped highlightOnHover>
                 <Table.Thead>
@@ -62,20 +56,13 @@ export function ClubsListPage() {
                             <Table.Td>{club.description}</Table.Td>
                             <Table.Td>
                                 <Group gap="xs" justify="flex-end">
-                                    <ActionIcon
-                                        variant="subtle"
-                                        onClick={() =>
-                                            navigate(`/admin/clubs/${club.id}`)
-                                        }
-                                    >
+                                    <ActionIcon variant="subtle" onClick={() => navigate(`/admin/clubs/${club.id}`)}>
                                         <IconEdit size={18} />
                                     </ActionIcon>
                                     <ActionIcon
                                         variant="subtle"
                                         color="red"
-                                        onClick={() =>
-                                            handleDelete(club.id, club.name)
-                                        }
+                                        onClick={() => handleDelete(club.id, club.name)}
                                     >
                                         <IconTrash size={18} />
                                     </ActionIcon>

@@ -10,10 +10,7 @@ const SEPARATOR = CHAR_LINE.repeat(LINE_LENGTH);
 export const Logger = {
     separator: () => console.log(SEPARATOR),
 
-    title: (message: string) =>
-        console.log(
-            message + ' ' + CHAR_LINE.repeat(LINE_LENGTH - message.length - 1),
-        ),
+    title: (message: string) => console.log(message + ' ' + CHAR_LINE.repeat(LINE_LENGTH - message.length - 1)),
 
     nl: (iterations: number = 1) => {
         for (let i = 0; i < iterations; i++) {
@@ -21,22 +18,15 @@ export const Logger = {
         }
     },
 
-    error: (message: Message, icon?: string) =>
-        console.error(formatMessage(message, icon)),
+    error: (message: Message, icon?: string) => console.error(formatMessage(message, icon)),
 
-    warn: (message: Message, icon?: string) =>
-        console.warn(formatMessage(message, icon)),
+    warn: (message: Message, icon?: string) => console.warn(formatMessage(message, icon)),
 
-    info: (message: Message, icon?: string) =>
-        console.log(formatMessage(message, icon)),
+    info: (message: Message, icon?: string) => console.log(formatMessage(message, icon)),
 
-    success: (message: Message, icon?: string) =>
-        console.log(formatMessage(message, icon)),
+    success: (message: Message, icon?: string) => console.log(formatMessage(message, icon)),
 
-    status: (
-        status: 'error' | 'warning' | 'success' | boolean,
-        message: Message,
-    ) => {
+    status: (status: 'error' | 'warning' | 'success' | boolean, message: Message) => {
         const icon =
             status === 'error' || status === false
                 ? emojis.statusRed
@@ -46,13 +36,8 @@ export const Logger = {
         console.log(formatMessage(message, icon));
     },
 
-    select: async <T>(
-        message: string,
-        options: Array<{ value: T; label: string }>,
-    ): Promise<T> => {
-        const optionsStr = options
-            .map((option, i) => `${i + 1}. ${option.label}`)
-            .join('\n');
+    select: async <T>(message: string, options: Array<{ value: T; label: string }>): Promise<T> => {
+        const optionsStr = options.map((option, i) => `${i + 1}. ${option.label}`).join('\n');
         const fullPrompt = `${message}\n${optionsStr}\n\nEnter the number of your choice: `;
         const retryPrompt = 'Invalid choice, try again: ';
 
@@ -82,16 +67,12 @@ export const Logger = {
 
 function formatMessage(message: Message, icon?: string): string {
     if (icon && icon.length > TAB_STOPS[0]) {
-        throw new Error(
-            `Icon should be a single character, received: '${icon}': ${icon.length}`,
-        );
+        throw new Error(`Icon should be a single character, received: '${icon}': ${icon.length}`);
     }
 
     icon = icon?.length ? icon.padEnd(TAB_STOPS[0], ' ') : '';
     if (Array.isArray(message)) {
-        message = message
-            .map((part, i) => part.padEnd(TAB_STOPS[i + 1], ' '))
-            .join('');
+        message = message.map((part, i) => part.padEnd(TAB_STOPS[i + 1], ' ')).join('');
     }
     return icon + String(message);
 }

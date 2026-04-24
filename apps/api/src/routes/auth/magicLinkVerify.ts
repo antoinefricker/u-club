@@ -52,10 +52,7 @@ router.post('/magic_link_verify', async (req: Request, res: Response) => {
         return;
     }
 
-    const loginToken = await db('authTokens')
-        .where({ token })
-        .where('expiresAt', '>', new Date())
-        .first();
+    const loginToken = await db('authTokens').where({ token }).where('expiresAt', '>', new Date()).first();
 
     if (!loginToken) {
         res.status(401).json({ error: 'invalid or expired token' });
@@ -71,9 +68,7 @@ router.post('/magic_link_verify', async (req: Request, res: Response) => {
     }
 
     if (!user.emailVerifiedAt) {
-        await db('users')
-            .where({ id: user.id })
-            .update({ emailVerifiedAt: new Date() });
+        await db('users').where({ id: user.id }).update({ emailVerifiedAt: new Date() });
     }
 
     const jwtSecret = process.env.JWT_SECRET;
@@ -82,13 +77,9 @@ router.post('/magic_link_verify', async (req: Request, res: Response) => {
         return;
     }
 
-    const accessToken = jwt.sign(
-        { sub: user.id, email: user.email, role: user.role },
-        jwtSecret,
-        {
-            expiresIn: '7d',
-        },
-    );
+    const accessToken = jwt.sign({ sub: user.id, email: user.email, role: user.role }, jwtSecret, {
+        expiresIn: '7d',
+    });
 
     res.json({ accessToken });
 });

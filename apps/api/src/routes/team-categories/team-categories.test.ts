@@ -94,9 +94,7 @@ describe('GET /team-categories', () => {
     it('returns envelope with defaults when no query params', async () => {
         mockList([sampleCategory], 1);
 
-        const res = await request(app)
-            .get('/team-categories')
-            .set('Authorization', `Bearer ${adminToken}`);
+        const res = await request(app).get('/team-categories').set('Authorization', `Bearer ${adminToken}`);
 
         expect(res.status).toBe(200);
         expect(res.body).toEqual({
@@ -141,9 +139,7 @@ describe('GET /team-categories', () => {
     it('returns empty envelope when no categories', async () => {
         mockList([], 0);
 
-        const res = await request(app)
-            .get('/team-categories')
-            .set('Authorization', `Bearer ${adminToken}`);
+        const res = await request(app).get('/team-categories').set('Authorization', `Bearer ${adminToken}`);
 
         expect(res.body).toEqual({
             data: [],
@@ -158,22 +154,15 @@ describe('GET /team-categories', () => {
 
     it('orders results by id ascending', async () => {
         mockList([sampleCategory], 1);
-        await request(app)
-            .get('/team-categories')
-            .set('Authorization', `Bearer ${adminToken}`);
+        await request(app).get('/team-categories').set('Authorization', `Bearer ${adminToken}`);
         expect(mockOrderBy).toHaveBeenCalledWith('id', 'asc');
     });
 
-    it.each([['page=0'], ['itemsPerPage=101']])(
-        'returns 400 for %s',
-        async (qs) => {
-            const res = await request(app)
-                .get(`/team-categories?${qs}`)
-                .set('Authorization', `Bearer ${adminToken}`);
-            expect(res.status).toBe(400);
-            expect(res.body).toHaveProperty('error', 'validation error');
-        },
-    );
+    it.each([['page=0'], ['itemsPerPage=101']])('returns 400 for %s', async (qs) => {
+        const res = await request(app).get(`/team-categories?${qs}`).set('Authorization', `Bearer ${adminToken}`);
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'validation error');
+    });
 
     it('returns 401 when unauthenticated', async () => {
         const res = await request(app).get('/team-categories');
@@ -181,9 +170,7 @@ describe('GET /team-categories', () => {
     });
 
     it('returns 403 when authenticated as a regular user', async () => {
-        const res = await request(app)
-            .get('/team-categories')
-            .set('Authorization', `Bearer ${userToken}`);
+        const res = await request(app).get('/team-categories').set('Authorization', `Bearer ${userToken}`);
         expect(res.status).toBe(403);
     });
 });
@@ -203,9 +190,7 @@ describe('GET /team-categories/:id', () => {
     it('returns 404 when missing', async () => {
         mockFirst.mockResolvedValueOnce(undefined);
 
-        const res = await request(app)
-            .get('/team-categories/nonexistent')
-            .set('Authorization', `Bearer ${adminToken}`);
+        const res = await request(app).get('/team-categories/nonexistent').set('Authorization', `Bearer ${adminToken}`);
 
         expect(res.status).toBe(404);
         expect(res.body).toHaveProperty('error', 'team category not found');
@@ -265,10 +250,7 @@ describe('POST /team-categories', () => {
             .send({ clubId: CLUB_ID, label: 'U15' });
 
         expect(res.status).toBe(409);
-        expect(res.body).toHaveProperty(
-            'error',
-            'label already in use for this club',
-        );
+        expect(res.body).toHaveProperty('error', 'label already in use for this club');
     });
 });
 
@@ -323,10 +305,7 @@ describe('PUT /team-categories/:id', () => {
             .send({ label: 'U15' });
 
         expect(res.status).toBe(409);
-        expect(res.body).toHaveProperty(
-            'error',
-            'label already in use for this club',
-        );
+        expect(res.body).toHaveProperty('error', 'label already in use for this club');
     });
 });
 

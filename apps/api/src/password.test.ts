@@ -24,9 +24,7 @@ describe('verifyPassword', () => {
 
     it('should return false for an incorrect password', async () => {
         const stored = await hashPassword('hunter2');
-        await expect(verifyPassword('wrong-password', stored)).resolves.toBe(
-            false,
-        );
+        await expect(verifyPassword('wrong-password', stored)).resolves.toBe(false);
     });
 
     it('should return false when the password case differs', async () => {
@@ -38,8 +36,6 @@ describe('verifyPassword', () => {
         const password = '🔐漢字'.repeat(50);
         const stored = await hashPassword(password);
         await expect(verifyPassword(password, stored)).resolves.toBe(true);
-        await expect(verifyPassword(password + 'x', stored)).resolves.toBe(
-            false,
-        );
+        await expect(verifyPassword(password + 'x', stored)).resolves.toBe(false);
     });
 });

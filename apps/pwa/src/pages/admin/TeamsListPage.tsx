@@ -1,12 +1,4 @@
-import {
-    ActionIcon,
-    Alert,
-    Button,
-    Group,
-    Loader,
-    Select,
-    Table,
-} from '@mantine/core';
+import { ActionIcon, Alert, Button, Group, Loader, Select, Table } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { PageTitle } from '../../components/layout/PageTitle';
 import { ListFilters } from '../../components/admin/lists/ListFilters';
@@ -15,11 +7,7 @@ import { EmptyListRow } from '../../components/admin/lists/EmptyListRow';
 import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import { useTeams, useDeleteTeam } from '../../hooks/useTeams';
-import {
-    TEAM_GENDER_LABELS,
-    TEAM_GENDER_OPTIONS,
-    type TeamGender,
-} from '../../types/Team';
+import { TEAM_GENDER_LABELS, TEAM_GENDER_OPTIONS, type TeamGender } from '../../types/Team';
 import { useClubs } from '../../hooks/useClubs';
 import { useTeamCategories } from '../../hooks/useTeamCategories';
 import { usePagination } from '../../hooks/usePagination';
@@ -30,8 +18,7 @@ const TEAMS_FILTER_KEYS = ['clubId', 'categoryId', 'gender'] as const;
 export function TeamsListPage() {
     const navigate = useNavigate();
     const { page, itemsPerPage } = usePagination();
-    const { filters, setFilter, setFilters } =
-        useListFilters(TEAMS_FILTER_KEYS);
+    const { filters, setFilter, setFilters } = useListFilters(TEAMS_FILTER_KEYS);
     const clubId = filters.clubId ?? null;
     const categoryId = filters.categoryId ?? null;
     const gender = (filters.gender as TeamGender | undefined) ?? null;
@@ -59,15 +46,12 @@ export function TeamsListPage() {
     const teams = teamsData?.data;
     const pagination = teamsData?.pagination;
 
-    const clubOptions =
-        clubs?.map((c) => ({ value: c.id, label: c.name })) ?? [];
+    const clubOptions = clubs?.map((c) => ({ value: c.id, label: c.name })) ?? [];
     const clubNameById = new Map(clubs?.map((c) => [c.id, c.name]));
     const categoryOptions =
         categories?.map((c) => ({
             value: c.id,
-            label: clubId
-                ? c.label
-                : `${clubNameById.get(c.clubId) ?? c.clubId} — ${c.label}`,
+            label: clubId ? c.label : `${clubNameById.get(c.clubId) ?? c.clubId} — ${c.label}`,
         })) ?? [];
 
     const handleClubChange = (v: string | null) => {
@@ -97,9 +81,7 @@ export function TeamsListPage() {
     return (
         <>
             <PageTitle label="Teams">
-                <Button onClick={() => navigate('/admin/teams/new')}>
-                    New team
-                </Button>
+                <Button onClick={() => navigate('/admin/teams/new')}>New team</Button>
             </PageTitle>
 
             <ListFilters>
@@ -148,29 +130,18 @@ export function TeamsListPage() {
                     {teams?.map((team) => (
                         <Table.Tr key={team.id}>
                             <Table.Td>{team.label}</Table.Td>
-                            <Table.Td>
-                                {clubNameById.get(team.clubId) ?? team.clubId}
-                            </Table.Td>
+                            <Table.Td>{clubNameById.get(team.clubId) ?? team.clubId}</Table.Td>
                             <Table.Td>{team.categoryLabel ?? '—'}</Table.Td>
-                            <Table.Td>
-                                {TEAM_GENDER_LABELS[team.gender]}
-                            </Table.Td>
+                            <Table.Td>{TEAM_GENDER_LABELS[team.gender]}</Table.Td>
                             <Table.Td>
                                 <Group gap="xs" justify="flex-end">
-                                    <ActionIcon
-                                        variant="subtle"
-                                        onClick={() =>
-                                            navigate(`/admin/teams/${team.id}`)
-                                        }
-                                    >
+                                    <ActionIcon variant="subtle" onClick={() => navigate(`/admin/teams/${team.id}`)}>
                                         <IconEdit size={18} />
                                     </ActionIcon>
                                     <ActionIcon
                                         variant="subtle"
                                         color="red"
-                                        onClick={() =>
-                                            handleDelete(team.id, team.label)
-                                        }
+                                        onClick={() => handleDelete(team.id, team.label)}
                                     >
                                         <IconTrash size={18} />
                                     </ActionIcon>

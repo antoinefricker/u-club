@@ -1,9 +1,6 @@
 import { Router, Request, Response } from 'express';
 import db from '../../db.js';
-import {
-    requireAuth,
-    type AuthenticatedRequest,
-} from '../../middleware/auth.js';
+import { requireAuth, type AuthenticatedRequest } from '../../middleware/auth.js';
 import { validate } from '../../middleware/validate.js';
 import { createUserMemberSchema } from '../../schemas/userMember.js';
 
@@ -42,48 +39,34 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post(
-    '/',
-    requireAuth,
-    validate(createUserMemberSchema),
-    async (req: Request, res: Response) => {
-        const user = (req as AuthenticatedRequest).user;
-        const isPrivileged = user.role === 'admin' || user.role === 'manager';
-        const { userId, memberId, type, description } = req.body;
+router.post('/', requireAuth, validate(createUserMemberSchema), async (req: Request, res: Response) => {
+    const user = (req as AuthenticatedRequest).user;
+    const isPrivileged = user.role === 'admin' || user.role === 'manager';
+    const { userId, memberId, type, description } = req.body;
 
-        if (!isPrivileged && userId !== user.id) {
-            res.status(403).json({
-                error: 'not allowed to create for another user',
-            });
-            return;
-        }
+    if (!isPrivileged && userId !== user.id) {
+        res.status(403).json({
+            error: 'not allowed to create for another user',
+        });
+        return;
+    }
 
-        const existing = await db('userMembers')
-            .where({ userId, memberId })
-            .first();
-        if (existing) {
-            res.status(409).json({ error: 'association already exists' });
-            return;
-        }
+    const existing = await db('userMembers').where({ userId, memberId }).first();
+    if (existing) {
+        res.status(409).json({ error: 'association already exists' });
+        return;
+    }
 
-        const [userMember] = await db('userMembers')
-            .insert({
-                userId,
-                memberId,
-                type,
-                description: description ?? null,
-            })
-            .returning([
-                'id',
-                'userId',
-                'memberId',
-                'type',
-                'description',
-                'createdAt',
-            ]);
+    const [userMember] = await db('userMembers')
+        .insert({
+            userId,
+            memberId,
+            type,
+            description: description ?? null,
+        })
+        .returning(['id', 'userId', 'memberId', 'type', 'description', 'createdAt']);
 
-        res.status(201).json(userMember);
-    },
-);
+    res.status(201).json(userMember);
+});
 
 export default router;

@@ -35,43 +35,27 @@ describe('POST /auth/logout', () => {
         const res = await request(app).post('/auth/logout');
 
         expect(res.status).toBe(401);
-        expect(res.body).toHaveProperty(
-            'error',
-            'missing authorization header',
-        );
+        expect(res.body).toHaveProperty('error', 'missing authorization header');
     });
 
     it('should return 401 if authorization header is not Bearer', async () => {
-        const res = await request(app)
-            .post('/auth/logout')
-            .set('Authorization', 'Basic abc');
+        const res = await request(app).post('/auth/logout').set('Authorization', 'Basic abc');
 
         expect(res.status).toBe(401);
-        expect(res.body).toHaveProperty(
-            'error',
-            'missing authorization header',
-        );
+        expect(res.body).toHaveProperty('error', 'missing authorization header');
     });
 
     it('should return 401 if token is invalid', async () => {
-        const res = await request(app)
-            .post('/auth/logout')
-            .set('Authorization', 'Bearer invalid-token');
+        const res = await request(app).post('/auth/logout').set('Authorization', 'Bearer invalid-token');
 
         expect(res.status).toBe(401);
         expect(res.body).toHaveProperty('error', 'invalid token');
     });
 
     it('should revoke a valid token and return success', async () => {
-        const token = jwt.sign(
-            { sub: 'uuid-1', email: 'john@example.com' },
-            'test-secret',
-            { expiresIn: '7d' },
-        );
+        const token = jwt.sign({ sub: 'uuid-1', email: 'john@example.com' }, 'test-secret', { expiresIn: '7d' });
 
-        const res = await request(app)
-            .post('/auth/logout')
-            .set('Authorization', `Bearer ${token}`);
+        const res = await request(app).post('/auth/logout').set('Authorization', `Bearer ${token}`);
 
         expect(res.status).toBe(200);
         expect(res.body).toHaveProperty('message', 'logged out');
@@ -86,9 +70,7 @@ describe('POST /auth/logout', () => {
     it('should return 500 if JWT_SECRET is not set', async () => {
         delete process.env.JWT_SECRET;
 
-        const res = await request(app)
-            .post('/auth/logout')
-            .set('Authorization', 'Bearer some-token');
+        const res = await request(app).post('/auth/logout').set('Authorization', 'Bearer some-token');
 
         expect(res.status).toBe(500);
         expect(res.body).toHaveProperty('error', 'server configuration error');

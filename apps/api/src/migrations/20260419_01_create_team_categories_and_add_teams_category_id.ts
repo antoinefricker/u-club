@@ -11,12 +11,7 @@ export async function up(knex: Knex): Promise<void> {
     });
 
     await knex.schema.alterTable('teams', (table) => {
-        table
-            .uuid('category_id')
-            .nullable()
-            .references('id')
-            .inTable('team_categories')
-            .onDelete('SET NULL');
+        table.uuid('category_id').nullable().references('id').inTable('team_categories').onDelete('SET NULL');
     });
 }
 

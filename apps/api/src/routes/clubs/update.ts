@@ -63,10 +63,7 @@ router.put(
         const updates: Record<string, unknown> = { ...req.body };
 
         if (updates.code) {
-            const existing = await db('clubs')
-                .where({ code: updates.code })
-                .whereNot({ id })
-                .first();
+            const existing = await db('clubs').where({ code: updates.code }).whereNot({ id }).first();
             if (existing) {
                 res.status(409).json({ error: 'code already in use' });
                 return;
@@ -78,14 +75,7 @@ router.put(
         const [club] = await db('clubs')
             .where({ id })
             .update(updates)
-            .returning([
-                'id',
-                'name',
-                'code',
-                'description',
-                'createdAt',
-                'updatedAt',
-            ]);
+            .returning(['id', 'name', 'code', 'description', 'createdAt', 'updatedAt']);
 
         if (!club) {
             res.status(404).json({ error: 'club not found' });

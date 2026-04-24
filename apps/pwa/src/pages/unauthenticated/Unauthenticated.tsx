@@ -9,10 +9,7 @@ export function Unauthenticated() {
     return (
         <Container size="xs" pt={20}>
             {view === 'login' ? (
-                <LoginForm
-                    onSwitchMode={() => setView('register')}
-                    onForgotPassword={() => setView('forgot')}
-                />
+                <LoginForm onSwitchMode={() => setView('register')} onForgotPassword={() => setView('forgot')} />
             ) : view === 'register' ? (
                 <RegisterForm onSwitchMode={() => setView('login')} />
             ) : (

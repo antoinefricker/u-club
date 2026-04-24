@@ -45,9 +45,7 @@ describe('POST /auth/magic_link', () => {
     it('should return success without sending email if user does not exist', async () => {
         mockFirst.mockResolvedValueOnce(undefined);
 
-        const res = await request(app)
-            .post('/auth/magic_link')
-            .send({ email: 'unknown@example.com' });
+        const res = await request(app).post('/auth/magic_link').send({ email: 'unknown@example.com' });
 
         expect(res.status).toBe(200);
         expect(res.body).toHaveProperty('message', 'login email sent');
@@ -60,9 +58,7 @@ describe('POST /auth/magic_link', () => {
             email: 'test@example.com',
         });
 
-        const res = await request(app)
-            .post('/auth/magic_link')
-            .send({ email: 'test@example.com' });
+        const res = await request(app).post('/auth/magic_link').send({ email: 'test@example.com' });
 
         expect(res.status).toBe(200);
         expect(res.body).toHaveProperty('message', 'login email sent');
@@ -81,9 +77,7 @@ describe('POST /auth/magic_link', () => {
         });
 
         const before = Date.now();
-        await request(app)
-            .post('/auth/magic_link')
-            .send({ email: 'test@example.com' });
+        await request(app).post('/auth/magic_link').send({ email: 'test@example.com' });
         const after = Date.now();
 
         const insertArg = mockInsert.mock.calls[0][0];
@@ -100,22 +94,17 @@ describe('POST /auth/magic_link', () => {
             email: 'test@example.com',
         });
 
-        await request(app)
-            .post('/auth/magic_link')
-            .send({ email: 'test@example.com' });
+        await request(app).post('/auth/magic_link').send({ email: 'test@example.com' });
 
         const insertArg = mockInsert.mock.calls[0][0];
-        const mailArg = (mailer.sendMail as ReturnType<typeof vi.fn>).mock
-            .calls[0][0];
+        const mailArg = (mailer.sendMail as ReturnType<typeof vi.fn>).mock.calls[0][0];
         expect(mailArg.text).toContain(insertArg.token);
     });
 
     it('should not send email when email field is an empty string', async () => {
         mockFirst.mockResolvedValueOnce(undefined);
 
-        const res = await request(app)
-            .post('/auth/magic_link')
-            .send({ email: '' });
+        const res = await request(app).post('/auth/magic_link').send({ email: '' });
 
         expect(res.status).toBe(200);
         expect(mailer.sendMail).not.toHaveBeenCalled();

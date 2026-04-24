@@ -27,10 +27,9 @@ function checkPort(port: number): Promise<boolean> {
 
 function isDockerRunning(service: string): boolean {
     try {
-        const out = execSync(
-            `docker compose ps ${service} --status running -q 2>/dev/null`,
-            { encoding: 'utf-8' },
-        ).trim();
+        const out = execSync(`docker compose ps ${service} --status running -q 2>/dev/null`, {
+            encoding: 'utf-8',
+        }).trim();
         return out.length > 0;
     } catch {
         return false;

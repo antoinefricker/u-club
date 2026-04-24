@@ -14,10 +14,7 @@ type MockQueryBuilder = {
     then: ReturnType<typeof vi.fn>;
 };
 
-function createMockQuery(
-    rows: unknown[],
-    total: number | string,
-): MockQueryBuilder {
+function createMockQuery(rows: unknown[], total: number | string): MockQueryBuilder {
     const countQuery = {
         clearSelect: vi.fn().mockReturnThis(),
         clearOrder: vi.fn().mockReturnThis(),
@@ -47,10 +44,10 @@ describe('applyPagination', () => {
     });
 
     it('returns data and totalItems', async () => {
-        const result = await applyPagination<{ id: string }>(
-            query as unknown as Knex.QueryBuilder,
-            { page: 1, itemsPerPage: 25 },
-        );
+        const result = await applyPagination<{ id: string }>(query as unknown as Knex.QueryBuilder, {
+            page: 1,
+            itemsPerPage: 25,
+        });
         expect(result).toEqual({ data: rows, totalItems: 42 });
     });
 
@@ -100,55 +97,68 @@ describe('applyPagination', () => {
 
     it('coerces string total to number', async () => {
         const q = createMockQuery([], '0');
-        const result = await applyPagination<{ id: string }>(
-            q as unknown as Knex.QueryBuilder,
-            { page: 1, itemsPerPage: 25 },
-        );
+        const result = await applyPagination<{ id: string }>(q as unknown as Knex.QueryBuilder, {
+            page: 1,
+            itemsPerPage: 25,
+        });
         expect(result.totalItems).toBe(0);
     });
 
     it('returns totalItems = 0 when count row is missing', async () => {
         const q = createMockQuery([], 0);
         const cloned = q.clone();
-        (cloned.first as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-            undefined,
-        );
-        const result = await applyPagination<{ id: string }>(
-            q as unknown as Knex.QueryBuilder,
-            { page: 1, itemsPerPage: 25 },
-        );
+        (cloned.first as ReturnType<typeof vi.fn>).mockResolvedValueOnce(undefined);
+        const result = await applyPagination<{ id: string }>(q as unknown as Knex.QueryBuilder, {
+            page: 1,
+            itemsPerPage: 25,
+        });
         expect(result.totalItems).toBe(0);
     });
 });
 
 describe('buildPaginationMeta', () => {
     it('computes totalPages with exact division', () => {
-        expect(
-            buildPaginationMeta({ page: 1, itemsPerPage: 10, totalItems: 30 }),
-        ).toEqual({ page: 1, itemsPerPage: 10, totalItems: 30, totalPages: 3 });
+        expect(buildPaginationMeta({ page: 1, itemsPerPage: 10, totalItems: 30 })).toEqual({
+            page: 1,
+            itemsPerPage: 10,
+            totalItems: 30,
+            totalPages: 3,
+        });
     });
 
     it('computes totalPages with remainder (partial last page)', () => {
-        expect(
-            buildPaginationMeta({ page: 1, itemsPerPage: 10, totalItems: 31 }),
-        ).toEqual({ page: 1, itemsPerPage: 10, totalItems: 31, totalPages: 4 });
+        expect(buildPaginationMeta({ page: 1, itemsPerPage: 10, totalItems: 31 })).toEqual({
+            page: 1,
+            itemsPerPage: 10,
+            totalItems: 31,
+            totalPages: 4,
+        });
     });
 
     it('returns totalPages = 1 when totalItems is 0', () => {
-        expect(
-            buildPaginationMeta({ page: 1, itemsPerPage: 25, totalItems: 0 }),
-        ).toEqual({ page: 1, itemsPerPage: 25, totalItems: 0, totalPages: 1 });
+        expect(buildPaginationMeta({ page: 1, itemsPerPage: 25, totalItems: 0 })).toEqual({
+            page: 1,
+            itemsPerPage: 25,
+            totalItems: 0,
+            totalPages: 1,
+        });
     });
 
     it('returns totalPages = 1 when totalItems < itemsPerPage', () => {
-        expect(
-            buildPaginationMeta({ page: 1, itemsPerPage: 25, totalItems: 3 }),
-        ).toEqual({ page: 1, itemsPerPage: 25, totalItems: 3, totalPages: 1 });
+        expect(buildPaginationMeta({ page: 1, itemsPerPage: 25, totalItems: 3 })).toEqual({
+            page: 1,
+            itemsPerPage: 25,
+            totalItems: 3,
+            totalPages: 1,
+        });
     });
 
     it('preserves page param even when beyond totalPages', () => {
-        expect(
-            buildPaginationMeta({ page: 99, itemsPerPage: 10, totalItems: 5 }),
-        ).toEqual({ page: 99, itemsPerPage: 10, totalItems: 5, totalPages: 1 });
+        expect(buildPaginationMeta({ page: 99, itemsPerPage: 10, totalItems: 5 })).toEqual({
+            page: 99,
+            itemsPerPage: 10,
+            totalItems: 5,
+            totalPages: 1,
+        });
     });
 });

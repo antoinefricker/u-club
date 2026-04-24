@@ -1,9 +1,4 @@
-import type {
-    MemberGender,
-    TeamGender,
-    TeamRole,
-    UserRole,
-} from '../../types/index.js';
+import type { MemberGender, TeamGender, TeamRole, UserRole } from '../../types/index.js';
 
 export type PersonaTeamRef = {
     categoryName: string;
@@ -190,9 +185,7 @@ const PERSONAS: PersonaConfiguration[] = [
         gender: 'female',
         age: 14,
         clubCode: 'CSG-BASKETBALL',
-        assignments: [
-            { categoryName: 'U15', gender: 'female', index: 1, role: 'player' },
-        ],
+        assignments: [{ categoryName: 'U15', gender: 'female', index: 1, role: 'player' }],
         kids: [],
         facts: [
             'Eline is a teenager who is passionate about basketball and is eager to improve her skills and compete at a high level.',

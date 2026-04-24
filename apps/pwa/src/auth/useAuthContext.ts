@@ -4,9 +4,7 @@ import type { User } from '../types/User';
 export function useAuthContext() {
     const ctx = useContext(AuthContext);
     if (!ctx) {
-        throw new Error(
-            'useAuthContext must be used within an AuthContextProvider',
-        );
+        throw new Error('useAuthContext must be used within an AuthContextProvider');
     }
     return ctx;
 }

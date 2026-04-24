@@ -2,9 +2,7 @@ import { faker } from '@faker-js/faker/locale/fr';
 
 import { seedClear } from './seedClear.js';
 import CONFIG from './utils/seedConfiguration.js';
-import PERSONAS, {
-    type PersonaTeamRef,
-} from './utils/personasConfiguration.js';
+import PERSONAS, { type PersonaTeamRef } from './utils/personasConfiguration.js';
 import {
     insertClub,
     insertMember,
@@ -55,12 +53,8 @@ const ROLE_PRIORITY: Record<TeamRole, number> = {
     sparring: 0,
 };
 
-const teamRefKey = (
-    clubCode: string,
-    categoryName: string,
-    gender: TeamGender,
-    index: number,
-): string => `${clubCode}:${categoryName}:${gender}:${index}`;
+const teamRefKey = (clubCode: string, categoryName: string, gender: TeamGender, index: number): string =>
+    `${clubCode}:${categoryName}:${gender}:${index}`;
 
 const toDateString = (date: Date): string => date.toISOString().split('T')[0];
 
@@ -156,15 +150,7 @@ async function seedCreate(force: boolean) {
                         ageRange: category.ageRange,
                     };
                     teamInfos.push(info);
-                    teamByRef.set(
-                        teamRefKey(
-                            club.code,
-                            category.name,
-                            genderConfig.type,
-                            n + 1,
-                        ),
-                        info,
-                    );
+                    teamByRef.set(teamRefKey(club.code, category.name, genderConfig.type, n + 1), info);
                 }
             }
         }
@@ -189,21 +175,14 @@ async function seedCreate(force: boolean) {
     Logger.title('MEMBERS');
     Logger.nl();
 
-    const activeStatus =
-        seeded.memberStatuses.find((s) => s.label === 'active') ??
-        seeded.memberStatuses[0];
+    const activeStatus = seeded.memberStatuses.find((s) => s.label === 'active') ?? seeded.memberStatuses[0];
 
     for (const { team, club, ageRange } of teamInfos) {
         const playerCount = faker.number.int({ min: 10, max: 15 });
 
         for (let p = 0; p < playerCount; p++) {
             const gender: MemberGender =
-                team.gender === 'mixed'
-                    ? faker.helpers.arrayElement<MemberGender>([
-                          'male',
-                          'female',
-                      ])
-                    : team.gender;
+                team.gender === 'mixed' ? faker.helpers.arrayElement<MemberGender>(['male', 'female']) : team.gender;
             const player = await insertMember({
                 statusId: activeStatus.id,
                 firstName: faker.person.firstName(gender),
@@ -226,17 +205,12 @@ async function seedCreate(force: boolean) {
             seeded.teamAssignments.push(assignment);
         }
 
-        const coachGender = faker.helpers.arrayElement<MemberGender>([
-            'male',
-            'female',
-        ]);
+        const coachGender = faker.helpers.arrayElement<MemberGender>(['male', 'female']);
         const coach = await insertMember({
             statusId: activeStatus.id,
             firstName: faker.person.firstName(coachGender),
             lastName: faker.person.lastName(),
-            birthdate: toDateString(
-                faker.date.birthdate({ min: 25, max: 55, mode: 'age' }),
-            ),
+            birthdate: toDateString(faker.date.birthdate({ min: 25, max: 55, mode: 'age' })),
             gender: coachGender,
         });
         seeded.members.push(coach);
@@ -247,16 +221,11 @@ async function seedCreate(force: boolean) {
         });
         seeded.teamAssignments.push(coachAssignment);
 
-        Logger.info(
-            [team.label, club.name, `${playerCount} players + 1 coach`],
-            ' ',
-        );
+        Logger.info([team.label, club.name, `${playerCount} players + 1 coach`], ' ');
     }
 
     Logger.nl();
-    Logger.info(
-        `Created ${seeded.members.length} members, ${seeded.teamAssignments.length} team assignments`,
-    );
+    Logger.info(`Created ${seeded.members.length} members, ${seeded.teamAssignments.length} team assignments`);
     Logger.nl(2);
 
     // -------------------------- personas
@@ -267,14 +236,7 @@ async function seedCreate(force: boolean) {
         persona: (typeof PERSONAS)[number],
         ref: Pick<PersonaTeamRef, 'categoryName' | 'gender' | 'index'>,
     ): TeamInfo => {
-        const info = teamByRef.get(
-            teamRefKey(
-                persona.clubCode,
-                ref.categoryName,
-                ref.gender,
-                ref.index,
-            ),
-        );
+        const info = teamByRef.get(teamRefKey(persona.clubCode, ref.categoryName, ref.gender, ref.index));
         if (!info) {
             throw new Error(
                 `Persona ${persona.email}: no team for ${persona.clubCode} ${ref.categoryName}/${ref.gender}/${ref.index}`,
@@ -284,9 +246,7 @@ async function seedCreate(force: boolean) {
     };
 
     for (const persona of PERSONAS) {
-        const personaBirthdate = toDateString(
-            new Date(CONFIG.season - persona.age, 5, 15),
-        );
+        const personaBirthdate = toDateString(new Date(CONFIG.season - persona.age, 5, 15));
         const personaMember = await insertMember({
             statusId: activeStatus.id,
             firstName: persona.firstName,
@@ -361,23 +321,12 @@ async function seedCreate(force: boolean) {
             seeded.userMembers.push(kidLink);
         }
 
-        Logger.info(
-            [`${persona.firstName} [${persona.role}]`, persona.email],
-            ' ',
-        );
-        Logger.info(
-            [
-                '',
-                `${bestRoleByTeam.size} assignments / ${persona.kids.length} relationships`,
-            ],
-            ' ',
-        );
+        Logger.info([`${persona.firstName} [${persona.role}]`, persona.email], ' ');
+        Logger.info(['', `${bestRoleByTeam.size} assignments / ${persona.kids.length} relationships`], ' ');
     }
 
     Logger.nl();
-    Logger.info(
-        `Created ${seeded.users.length} personas, ${seeded.userMembers.length} user-member links`,
-    );
+    Logger.info(`Created ${seeded.users.length} personas, ${seeded.userMembers.length} user-member links`);
     Logger.nl(2);
 
     // -------------------------- conclusion

@@ -1,13 +1,6 @@
 import { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router';
-import {
-    PasswordInput,
-    Button,
-    Stack,
-    Title,
-    Alert,
-    Paper,
-} from '@mantine/core';
+import { PasswordInput, Button, Stack, Title, Alert, Paper } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { confirmPasswordValidation } from '../utils/formValidations/passwordValidation';
 
@@ -27,8 +20,7 @@ export function ResetPasswordPage() {
             confirmPassword: '',
         },
         validate: {
-            password: (v) =>
-                v.length >= 6 ? null : 'Password must be at least 6 characters',
+            password: (v) => (v.length >= 6 ? null : 'Password must be at least 6 characters'),
             confirmPassword: confirmPasswordValidation,
         },
     });
@@ -57,9 +49,7 @@ export function ResetPasswordPage() {
             navigate('/');
             window.location.reload();
         } catch (err) {
-            setError(
-                err instanceof Error ? err.message : 'Password reset failed',
-            );
+            setError(err instanceof Error ? err.message : 'Password reset failed');
         } finally {
             setLoading(false);
         }

@@ -12,11 +12,7 @@ const ITEMS_PER_PAGE_OPTIONS = ['15', '25', '50'].map((n) => ({
     label: `${n} rows`,
 }));
 
-export function ListPagination({
-    totalPages,
-    totalItems,
-    itemsLabel,
-}: ListPaginationProps) {
+export function ListPagination({ totalPages, totalItems, itemsLabel }: ListPaginationProps) {
     const { page, itemsPerPage, setPage, setItemsPerPage } = usePagination();
 
     const firstDisplayedElement = (page - 1) * itemsPerPage + 1;
@@ -40,13 +36,7 @@ export function ListPagination({
                 {totalPages > 1 && (
                     <>
                         <Space w="sm" />
-                        <Pagination
-                            total={totalPages}
-                            value={page}
-                            onChange={setPage}
-                            size="sm"
-                            withEdges
-                        />
+                        <Pagination total={totalPages} value={page} onChange={setPage} size="sm" withEdges />
                     </>
                 )}
             </Group>

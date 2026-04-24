@@ -98,9 +98,7 @@ describe('GET /users', () => {
     it('returns envelope with defaults when no query params', async () => {
         mockList([sampleUser], 1);
 
-        const res = await request(app)
-            .get('/users')
-            .set('Authorization', `Bearer ${adminToken}`);
+        const res = await request(app).get('/users').set('Authorization', `Bearer ${adminToken}`);
 
         expect(res.status).toBe(200);
         expect(res.body).toEqual({
@@ -137,9 +135,7 @@ describe('GET /users', () => {
     it('returns empty envelope when no users', async () => {
         mockList([], 0);
 
-        const res = await request(app)
-            .get('/users')
-            .set('Authorization', `Bearer ${adminToken}`);
+        const res = await request(app).get('/users').set('Authorization', `Bearer ${adminToken}`);
 
         expect(res.body).toEqual({
             data: [],
@@ -154,31 +150,22 @@ describe('GET /users', () => {
 
     it('orders results by id ascending', async () => {
         mockList([sampleUser], 1);
-        await request(app)
-            .get('/users')
-            .set('Authorization', `Bearer ${adminToken}`);
+        await request(app).get('/users').set('Authorization', `Bearer ${adminToken}`);
         expect(mockOrderBy).toHaveBeenCalledWith('id', 'asc');
     });
 
-    it.each([['page=0'], ['itemsPerPage=101']])(
-        'returns 400 for %s',
-        async (qs) => {
-            const res = await request(app)
-                .get(`/users?${qs}`)
-                .set('Authorization', `Bearer ${adminToken}`);
-            expect(res.status).toBe(400);
-            expect(res.body).toHaveProperty('error', 'validation error');
-        },
-    );
+    it.each([['page=0'], ['itemsPerPage=101']])('returns 400 for %s', async (qs) => {
+        const res = await request(app).get(`/users?${qs}`).set('Authorization', `Bearer ${adminToken}`);
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'validation error');
+    });
 });
 
 describe('GET /users/:id', () => {
     it('should return a user by id', async () => {
         mockFirst.mockResolvedValueOnce(sampleUser);
 
-        const res = await request(app)
-            .get('/users/uuid-1')
-            .set('Authorization', `Bearer ${adminToken}`);
+        const res = await request(app).get('/users/uuid-1').set('Authorization', `Bearer ${adminToken}`);
 
         expect(res.status).toBe(200);
         expect(res.body).toEqual(sampleUser);
@@ -187,9 +174,7 @@ describe('GET /users/:id', () => {
     it('should return 404 if user not found', async () => {
         mockFirst.mockResolvedValueOnce(undefined);
 
-        const res = await request(app)
-            .get('/users/nonexistent')
-            .set('Authorization', `Bearer ${adminToken}`);
+        const res = await request(app).get('/users/nonexistent').set('Authorization', `Bearer ${adminToken}`);
 
         expect(res.status).toBe(404);
         expect(res.body).toHaveProperty('error', 'user not found');
@@ -205,9 +190,7 @@ describe('POST /users', () => {
     });
 
     it('should return 400 if email is missing', async () => {
-        const res = await request(app)
-            .post('/users')
-            .send({ displayName: 'johnd' });
+        const res = await request(app).post('/users').send({ displayName: 'johnd' });
 
         expect(res.status).toBe(400);
         expect(res.body).toHaveProperty('error', 'validation error');
@@ -274,10 +257,7 @@ describe('POST /users', () => {
 
 describe('PUT /users/:id', () => {
     it('should return 400 if no valid fields provided', async () => {
-        const res = await request(app)
-            .put('/users/uuid-1')
-            .set('Authorization', `Bearer ${selfToken}`)
-            .send({});
+        const res = await request(app).put('/users/uuid-1').set('Authorization', `Bearer ${selfToken}`).send({});
 
         expect(res.status).toBe(400);
         expect(res.body).toHaveProperty('error', 'validation error');
@@ -325,9 +305,7 @@ describe('DELETE /users/:id', () => {
     it('should return 404 if user not found', async () => {
         mockDel.mockResolvedValueOnce(0);
 
-        const res = await request(app)
-            .delete('/users/nonexistent')
-            .set('Authorization', `Bearer ${adminToken}`);
+        const res = await request(app).delete('/users/nonexistent').set('Authorization', `Bearer ${adminToken}`);
 
         expect(res.status).toBe(404);
         expect(res.body).toHaveProperty('error', 'user not found');
@@ -336,9 +314,7 @@ describe('DELETE /users/:id', () => {
     it('should delete and return 204', async () => {
         mockDel.mockResolvedValueOnce(1);
 
-        const res = await request(app)
-            .delete('/users/uuid-1')
-            .set('Authorization', `Bearer ${selfToken}`);
+        const res = await request(app).delete('/users/uuid-1').set('Authorization', `Bearer ${selfToken}`);
 
         expect(res.status).toBe(204);
     });

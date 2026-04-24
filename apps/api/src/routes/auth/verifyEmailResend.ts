@@ -42,40 +42,36 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post(
-    '/verify_email_resend',
-    validate(verifyEmailResendSchema),
-    async (req: Request, res: Response) => {
-        const { email } = req.body;
+router.post('/verify_email_resend', validate(verifyEmailResendSchema), async (req: Request, res: Response) => {
+    const { email } = req.body;
 
-        const user = await db('users').where({ email }).first();
-        if (!user || user.emailVerifiedAt) {
-            res.json({ message: 'verification email sent' });
-            return;
-        }
-
-        await db('authTokens').where({ email, type: 'confirmation' }).del();
-
-        const token = crypto.randomBytes(32).toString('hex');
-        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-        await db('authTokens').insert({
-            email,
-            token,
-            expiresAt,
-            type: 'confirmation',
-        });
-
-        const appUrl = process.env.APP_URL || 'http://localhost:5173';
-        await mailer.sendMail({
-            from: process.env.SMTP_FROM || 'noreply@eggplant.app',
-            to: email,
-            subject: 'Verify your email',
-            text: `Click here to verify your email: ${appUrl}/verify-email?token=${token}&email=${encodeURIComponent(email)}\n\nThis link expires in 24 hours.`,
-        });
-
+    const user = await db('users').where({ email }).first();
+    if (!user || user.emailVerifiedAt) {
         res.json({ message: 'verification email sent' });
-    },
-);
+        return;
+    }
+
+    await db('authTokens').where({ email, type: 'confirmation' }).del();
+
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    await db('authTokens').insert({
+        email,
+        token,
+        expiresAt,
+        type: 'confirmation',
+    });
+
+    const appUrl = process.env.APP_URL || 'http://localhost:5173';
+    await mailer.sendMail({
+        from: process.env.SMTP_FROM || 'noreply@eggplant.app',
+        to: email,
+        subject: 'Verify your email',
+        text: `Click here to verify your email: ${appUrl}/verify-email?token=${token}&email=${encodeURIComponent(email)}\n\nThis link expires in 24 hours.`,
+    });
+
+    res.json({ message: 'verification email sent' });
+});
 
 export default router;

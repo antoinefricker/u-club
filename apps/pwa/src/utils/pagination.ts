@@ -15,9 +15,7 @@ export type PaginationArgs = {
     itemsPerPage?: number;
 };
 
-export function buildListQueryString(
-    params: Record<string, string | number | undefined | null>,
-): string {
+export function buildListQueryString(params: Record<string, string | number | undefined | null>): string {
     const search = new URLSearchParams();
     for (const [key, value] of Object.entries(params)) {
         if (value == null || value === '') continue;

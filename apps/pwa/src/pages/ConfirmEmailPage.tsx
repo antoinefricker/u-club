@@ -32,9 +32,7 @@ export function ConfirmEmailPage() {
                 window.location.reload();
             })
             .catch((err) => {
-                setError(
-                    err instanceof Error ? err.message : 'Confirmation failed',
-                );
+                setError(err instanceof Error ? err.message : 'Confirmation failed');
             });
     }, [token, email, navigate]);
 

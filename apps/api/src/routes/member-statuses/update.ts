@@ -66,20 +66,14 @@ router.put(
         const updates = { ...req.body };
 
         if (updates.label) {
-            const existing = await db('memberStatuses')
-                .where({ label: updates.label })
-                .whereNot({ id })
-                .first();
+            const existing = await db('memberStatuses').where({ label: updates.label }).whereNot({ id }).first();
             if (existing) {
                 res.status(409).json({ error: 'label already in use' });
                 return;
             }
         }
 
-        const [status] = await db('memberStatuses')
-            .where({ id })
-            .update(updates)
-            .returning(['id', 'label']);
+        const [status] = await db('memberStatuses').where({ id }).update(updates).returning(['id', 'label']);
 
         if (!status) {
             res.status(404).json({ error: 'member status not found' });

@@ -5,10 +5,7 @@ interface EmptyListRowProps {
     message?: string;
 }
 
-export function EmptyListRow({
-    colSpan,
-    message = '¯\\_(ツ)_/¯ No results',
-}: EmptyListRowProps) {
+export function EmptyListRow({ colSpan, message = '¯\\_(ツ)_/¯ No results' }: EmptyListRowProps) {
     return (
         <Table.Tr>
             <Table.Td colSpan={colSpan}>

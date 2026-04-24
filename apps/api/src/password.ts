@@ -13,10 +13,7 @@ export function hashPassword(password: string): Promise<string> {
     });
 }
 
-export function verifyPassword(
-    password: string,
-    stored: string,
-): Promise<boolean> {
+export function verifyPassword(password: string, stored: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
         const [salt, hash] = stored.split(':');
         scrypt(password, salt, KEY_LENGTH, (err, derivedKey) => {

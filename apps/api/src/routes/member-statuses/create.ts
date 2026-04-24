@@ -57,9 +57,7 @@ router.post(
             return;
         }
 
-        const [status] = await db('memberStatuses')
-            .insert({ label })
-            .returning(['id', 'label']);
+        const [status] = await db('memberStatuses').insert({ label }).returning(['id', 'label']);
 
         res.status(201).json(status);
     },

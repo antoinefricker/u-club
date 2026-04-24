@@ -1,24 +1,12 @@
 import { useEffect } from 'react';
-import {
-    Button,
-    Grid,
-    Group,
-    Loader,
-    Select,
-    TextInput,
-    Title,
-} from '@mantine/core';
+import { Button, Grid, Group, Loader, Select, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import dayjs from 'dayjs';
 import { useNavigate, useParams } from 'react-router';
 import { FormWrapper } from '../../components/admin/forms/FormWrapper';
 import { PageTitle } from '../../components/layout/PageTitle';
-import {
-    useMember,
-    useCreateMember,
-    useUpdateMember,
-} from '../../hooks/useMembers';
+import { useMember, useCreateMember, useUpdateMember } from '../../hooks/useMembers';
 import { useMemberStatuses } from '../../hooks/useMemberStatuses';
 import { MEMBER_GENDER_OPTIONS, type MemberGender } from '../../types/Member';
 import { UserMemberLinks } from '../../components/admin/user/UserMemberLinks';
@@ -33,8 +21,7 @@ export function MemberFormPage() {
     const createMember = useCreateMember();
     const updateMember = useUpdateMember();
 
-    const statusOptions =
-        statusesData?.data.map((s) => ({ value: s.id, label: s.label })) ?? [];
+    const statusOptions = statusesData?.data.map((s) => ({ value: s.id, label: s.label })) ?? [];
 
     const form = useForm<{
         firstName: string;
@@ -63,9 +50,7 @@ export function MemberFormPage() {
                 firstName: member.firstName,
                 lastName: member.lastName,
                 gender: member.gender,
-                birthdate: member.birthdate
-                    ? dayjs(member.birthdate).format('YYYY-MM-DD')
-                    : '',
+                birthdate: member.birthdate ? dayjs(member.birthdate).format('YYYY-MM-DD') : '',
                 statusId: member.statusId ?? '',
             });
         }
@@ -145,11 +130,7 @@ export function MemberFormPage() {
                             />
                         </Grid.Col>
                         <Grid.Col span={{ base: 12, sm: 3 }}>
-                            <TextInput
-                                label="Birth date"
-                                type="date"
-                                {...form.getInputProps('birthdate')}
-                            />
+                            <TextInput label="Birth date" type="date" {...form.getInputProps('birthdate')} />
                         </Grid.Col>
                         <Grid.Col span={{ base: 12, sm: 3 }}>
                             <Select
@@ -163,19 +144,10 @@ export function MemberFormPage() {
                         <Grid.Col span={{ base: 12, sm: 1 }}></Grid.Col>
                         <Grid.Col span={12}>
                             <Group>
-                                <Button
-                                    type="submit"
-                                    loading={
-                                        createMember.isPending ||
-                                        updateMember.isPending
-                                    }
-                                >
+                                <Button type="submit" loading={createMember.isPending || updateMember.isPending}>
                                     {isEdit ? 'Update' : 'Create'}
                                 </Button>
-                                <Button
-                                    variant="subtle"
-                                    onClick={() => navigate('/admin/members')}
-                                >
+                                <Button variant="subtle" onClick={() => navigate('/admin/members')}>
                                     Cancel
                                 </Button>
                             </Group>
@@ -187,10 +159,7 @@ export function MemberFormPage() {
                 <Title order={3} mt="xl" mb="md">
                     Family & members
                 </Title>
-                <UserMemberLinks
-                    memberId={member?.id}
-                    useUserPointOfView={false}
-                />
+                <UserMemberLinks memberId={member?.id} useUserPointOfView={false} />
             </FormWrapper>
         </>
     );

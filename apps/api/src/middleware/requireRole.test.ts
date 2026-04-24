@@ -31,11 +31,7 @@ describe('requireRole', () => {
         const res = mockRes();
         const next = vi.fn() as NextFunction;
 
-        requireRole('admin')(
-            reqWith({ id: 'u1', email: 'a@b.com', role: 'user' }),
-            res,
-            next,
-        );
+        requireRole('admin')(reqWith({ id: 'u1', email: 'a@b.com', role: 'user' }), res, next);
 
         expect(res.status).toHaveBeenCalledWith(403);
         expect(next).not.toHaveBeenCalled();
@@ -45,11 +41,7 @@ describe('requireRole', () => {
         const res = mockRes();
         const next = vi.fn() as NextFunction;
 
-        requireRole('admin')(
-            reqWith({ id: 'u1', email: 'a@b.com', role: 'admin' }),
-            res,
-            next,
-        );
+        requireRole('admin')(reqWith({ id: 'u1', email: 'a@b.com', role: 'admin' }), res, next);
 
         expect(next).toHaveBeenCalledOnce();
         expect(res.status).not.toHaveBeenCalled();
@@ -59,19 +51,11 @@ describe('requireRole', () => {
         const middleware = requireRole('admin', 'manager');
 
         const next1 = vi.fn() as NextFunction;
-        middleware(
-            reqWith({ id: 'u1', email: 'a@b.com', role: 'manager' }),
-            mockRes(),
-            next1,
-        );
+        middleware(reqWith({ id: 'u1', email: 'a@b.com', role: 'manager' }), mockRes(), next1);
         expect(next1).toHaveBeenCalledOnce();
 
         const next2 = vi.fn() as NextFunction;
-        middleware(
-            reqWith({ id: 'u2', email: 'b@b.com', role: 'admin' }),
-            mockRes(),
-            next2,
-        );
+        middleware(reqWith({ id: 'u2', email: 'b@b.com', role: 'admin' }), mockRes(), next2);
         expect(next2).toHaveBeenCalledOnce();
     });
 });

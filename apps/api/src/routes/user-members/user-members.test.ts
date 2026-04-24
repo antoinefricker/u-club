@@ -99,9 +99,7 @@ describe('GET /user-members', () => {
     it('returns envelope with defaults for admin without filter', async () => {
         mockList([sampleUserMember], 1);
 
-        const res = await request(app)
-            .get('/user-members')
-            .set('Authorization', `Bearer ${adminToken}`);
+        const res = await request(app).get('/user-members').set('Authorization', `Bearer ${adminToken}`);
 
         expect(res.status).toBe(200);
         expect(res.body).toEqual({
@@ -124,10 +122,7 @@ describe('GET /user-members', () => {
             .set('Authorization', `Bearer ${adminToken}`);
 
         expect(res.status).toBe(200);
-        expect(mockWhere).toHaveBeenCalledWith(
-            'userMembers.userId',
-            USER_UUID_1,
-        );
+        expect(mockWhere).toHaveBeenCalledWith('userMembers.userId', USER_UUID_1);
     });
 
     it('applies memberId filter when admin passes it', async () => {
@@ -138,18 +133,11 @@ describe('GET /user-members', () => {
             .set('Authorization', `Bearer ${adminToken}`);
 
         expect(res.status).toBe(200);
-        expect(mockWhere).toHaveBeenCalledWith(
-            'userMembers.memberId',
-            MEMBER_UUID_1,
-        );
+        expect(mockWhere).toHaveBeenCalledWith('userMembers.memberId', MEMBER_UUID_1);
     });
 
     it('applies memberId filter when manager passes it', async () => {
-        const managerToken = createTestToken(
-            'uuid-manager',
-            'manager@example.com',
-            'manager',
-        );
+        const managerToken = createTestToken('uuid-manager', 'manager@example.com', 'manager');
         mockList([sampleUserMember], 1);
 
         const res = await request(app)
@@ -157,17 +145,12 @@ describe('GET /user-members', () => {
             .set('Authorization', `Bearer ${managerToken}`);
 
         expect(res.status).toBe(200);
-        expect(mockWhere).toHaveBeenCalledWith(
-            'userMembers.memberId',
-            MEMBER_UUID_1,
-        );
+        expect(mockWhere).toHaveBeenCalledWith('userMembers.memberId', MEMBER_UUID_1);
     });
 
     it('returns 400 when userId and memberId are both provided', async () => {
         const res = await request(app)
-            .get(
-                `/user-members?userId=${USER_UUID_1}&memberId=${MEMBER_UUID_1}`,
-            )
+            .get(`/user-members?userId=${USER_UUID_1}&memberId=${MEMBER_UUID_1}`)
             .set('Authorization', `Bearer ${adminToken}`);
 
         expect(res.status).toBe(400);
@@ -202,9 +185,7 @@ describe('GET /user-members', () => {
     it('selects joined user and member identity fields', async () => {
         mockList([sampleUserMember], 1);
 
-        await request(app)
-            .get('/user-members')
-            .set('Authorization', `Bearer ${adminToken}`);
+        await request(app).get('/user-members').set('Authorization', `Bearer ${adminToken}`);
 
         expect(mockSelect).toHaveBeenCalledWith(
             'userMembers.id',
@@ -229,10 +210,7 @@ describe('GET /user-members', () => {
 
         expect(res.status).toBe(200);
         expect(mockWhere).toHaveBeenCalledWith('userMembers.userId', 'uuid-1');
-        expect(mockWhere).not.toHaveBeenCalledWith(
-            'userMembers.userId',
-            USER_UUID_OTHER,
-        );
+        expect(mockWhere).not.toHaveBeenCalledWith('userMembers.userId', USER_UUID_OTHER);
     });
 
     it('restricts regular users to their own userId and ignores memberId query param', async () => {
@@ -244,10 +222,7 @@ describe('GET /user-members', () => {
 
         expect(res.status).toBe(200);
         expect(mockWhere).toHaveBeenCalledWith('userMembers.userId', 'uuid-1');
-        expect(mockWhere).not.toHaveBeenCalledWith(
-            'userMembers.memberId',
-            MEMBER_UUID_1,
-        );
+        expect(mockWhere).not.toHaveBeenCalledWith('userMembers.memberId', MEMBER_UUID_1);
     });
 
     it('applies page=2 and itemsPerPage=10', async () => {
@@ -266,9 +241,7 @@ describe('GET /user-members', () => {
     it('returns empty envelope when no rows match', async () => {
         mockList([], 0);
 
-        const res = await request(app)
-            .get('/user-members')
-            .set('Authorization', `Bearer ${adminToken}`);
+        const res = await request(app).get('/user-members').set('Authorization', `Bearer ${adminToken}`);
 
         expect(res.body).toEqual({
             data: [],
@@ -283,22 +256,15 @@ describe('GET /user-members', () => {
 
     it('orders results by userMembers.id ascending', async () => {
         mockList([sampleUserMember], 1);
-        await request(app)
-            .get('/user-members')
-            .set('Authorization', `Bearer ${adminToken}`);
+        await request(app).get('/user-members').set('Authorization', `Bearer ${adminToken}`);
         expect(mockOrderBy).toHaveBeenCalledWith('userMembers.id', 'asc');
     });
 
-    it.each([['page=0'], ['itemsPerPage=101']])(
-        'returns 400 for %s',
-        async (qs) => {
-            const res = await request(app)
-                .get(`/user-members?${qs}`)
-                .set('Authorization', `Bearer ${adminToken}`);
-            expect(res.status).toBe(400);
-            expect(res.body).toHaveProperty('error', 'validation error');
-        },
-    );
+    it.each([['page=0'], ['itemsPerPage=101']])('returns 400 for %s', async (qs) => {
+        const res = await request(app).get(`/user-members?${qs}`).set('Authorization', `Bearer ${adminToken}`);
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'validation error');
+    });
 
     it('returns 401 when unauthenticated', async () => {
         const res = await request(app).get('/user-members');
@@ -311,14 +277,11 @@ describe('POST /user-members', () => {
         mockFirst.mockResolvedValueOnce(undefined);
         mockReturning.mockResolvedValueOnce([sampleUserMember]);
 
-        const res = await request(app)
-            .post('/user-members')
-            .set('Authorization', `Bearer ${adminToken}`)
-            .send({
-                userId: 'uuid-1',
-                memberId: 'member-1',
-                type: 'self',
-            });
+        const res = await request(app).post('/user-members').set('Authorization', `Bearer ${adminToken}`).send({
+            userId: 'uuid-1',
+            memberId: 'member-1',
+            type: 'self',
+        });
 
         expect(res.status).toBe(201);
         expect(res.body).toEqual(sampleUserMember);
@@ -328,47 +291,35 @@ describe('POST /user-members', () => {
         mockFirst.mockResolvedValueOnce(undefined);
         mockReturning.mockResolvedValueOnce([sampleUserMember]);
 
-        const res = await request(app)
-            .post('/user-members')
-            .set('Authorization', `Bearer ${userToken}`)
-            .send({
-                userId: 'uuid-1',
-                memberId: 'member-1',
-                type: 'self',
-            });
+        const res = await request(app).post('/user-members').set('Authorization', `Bearer ${userToken}`).send({
+            userId: 'uuid-1',
+            memberId: 'member-1',
+            type: 'self',
+        });
 
         expect(res.status).toBe(201);
         expect(res.body).toEqual(sampleUserMember);
     });
 
     it('should return 403 when regular user creates for another user', async () => {
-        const res = await request(app)
-            .post('/user-members')
-            .set('Authorization', `Bearer ${userToken}`)
-            .send({
-                userId: 'uuid-other',
-                memberId: 'member-1',
-                type: 'self',
-            });
+        const res = await request(app).post('/user-members').set('Authorization', `Bearer ${userToken}`).send({
+            userId: 'uuid-other',
+            memberId: 'member-1',
+            type: 'self',
+        });
 
         expect(res.status).toBe(403);
-        expect(res.body).toHaveProperty(
-            'error',
-            'not allowed to create for another user',
-        );
+        expect(res.body).toHaveProperty('error', 'not allowed to create for another user');
     });
 
     it('should return 409 when duplicate (userId, memberId) pair', async () => {
         mockFirst.mockResolvedValueOnce(sampleUserMember);
 
-        const res = await request(app)
-            .post('/user-members')
-            .set('Authorization', `Bearer ${adminToken}`)
-            .send({
-                userId: 'uuid-1',
-                memberId: 'member-1',
-                type: 'self',
-            });
+        const res = await request(app).post('/user-members').set('Authorization', `Bearer ${adminToken}`).send({
+            userId: 'uuid-1',
+            memberId: 'member-1',
+            type: 'self',
+        });
 
         expect(res.status).toBe(409);
         expect(res.body).toHaveProperty('error', 'association already exists');
@@ -412,10 +363,7 @@ describe('PUT /user-members/:id', () => {
             .send({ type: 'relative' });
 
         expect(res.status).toBe(404);
-        expect(res.body).toHaveProperty(
-            'error',
-            'user-member association not found',
-        );
+        expect(res.body).toHaveProperty('error', 'user-member association not found');
     });
 
     it('should return 403 when non-owner regular user updates', async () => {
@@ -430,17 +378,11 @@ describe('PUT /user-members/:id', () => {
             .send({ type: 'relative' });
 
         expect(res.status).toBe(403);
-        expect(res.body).toHaveProperty(
-            'error',
-            'not allowed to update this association',
-        );
+        expect(res.body).toHaveProperty('error', 'not allowed to update this association');
     });
 
     it('should return 400 when body is empty', async () => {
-        const res = await request(app)
-            .put('/user-members/um-1')
-            .set('Authorization', `Bearer ${adminToken}`)
-            .send({});
+        const res = await request(app).put('/user-members/um-1').set('Authorization', `Bearer ${adminToken}`).send({});
 
         expect(res.status).toBe(400);
         expect(res.body).toHaveProperty('error', 'validation error');
@@ -455,9 +397,7 @@ describe('DELETE /user-members/:id', () => {
         });
         mockDel.mockResolvedValueOnce(1);
 
-        const res = await request(app)
-            .delete('/user-members/um-1')
-            .set('Authorization', `Bearer ${userToken}`);
+        const res = await request(app).delete('/user-members/um-1').set('Authorization', `Bearer ${userToken}`);
 
         expect(res.status).toBe(204);
     });
@@ -465,15 +405,10 @@ describe('DELETE /user-members/:id', () => {
     it('should return 404 when user-member not found', async () => {
         mockFirst.mockResolvedValueOnce(undefined);
 
-        const res = await request(app)
-            .delete('/user-members/nonexistent')
-            .set('Authorization', `Bearer ${adminToken}`);
+        const res = await request(app).delete('/user-members/nonexistent').set('Authorization', `Bearer ${adminToken}`);
 
         expect(res.status).toBe(404);
-        expect(res.body).toHaveProperty(
-            'error',
-            'user-member association not found',
-        );
+        expect(res.body).toHaveProperty('error', 'user-member association not found');
     });
 
     it('should return 403 when non-owner regular user deletes', async () => {
@@ -482,14 +417,9 @@ describe('DELETE /user-members/:id', () => {
             userId: 'uuid-other',
         });
 
-        const res = await request(app)
-            .delete('/user-members/um-1')
-            .set('Authorization', `Bearer ${userToken}`);
+        const res = await request(app).delete('/user-members/um-1').set('Authorization', `Bearer ${userToken}`);
 
         expect(res.status).toBe(403);
-        expect(res.body).toHaveProperty(
-            'error',
-            'not allowed to delete this association',
-        );
+        expect(res.body).toHaveProperty('error', 'not allowed to delete this association');
     });
 });

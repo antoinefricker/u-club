@@ -36,18 +36,14 @@ describe('POST /auth/verify_email', () => {
     });
 
     it('should return 400 if token is missing', async () => {
-        const res = await request(app)
-            .post('/auth/verify_email')
-            .send({ email: 'test@example.com' });
+        const res = await request(app).post('/auth/verify_email').send({ email: 'test@example.com' });
 
         expect(res.status).toBe(400);
         expect(res.body).toHaveProperty('error', 'validation error');
     });
 
     it('should return 400 if email is missing', async () => {
-        const res = await request(app)
-            .post('/auth/verify_email')
-            .send({ token: 'valid-token' });
+        const res = await request(app).post('/auth/verify_email').send({ token: 'valid-token' });
 
         expect(res.status).toBe(400);
         expect(res.body).toHaveProperty('error', 'validation error');

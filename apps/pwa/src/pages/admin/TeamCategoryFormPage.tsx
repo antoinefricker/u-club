@@ -5,11 +5,7 @@ import { notifications } from '@mantine/notifications';
 import { useNavigate, useParams } from 'react-router';
 import { FormWrapper } from '../../components/admin/forms/FormWrapper';
 import { PageTitle } from '../../components/layout/PageTitle';
-import {
-    useTeamCategory,
-    useCreateTeamCategory,
-    useUpdateTeamCategory,
-} from '../../hooks/useTeamCategories';
+import { useTeamCategory, useCreateTeamCategory, useUpdateTeamCategory } from '../../hooks/useTeamCategories';
 import { useClubs } from '../../hooks/useClubs';
 
 export function TeamCategoryFormPage() {
@@ -22,8 +18,7 @@ export function TeamCategoryFormPage() {
     const createCategory = useCreateTeamCategory();
     const updateCategory = useUpdateTeamCategory();
 
-    const clubOptions =
-        clubsData?.data.map((c) => ({ value: c.id, label: c.name })) ?? [];
+    const clubOptions = clubsData?.data.map((c) => ({ value: c.id, label: c.name })) ?? [];
 
     const form = useForm({
         initialValues: {
@@ -82,9 +77,7 @@ export function TeamCategoryFormPage() {
 
     return (
         <>
-            <PageTitle
-                label={isEdit ? 'Edit team category' : 'New team category'}
-            />
+            <PageTitle label={isEdit ? 'Edit team category' : 'New team category'} />
 
             <FormWrapper>
                 <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
@@ -96,11 +89,7 @@ export function TeamCategoryFormPage() {
                                 data={clubOptions}
                                 required
                                 disabled={isEdit}
-                                description={
-                                    isEdit
-                                        ? "Can't be changed after creation"
-                                        : undefined
-                                }
+                                description={isEdit ? "Can't be changed after creation" : undefined}
                                 {...form.getInputProps('clubId')}
                             />
                         </Grid.Col>
@@ -114,21 +103,10 @@ export function TeamCategoryFormPage() {
                         </Grid.Col>
                         <Grid.Col span={12}>
                             <Group>
-                                <Button
-                                    type="submit"
-                                    loading={
-                                        createCategory.isPending ||
-                                        updateCategory.isPending
-                                    }
-                                >
+                                <Button type="submit" loading={createCategory.isPending || updateCategory.isPending}>
                                     {isEdit ? 'Update' : 'Create'}
                                 </Button>
-                                <Button
-                                    variant="subtle"
-                                    onClick={() =>
-                                        navigate('/admin/team-categories')
-                                    }
-                                >
+                                <Button variant="subtle" onClick={() => navigate('/admin/team-categories')}>
                                     Cancel
                                 </Button>
                             </Group>

@@ -49,16 +49,7 @@ router.post(
                 statusId: statusId || null,
                 birthdate: birthdate || null,
             })
-            .returning([
-                'id',
-                'statusId',
-                'firstName',
-                'lastName',
-                'birthdate',
-                'gender',
-                'createdAt',
-                'updatedAt',
-            ]);
+            .returning(['id', 'statusId', 'firstName', 'lastName', 'birthdate', 'gender', 'createdAt', 'updatedAt']);
 
         res.status(201).json(member);
     },

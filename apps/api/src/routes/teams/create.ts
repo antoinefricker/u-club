@@ -49,16 +49,7 @@ router.post(
                 description: description || null,
                 categoryId: categoryId || null,
             })
-            .returning([
-                'id',
-                'clubId',
-                'categoryId',
-                'label',
-                'gender',
-                'description',
-                'createdAt',
-                'updatedAt',
-            ]);
+            .returning(['id', 'clubId', 'categoryId', 'label', 'gender', 'description', 'createdAt', 'updatedAt']);
 
         res.status(201).json(team);
     },

@@ -1,10 +1,4 @@
-import {
-    useCallback,
-    useEffect,
-    useMemo,
-    useState,
-    type ReactNode,
-} from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { User } from '../types/User';
 import { AuthContext } from './useAuthContext';
 
@@ -27,13 +21,9 @@ async function fetchUser(userId: string, token: string): Promise<User> {
 }
 
 export function AuthContextProvider({ children }: { children: ReactNode }) {
-    const [token, setToken] = useState<string | null>(() =>
-        localStorage.getItem(TOKEN_KEY),
-    );
+    const [token, setToken] = useState<string | null>(() => localStorage.getItem(TOKEN_KEY));
     const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(
-        () => !!localStorage.getItem(TOKEN_KEY),
-    );
+    const [loading, setLoading] = useState(() => !!localStorage.getItem(TOKEN_KEY));
 
     useEffect(() => {
         if (!token) return;
@@ -98,7 +88,5 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
 
     if (loading) return null;
 
-    return (
-        <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-    );
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

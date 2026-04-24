@@ -1,15 +1,5 @@
 import { useState } from 'react';
-import {
-    TextInput,
-    PasswordInput,
-    Button,
-    Stack,
-    Title,
-    Alert,
-    Paper,
-    Anchor,
-    Text,
-} from '@mantine/core';
+import { TextInput, PasswordInput, Button, Stack, Title, Alert, Paper, Anchor, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useAuthContext } from '../../auth/useAuthContext';
 import { emailValidation } from '../../utils/formValidations/emailValidation';
@@ -44,10 +34,7 @@ export function LoginForm({ onSwitchMode, onForgotPassword }: LoginFormProps) {
         try {
             await login(values.email, values.password);
         } catch (err) {
-            const message =
-                err instanceof Error
-                    ? err.message
-                    : 'Invalid email or password';
+            const message = err instanceof Error ? err.message : 'Invalid email or password';
             if (message === 'email not verified') {
                 setUnverifiedEmail(values.email);
             } else {
@@ -90,15 +77,9 @@ export function LoginForm({ onSwitchMode, onForgotPassword }: LoginFormProps) {
                         {unverifiedEmail && (
                             <>
                                 <Alert color="orange" variant="light">
-                                    Please verify your email address. Check your
-                                    inbox for the confirmation link.
+                                    Please verify your email address. Check your inbox for the confirmation link.
                                 </Alert>
-                                <Button
-                                    variant="light"
-                                    fullWidth
-                                    loading={resending}
-                                    onClick={handleResend}
-                                >
+                                <Button variant="light" fullWidth loading={resending} onClick={handleResend}>
                                     Resend confirmation email
                                 </Button>
                             </>
@@ -120,11 +101,7 @@ export function LoginForm({ onSwitchMode, onForgotPassword }: LoginFormProps) {
                         />
 
                         <Text size="sm" ta="right">
-                            <Anchor
-                                component="button"
-                                type="button"
-                                onClick={onForgotPassword}
-                            >
+                            <Anchor component="button" type="button" onClick={onForgotPassword}>
                                 Forgot password?
                             </Anchor>
                         </Text>
@@ -135,11 +112,7 @@ export function LoginForm({ onSwitchMode, onForgotPassword }: LoginFormProps) {
 
                         <Text size="sm" ta="center">
                             No account?{' '}
-                            <Anchor
-                                component="button"
-                                type="button"
-                                onClick={onSwitchMode}
-                            >
+                            <Anchor component="button" type="button" onClick={onSwitchMode}>
                                 Create an account
                             </Anchor>
                         </Text>

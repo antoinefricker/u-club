@@ -5,10 +5,7 @@ export async function up(knex: Knex): Promise<void> {
         table.dropColumn('type');
     });
     await knex.schema.alterTable('auth_tokens', (table) => {
-        table
-            .enum('type', ['login', 'confirmation', 'password_reset'])
-            .notNullable()
-            .defaultTo('login');
+        table.enum('type', ['login', 'confirmation', 'password_reset']).notNullable().defaultTo('login');
     });
 }
 

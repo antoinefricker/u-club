@@ -51,10 +51,7 @@ describe('requireAuth', () => {
 
     it('should return 500 when JWT_SECRET is not configured', () => {
         delete process.env.JWT_SECRET;
-        const token = jwt.sign(
-            { sub: 'u1', email: 'a@b.com', role: 'user' },
-            SECRET,
-        );
+        const token = jwt.sign({ sub: 'u1', email: 'a@b.com', role: 'user' }, SECRET);
         const res = mockRes();
         const next = vi.fn() as NextFunction;
 
@@ -81,11 +78,7 @@ describe('requireAuth', () => {
     });
 
     it('should return 401 when the token has expired', () => {
-        const token = jwt.sign(
-            { sub: 'u1', email: 'a@b.com', role: 'user' },
-            SECRET,
-            { expiresIn: '-1s' },
-        );
+        const token = jwt.sign({ sub: 'u1', email: 'a@b.com', role: 'user' }, SECRET, { expiresIn: '-1s' });
         const res = mockRes();
         const next = vi.fn() as NextFunction;
 
@@ -98,10 +91,7 @@ describe('requireAuth', () => {
     });
 
     it('should return 401 when the token was signed with a different secret', () => {
-        const token = jwt.sign(
-            { sub: 'u1', email: 'a@b.com', role: 'user' },
-            'wrong-secret',
-        );
+        const token = jwt.sign({ sub: 'u1', email: 'a@b.com', role: 'user' }, 'wrong-secret');
         const res = mockRes();
         const next = vi.fn() as NextFunction;
 
@@ -111,10 +101,7 @@ describe('requireAuth', () => {
     });
 
     it('should attach user to req and call next() for a valid token', () => {
-        const token = jwt.sign(
-            { sub: 'u1', email: 'a@b.com', role: 'admin' },
-            SECRET,
-        );
+        const token = jwt.sign({ sub: 'u1', email: 'a@b.com', role: 'admin' }, SECRET);
         const req = reqWith(`Bearer ${token}`);
         const res = mockRes();
         const next = vi.fn() as NextFunction;

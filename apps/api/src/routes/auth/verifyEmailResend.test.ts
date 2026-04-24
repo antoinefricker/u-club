@@ -36,9 +36,7 @@ describe('POST /auth/verify_email_resend', () => {
     });
 
     it('should return 400 if email is missing', async () => {
-        const res = await request(app)
-            .post('/auth/verify_email_resend')
-            .send({});
+        const res = await request(app).post('/auth/verify_email_resend').send({});
 
         expect(res.status).toBe(400);
         expect(res.body).toHaveProperty('error', 'validation error');
@@ -47,9 +45,7 @@ describe('POST /auth/verify_email_resend', () => {
     it('should return 200 silently if user does not exist', async () => {
         mockFirst.mockResolvedValueOnce(undefined);
 
-        const res = await request(app)
-            .post('/auth/verify_email_resend')
-            .send({ email: 'unknown@example.com' });
+        const res = await request(app).post('/auth/verify_email_resend').send({ email: 'unknown@example.com' });
 
         expect(res.status).toBe(200);
         expect(res.body).toHaveProperty('message', 'verification email sent');
@@ -63,9 +59,7 @@ describe('POST /auth/verify_email_resend', () => {
             emailVerifiedAt: '2026-01-01T00:00:00.000Z',
         });
 
-        const res = await request(app)
-            .post('/auth/verify_email_resend')
-            .send({ email: 'verified@example.com' });
+        const res = await request(app).post('/auth/verify_email_resend').send({ email: 'verified@example.com' });
 
         expect(res.status).toBe(200);
         expect(res.body).toHaveProperty('message', 'verification email sent');
@@ -79,9 +73,7 @@ describe('POST /auth/verify_email_resend', () => {
             emailVerifiedAt: null,
         });
 
-        const res = await request(app)
-            .post('/auth/verify_email_resend')
-            .send({ email: 'unverified@example.com' });
+        const res = await request(app).post('/auth/verify_email_resend').send({ email: 'unverified@example.com' });
 
         expect(res.status).toBe(200);
         expect(res.body).toHaveProperty('message', 'verification email sent');
@@ -103,9 +95,7 @@ describe('POST /auth/verify_email_resend', () => {
         });
 
         const before = Date.now();
-        await request(app)
-            .post('/auth/verify_email_resend')
-            .send({ email: 'unverified@example.com' });
+        await request(app).post('/auth/verify_email_resend').send({ email: 'unverified@example.com' });
         const after = Date.now();
 
         const insertArg = mockInsert.mock.calls[0][0];
@@ -124,9 +114,7 @@ describe('POST /auth/verify_email_resend', () => {
             emailVerifiedAt: null,
         });
 
-        await request(app)
-            .post('/auth/verify_email_resend')
-            .send({ email: 'user+alias@example.com' });
+        await request(app).post('/auth/verify_email_resend').send({ email: 'user+alias@example.com' });
 
         const mailArg = mockSendMail.mock.calls[0][0];
         expect(mailArg.text).toContain('email=user%2Balias%40example.com');

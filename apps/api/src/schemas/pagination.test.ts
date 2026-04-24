@@ -1,10 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-    DEFAULT_ITEMS_PER_PAGE,
-    DEFAULT_PAGE,
-    MAX_ITEMS_PER_PAGE,
-    paginationQuerySchema,
-} from './pagination.js';
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE, MAX_ITEMS_PER_PAGE, paginationQuerySchema } from './pagination.js';
 
 describe('paginationQuerySchema', () => {
     it('applies defaults when no query params are present', () => {

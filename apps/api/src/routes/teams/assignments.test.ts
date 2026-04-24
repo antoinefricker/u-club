@@ -67,9 +67,7 @@ describe('GET /teams/:teamId/members', () => {
     it('should return a list of team members', async () => {
         mockSelect.mockResolvedValueOnce([sampleMemberWithRole]);
 
-        const res = await request(app)
-            .get('/teams/team-1/members')
-            .set('Authorization', `Bearer ${adminToken}`);
+        const res = await request(app).get('/teams/team-1/members').set('Authorization', `Bearer ${adminToken}`);
 
         expect(res.status).toBe(200);
         expect(res.body).toEqual([sampleMemberWithRole]);
@@ -116,10 +114,7 @@ describe('POST /teams/:teamId/members', () => {
             .send({ memberId: 'member-1', role: 'player' });
 
         expect(res.status).toBe(409);
-        expect(res.body).toHaveProperty(
-            'error',
-            'Member is already assigned to this team',
-        );
+        expect(res.body).toHaveProperty('error', 'Member is already assigned to this team');
     });
 
     it('should create an assignment and return 201', async () => {

@@ -62,10 +62,7 @@ router.put(
         const updates = { ...req.body };
 
         if (updates.label) {
-            const current = await db('teamCategories')
-                .select('clubId')
-                .where({ id })
-                .first();
+            const current = await db('teamCategories').select('clubId').where({ id }).first();
             if (!current) {
                 res.status(404).json({ error: 'team category not found' });
                 return;

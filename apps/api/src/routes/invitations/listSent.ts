@@ -1,14 +1,8 @@
 import { Router, Request, Response } from 'express';
 import db from '../../db.js';
-import {
-    requireAuth,
-    type AuthenticatedRequest,
-} from '../../middleware/auth.js';
+import { requireAuth, type AuthenticatedRequest } from '../../middleware/auth.js';
 import { paginationQuerySchema } from '../../schemas/pagination.js';
-import {
-    applyPagination,
-    buildPaginationMeta,
-} from '../../utils/pagination.js';
+import { applyPagination, buildPaginationMeta } from '../../utils/pagination.js';
 
 const router = Router();
 

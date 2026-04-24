@@ -3,10 +3,7 @@ import db from '../../db.js';
 import { requireAuth } from '../../middleware/auth.js';
 import { requireRole } from '../../middleware/requireRole.js';
 import { paginationQuerySchema } from '../../schemas/pagination.js';
-import {
-    applyPagination,
-    buildPaginationMeta,
-} from '../../utils/pagination.js';
+import { applyPagination, buildPaginationMeta } from '../../utils/pagination.js';
 
 const router = Router();
 
@@ -52,41 +49,29 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get(
-    '/',
-    requireAuth,
-    requireRole('admin', 'manager'),
-    async (req: Request, res: Response) => {
-        const parsed = paginationQuerySchema.safeParse(req.query);
-        if (!parsed.success) {
-            res.status(400).json({
-                error: 'validation error',
-                details: parsed.error.issues.map((e) => ({
-                    field: e.path.join('.'),
-                    message: e.message,
-                })),
-            });
-            return;
-        }
-
-        const query = db('clubs')
-            .select(
-                'id',
-                'name',
-                'code',
-                'description',
-                'createdAt',
-                'updatedAt',
-            )
-            .orderBy('id', 'asc');
-
-        const { data, totalItems } = await applyPagination(query, parsed.data);
-
-        res.json({
-            data,
-            pagination: buildPaginationMeta({ ...parsed.data, totalItems }),
+router.get('/', requireAuth, requireRole('admin', 'manager'), async (req: Request, res: Response) => {
+    const parsed = paginationQuerySchema.safeParse(req.query);
+    if (!parsed.success) {
+        res.status(400).json({
+            error: 'validation error',
+            details: parsed.error.issues.map((e) => ({
+                field: e.path.join('.'),
+                message: e.message,
+            })),
         });
-    },
-);
+        return;
+    }
+
+    const query = db('clubs')
+        .select('id', 'name', 'code', 'description', 'createdAt', 'updatedAt')
+        .orderBy('id', 'asc');
+
+    const { data, totalItems } = await applyPagination(query, parsed.data);
+
+    res.json({
+        data,
+        pagination: buildPaginationMeta({ ...parsed.data, totalItems }),
+    });
+});
 
 export default router;

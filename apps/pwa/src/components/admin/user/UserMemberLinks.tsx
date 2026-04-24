@@ -1,38 +1,15 @@
 import { useState } from 'react';
-import {
-    Alert,
-    Loader,
-    Select,
-    Table,
-    TextInput,
-    Text,
-    ActionIcon,
-    Group,
-} from '@mantine/core';
-import {
-    IconCheck,
-    IconHandFingerRight,
-    IconHeartHandshake,
-    IconTrash,
-    IconX,
-} from '@tabler/icons-react';
+import { Alert, Loader, Select, Table, TextInput, Text, ActionIcon, Group } from '@mantine/core';
+import { IconCheck, IconHandFingerRight, IconHeartHandshake, IconTrash, IconX } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
-import {
-    useUserMembers,
-    useUpdateUserMember,
-    useDeleteUserMember,
-} from '../../../hooks/useUserMembers';
+import { useUserMembers, useUpdateUserMember, useDeleteUserMember } from '../../../hooks/useUserMembers';
 
 interface RowEdit {
     type: string;
     description: string;
 }
 
-export function UserMemberLinks({
-    userId,
-    useUserPointOfView,
-    memberId,
-}: UserMemberLinksProps) {
+export function UserMemberLinks({ userId, useUserPointOfView, memberId }: UserMemberLinksProps) {
     const bothProvided = !!(userId && memberId);
     const mode: 'user' | 'member' = memberId ? 'member' : 'user';
     const { data, isLoading, error } = useUserMembers({
@@ -46,17 +23,11 @@ export function UserMemberLinks({
     const [edits, setEdits] = useState<Record<string, RowEdit>>({});
 
     if (bothProvided) {
-        console.warn(
-            'UserMemberLinks: pass either userId or memberId, not both.',
-        );
+        console.warn('UserMemberLinks: pass either userId or memberId, not both.');
         return null;
     }
 
-    const getEdit = (rel: {
-        id: string;
-        type: string;
-        description: string | null;
-    }): RowEdit =>
+    const getEdit = (rel: { id: string; type: string; description: string | null }): RowEdit =>
         edits[rel.id] ?? { type: rel.type, description: rel.description ?? '' };
 
     const setEdit = (id: string, patch: Partial<RowEdit>) => {
@@ -72,16 +43,9 @@ export function UserMemberLinks({
         return { type: rel?.type ?? '', description: rel?.description ?? '' };
     };
 
-    const isDirty = (rel: {
-        id: string;
-        type: string;
-        description: string | null;
-    }) => {
+    const isDirty = (rel: { id: string; type: string; description: string | null }) => {
         const edit = getEdit(rel);
-        return (
-            edit.type !== rel.type ||
-            edit.description !== (rel.description ?? '')
-        );
+        return edit.type !== rel.type || edit.description !== (rel.description ?? '');
     };
 
     const handleSave = (id: string) => {
@@ -106,11 +70,7 @@ export function UserMemberLinks({
         );
     };
 
-    const handleCancel = (rel: {
-        id: string;
-        type: string;
-        description: string | null;
-    }) => {
+    const handleCancel = (rel: { id: string; type: string; description: string | null }) => {
         setEdits((prev) => {
             const next = { ...prev };
             delete next[rel.id];
@@ -141,9 +101,7 @@ export function UserMemberLinks({
     if (!relationships?.length)
         return (
             <Alert color="blue" variant="light">
-                {mode === 'member'
-                    ? 'No linked users yet.'
-                    : 'No linked members yet.'}
+                {mode === 'member' ? 'No linked users yet.' : 'No linked members yet.'}
             </Alert>
         );
 
@@ -178,17 +136,13 @@ export function UserMemberLinks({
                             <Table.Tr
                                 key={rel.id}
                                 style={{
-                                    borderBottom: showDescription
-                                        ? 'none'
-                                        : undefined,
+                                    borderBottom: showDescription ? 'none' : undefined,
                                 }}
                             >
                                 <Table.Td
                                     w={24}
                                     style={{
-                                        paddingBottom: showDescription
-                                            ? 4
-                                            : undefined,
+                                        paddingBottom: showDescription ? 4 : undefined,
                                     }}
                                 >
                                     <Text size="xs" c="dimmed">
@@ -197,32 +151,25 @@ export function UserMemberLinks({
                                 </Table.Td>
                                 <Table.Td
                                     style={{
-                                        paddingBottom: showDescription
-                                            ? 4
-                                            : undefined,
+                                        paddingBottom: showDescription ? 4 : undefined,
                                     }}
                                 >
                                     {mode === 'member' ? (
                                         <>
-                                            <Text fw={700}>
-                                                {rel.userDisplayName}
-                                            </Text>
+                                            <Text fw={700}>{rel.userDisplayName}</Text>
                                             <Text size="xs" c="dimmed">
                                                 {rel.userEmail}
                                             </Text>
                                         </>
                                     ) : (
                                         <Text fw={700}>
-                                            {rel.memberFirstName}{' '}
-                                            {rel.memberLastName}
+                                            {rel.memberFirstName} {rel.memberLastName}
                                         </Text>
                                     )}
                                 </Table.Td>
                                 <Table.Td
                                     style={{
-                                        paddingBottom: showDescription
-                                            ? 4
-                                            : undefined,
+                                        paddingBottom: showDescription ? 4 : undefined,
                                     }}
                                 >
                                     <Select
@@ -237,9 +184,7 @@ export function UserMemberLinks({
                                         }
                                         leftSection={
                                             edit.type === 'self' ? (
-                                                <IconHandFingerRight
-                                                    size={16}
-                                                />
+                                                <IconHandFingerRight size={16} />
                                             ) : (
                                                 <IconHeartHandshake size={16} />
                                             )
@@ -249,9 +194,7 @@ export function UserMemberLinks({
                                 <Table.Td
                                     rowSpan={2}
                                     style={{
-                                        paddingBottom: showDescription
-                                            ? 0
-                                            : undefined,
+                                        paddingBottom: showDescription ? 0 : undefined,
                                     }}
                                 >
                                     {dirty ? (
@@ -260,12 +203,8 @@ export function UserMemberLinks({
                                                 color="green"
                                                 variant="light"
                                                 size="sm"
-                                                onClick={() =>
-                                                    handleSave(rel.id)
-                                                }
-                                                loading={
-                                                    updateMutation.isPending
-                                                }
+                                                onClick={() => handleSave(rel.id)}
+                                                loading={updateMutation.isPending}
                                             >
                                                 <IconCheck size={14} />
                                             </ActionIcon>
@@ -273,9 +212,7 @@ export function UserMemberLinks({
                                                 color="gray"
                                                 variant="light"
                                                 size="sm"
-                                                onClick={() =>
-                                                    handleCancel(rel)
-                                                }
+                                                onClick={() => handleCancel(rel)}
                                             >
                                                 <IconX size={14} />
                                             </ActionIcon>
@@ -295,9 +232,7 @@ export function UserMemberLinks({
                             <Table.Tr
                                 key={`description-${rel.id}`}
                                 style={{
-                                    visibility: showDescription
-                                        ? 'visible'
-                                        : 'collapse',
+                                    visibility: showDescription ? 'visible' : 'collapse',
                                 }}
                             >
                                 <Table.Td w={24} style={{ paddingTop: 0 }} />
@@ -317,11 +252,7 @@ export function UserMemberLinks({
                                         <TextInput
                                             size="sm"
                                             width="100%"
-                                            type={
-                                                showDescription
-                                                    ? 'text'
-                                                    : 'hidden'
-                                            }
+                                            type={showDescription ? 'text' : 'hidden'}
                                             variant="default"
                                             placeholder="father, mother..."
                                             value={edit.description}

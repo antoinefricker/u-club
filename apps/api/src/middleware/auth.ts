@@ -9,11 +9,7 @@ export interface AuthenticatedRequest extends Request {
     };
 }
 
-export function requireAuth(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-): void {
+export function requireAuth(req: Request, res: Response, next: NextFunction): void {
     const header = req.headers.authorization;
     if (!header || !header.startsWith('Bearer ')) {
         res.status(401).json({ error: 'authentication required' });

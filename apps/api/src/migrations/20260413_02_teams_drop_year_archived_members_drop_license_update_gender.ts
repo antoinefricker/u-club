@@ -27,7 +27,5 @@ export async function down(knex: Knex): Promise<void> {
     });
 
     await knex.raw('ALTER TABLE members DROP CONSTRAINT members_gender_check');
-    await knex.raw(
-        "ALTER TABLE members ADD CONSTRAINT members_gender_check CHECK (gender IN ('male', 'female'))",
-    );
+    await knex.raw("ALTER TABLE members ADD CONSTRAINT members_gender_check CHECK (gender IN ('male', 'female'))");
 }

@@ -19,4 +19,7 @@ export const MEMBER_GENDER_LABELS: Record<MemberGender, string> = {
 
 export const MEMBER_GENDER_OPTIONS: { value: MemberGender; label: string }[] = (
     Object.keys(MEMBER_GENDER_LABELS) as MemberGender[]
-).map((value) => ({ value, label: MEMBER_GENDER_LABELS[value] }));
+).map((value) => ({
+    value,
+    label: MEMBER_GENDER_LABELS[value],
+}));

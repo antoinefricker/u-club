@@ -1,12 +1,4 @@
-import {
-    ActionIcon,
-    Alert,
-    Button,
-    Group,
-    Loader,
-    Select,
-    Table,
-} from '@mantine/core';
+import { ActionIcon, Alert, Button, Group, Loader, Select, Table } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { PageTitle } from '../../components/layout/PageTitle';
 import { ListFilters } from '../../components/admin/lists/ListFilters';
@@ -14,10 +6,7 @@ import { ListPagination } from '../../components/admin/lists/ListPagination';
 import { EmptyListRow } from '../../components/admin/lists/EmptyListRow';
 import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
-import {
-    useTeamCategories,
-    useDeleteTeamCategory,
-} from '../../hooks/useTeamCategories';
+import { useTeamCategories, useDeleteTeamCategory } from '../../hooks/useTeamCategories';
 import { useClubs } from '../../hooks/useClubs';
 import { usePagination } from '../../hooks/usePagination';
 import { useListFilters } from '../../hooks/useListFilters';
@@ -46,8 +35,7 @@ export function TeamCategoriesListPage() {
     const categories = categoriesData?.data;
     const pagination = categoriesData?.pagination;
 
-    const clubOptions =
-        clubs?.map((c) => ({ value: c.id, label: c.name })) ?? [];
+    const clubOptions = clubs?.map((c) => ({ value: c.id, label: c.name })) ?? [];
     const clubNameById = new Map(clubs?.map((c) => [c.id, c.name]));
 
     const handleDelete = (id: string, label: string) => {
@@ -69,9 +57,7 @@ export function TeamCategoriesListPage() {
     return (
         <>
             <PageTitle label="Team categories">
-                <Button onClick={() => navigate('/admin/team-categories/new')}>
-                    New category
-                </Button>
+                <Button onClick={() => navigate('/admin/team-categories/new')}>New category</Button>
             </PageTitle>
 
             <ListFilters>
@@ -99,31 +85,19 @@ export function TeamCategoriesListPage() {
                     {categories?.map((category) => (
                         <Table.Tr key={category.id}>
                             <Table.Td>{category.label}</Table.Td>
-                            <Table.Td>
-                                {clubNameById.get(category.clubId) ??
-                                    category.clubId}
-                            </Table.Td>
+                            <Table.Td>{clubNameById.get(category.clubId) ?? category.clubId}</Table.Td>
                             <Table.Td>
                                 <Group gap="xs" justify="flex-end">
                                     <ActionIcon
                                         variant="subtle"
-                                        onClick={() =>
-                                            navigate(
-                                                `/admin/team-categories/${category.id}`,
-                                            )
-                                        }
+                                        onClick={() => navigate(`/admin/team-categories/${category.id}`)}
                                     >
                                         <IconEdit size={18} />
                                     </ActionIcon>
                                     <ActionIcon
                                         variant="subtle"
                                         color="red"
-                                        onClick={() =>
-                                            handleDelete(
-                                                category.id,
-                                                category.label,
-                                            )
-                                        }
+                                        onClick={() => handleDelete(category.id, category.label)}
                                     >
                                         <IconTrash size={18} />
                                     </ActionIcon>

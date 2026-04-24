@@ -4,11 +4,7 @@ export async function up(knex: Knex): Promise<void> {
     await knex.schema.createTable('members', (table) => {
         table.uuid('id').primary().defaultTo(knex.fn.uuid());
         table.uuid('user_id').nullable().references('id').inTable('users');
-        table
-            .uuid('status_id')
-            .nullable()
-            .references('id')
-            .inTable('member_statuses');
+        table.uuid('status_id').nullable().references('id').inTable('member_statuses');
         table.string('first_name').notNullable();
         table.string('last_name').notNullable();
         table.date('birth_date');

@@ -33,18 +33,14 @@ describe('POST /auth/login', () => {
     });
 
     it('should return 400 if email is missing', async () => {
-        const res = await request(app)
-            .post('/auth/login')
-            .send({ password: 'secret' });
+        const res = await request(app).post('/auth/login').send({ password: 'secret' });
 
         expect(res.status).toBe(400);
         expect(res.body).toHaveProperty('error', 'validation error');
     });
 
     it('should return 400 if password is missing', async () => {
-        const res = await request(app)
-            .post('/auth/login')
-            .send({ email: 'john@example.com' });
+        const res = await request(app).post('/auth/login').send({ email: 'john@example.com' });
 
         expect(res.status).toBe(400);
         expect(res.body).toHaveProperty('error', 'validation error');
@@ -53,9 +49,7 @@ describe('POST /auth/login', () => {
     it('should return 401 if user not found', async () => {
         mockFirst.mockResolvedValueOnce(undefined);
 
-        const res = await request(app)
-            .post('/auth/login')
-            .send({ email: 'unknown@example.com', password: 'secret' });
+        const res = await request(app).post('/auth/login').send({ email: 'unknown@example.com', password: 'secret' });
 
         expect(res.status).toBe(401);
         expect(res.body).toHaveProperty('error', 'invalid email or password');
@@ -69,9 +63,7 @@ describe('POST /auth/login', () => {
         });
         mockVerifyPassword.mockResolvedValueOnce(false);
 
-        const res = await request(app)
-            .post('/auth/login')
-            .send({ email: 'john@example.com', password: 'wrong' });
+        const res = await request(app).post('/auth/login').send({ email: 'john@example.com', password: 'wrong' });
 
         expect(res.status).toBe(401);
         expect(res.body).toHaveProperty('error', 'invalid email or password');
@@ -86,9 +78,7 @@ describe('POST /auth/login', () => {
         });
         mockVerifyPassword.mockResolvedValueOnce(true);
 
-        const res = await request(app)
-            .post('/auth/login')
-            .send({ email: 'john@example.com', password: 'secret' });
+        const res = await request(app).post('/auth/login').send({ email: 'john@example.com', password: 'secret' });
 
         expect(res.status).toBe(403);
         expect(res.body).toHaveProperty('error', 'email not verified');
@@ -103,9 +93,7 @@ describe('POST /auth/login', () => {
         });
         mockVerifyPassword.mockResolvedValueOnce(true);
 
-        const res = await request(app)
-            .post('/auth/login')
-            .send({ email: 'john@example.com', password: 'secret' });
+        const res = await request(app).post('/auth/login').send({ email: 'john@example.com', password: 'secret' });
 
         expect(res.status).toBe(200);
         expect(res.body).toHaveProperty('accessToken');
@@ -122,9 +110,7 @@ describe('POST /auth/login', () => {
         });
         mockVerifyPassword.mockResolvedValueOnce(true);
 
-        const res = await request(app)
-            .post('/auth/login')
-            .send({ email: 'john@example.com', password: 'secret' });
+        const res = await request(app).post('/auth/login').send({ email: 'john@example.com', password: 'secret' });
 
         expect(res.status).toBe(500);
         expect(res.body).toHaveProperty('error', 'server configuration error');

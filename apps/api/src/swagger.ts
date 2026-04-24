@@ -290,12 +290,7 @@ const options: swaggerJsdoc.Options = {
                 },
                 PaginationMeta: {
                     type: 'object',
-                    required: [
-                        'page',
-                        'itemsPerPage',
-                        'totalItems',
-                        'totalPages',
-                    ],
+                    required: ['page', 'itemsPerPage', 'totalItems', 'totalPages'],
                     properties: {
                         page: { type: 'integer', minimum: 1 },
                         itemsPerPage: { type: 'integer', minimum: 1 },

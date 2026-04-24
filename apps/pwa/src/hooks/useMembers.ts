@@ -1,15 +1,6 @@
-import {
-    useQuery,
-    useMutation,
-    useQueryClient,
-    keepPreviousData,
-} from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { useAuthContext } from '../auth/useAuthContext';
-import {
-    buildListQueryString,
-    type Paginated,
-    type PaginationArgs,
-} from '../utils/pagination';
+import { buildListQueryString, type Paginated, type PaginationArgs } from '../utils/pagination';
 import type { Member } from '../types/Member';
 
 interface UseMembersArgs extends PaginationArgs {
@@ -74,8 +65,7 @@ export function useCreateMember() {
             }
             return res.json();
         },
-        onSuccess: () =>
-            queryClient.invalidateQueries({ queryKey: ['members'] }),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['members'] }),
     });
 }
 
@@ -83,10 +73,7 @@ export function useUpdateMember() {
     const headers = useAuthHeaders();
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({
-            id,
-            ...data
-        }: Partial<Member> & { id: string }) => {
+        mutationFn: async ({ id, ...data }: Partial<Member> & { id: string }) => {
             const res = await fetch(`/api/members/${id}`, {
                 method: 'PUT',
                 headers,
@@ -98,8 +85,7 @@ export function useUpdateMember() {
             }
             return res.json();
         },
-        onSuccess: () =>
-            queryClient.invalidateQueries({ queryKey: ['members'] }),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['members'] }),
     });
 }
 
@@ -114,7 +100,6 @@ export function useDeleteMember() {
             });
             if (!res.ok) throw new Error('Failed to delete member');
         },
-        onSuccess: () =>
-            queryClient.invalidateQueries({ queryKey: ['members'] }),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['members'] }),
     });
 }

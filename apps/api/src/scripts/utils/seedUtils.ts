@@ -11,17 +11,13 @@ import type {
     UserMember,
 } from '../../types/index.js';
 
-export const hashedPassword = await hashPassword(
-    process.env.SEED_PASSWORD || 'password123',
-);
+export const hashedPassword = await hashPassword(process.env.SEED_PASSWORD || 'password123');
 
 export const checkDbConnection = async () => {
     try {
         await db.raw('SELECT 1');
     } catch {
-        throw new Error(
-            'Unable to connect to the database. Is Postgres running?',
-        );
+        throw new Error('Unable to connect to the database. Is Postgres running?');
     }
 };
 
@@ -50,20 +46,13 @@ export const dbClear = async (): Promise<string[]> => {
     return results;
 };
 
-export const insertMemberStatus = async (
-    label: string,
-): Promise<MemberStatus> => {
-    const [status] = await db('memberStatuses')
-        .insert({ label })
-        .returning('*');
+export const insertMemberStatus = async (label: string): Promise<MemberStatus> => {
+    const [status] = await db('memberStatuses').insert({ label }).returning('*');
     return status;
 };
 
 export const insertMember = async (
-    member: Pick<
-        Member,
-        'statusId' | 'firstName' | 'lastName' | 'birthdate' | 'gender'
-    >,
+    member: Pick<Member, 'statusId' | 'firstName' | 'lastName' | 'birthdate' | 'gender'>,
 ): Promise<Member> => {
     const [createdMember] = await db('members').insert(member).returning('*');
     return createdMember;
@@ -72,15 +61,12 @@ export const insertMember = async (
 export const insertTeamAssignment = async (
     assignment: Pick<TeamAssignment, 'teamId' | 'memberId' | 'role'>,
 ): Promise<TeamAssignment> => {
-    const [createdAssignment] = await db('teamAssignments')
-        .insert(assignment)
-        .returning('*');
+    const [createdAssignment] = await db('teamAssignments').insert(assignment).returning('*');
     return createdAssignment;
 };
 
 export const insertUser = async (
-    user: Pick<User, 'email' | 'displayName' | 'role'> &
-        Partial<Pick<User, 'emailVerifiedAt'>>,
+    user: Pick<User, 'email' | 'displayName' | 'role'> & Partial<Pick<User, 'emailVerifiedAt'>>,
 ): Promise<User> => {
     const [createdUser] = await db('users')
         .insert({
@@ -101,25 +87,17 @@ export const insertUserMemberLink = async (
     return createdLink;
 };
 
-export const insertClub = async (
-    club: Pick<Club, 'name' | 'code' | 'description'>,
-): Promise<Club> => {
+export const insertClub = async (club: Pick<Club, 'name' | 'code' | 'description'>): Promise<Club> => {
     const [createdClub] = await db('clubs').insert(club).returning('*');
     return createdClub;
 };
 
-export const insertTeamCategory = async (
-    category: Pick<TeamCategory, 'clubId' | 'label'>,
-): Promise<TeamCategory> => {
-    const [createdCategory] = await db('teamCategories')
-        .insert(category)
-        .returning('*');
+export const insertTeamCategory = async (category: Pick<TeamCategory, 'clubId' | 'label'>): Promise<TeamCategory> => {
+    const [createdCategory] = await db('teamCategories').insert(category).returning('*');
     return createdCategory;
 };
 
-export const insertTeam = async (
-    team: Pick<Team, 'clubId' | 'categoryId' | 'label' | 'gender'>,
-): Promise<Team> => {
+export const insertTeam = async (team: Pick<Team, 'clubId' | 'categoryId' | 'label' | 'gender'>): Promise<Team> => {
     const [createdTeam] = await db('teams').insert(team).returning('*');
     return createdTeam;
 };

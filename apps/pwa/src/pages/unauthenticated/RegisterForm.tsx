@@ -1,15 +1,5 @@
 import { useState } from 'react';
-import {
-    TextInput,
-    PasswordInput,
-    Button,
-    Stack,
-    Title,
-    Alert,
-    Paper,
-    Anchor,
-    Text,
-} from '@mantine/core';
+import { TextInput, PasswordInput, Button, Stack, Title, Alert, Paper, Anchor, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { emailValidation } from '../../utils/formValidations/emailValidation';
 
@@ -30,11 +20,9 @@ export function RegisterForm({ onSwitchMode }: RegisterFormProps) {
             password: '',
         },
         validate: {
-            displayName: (v) =>
-                v.length > 0 ? null : 'Display name is required',
+            displayName: (v) => (v.length > 0 ? null : 'Display name is required'),
             email: emailValidation,
-            password: (v) =>
-                v.length >= 6 ? null : 'Password must be at least 6 characters',
+            password: (v) => (v.length >= 6 ? null : 'Password must be at least 6 characters'),
         },
     });
 
@@ -55,9 +43,7 @@ export function RegisterForm({ onSwitchMode }: RegisterFormProps) {
 
             setRegisteredEmail(values.email);
         } catch (err) {
-            setError(
-                err instanceof Error ? err.message : 'Error creating account',
-            );
+            setError(err instanceof Error ? err.message : 'Error creating account');
         } finally {
             setLoading(false);
         }
@@ -86,24 +72,14 @@ export function RegisterForm({ onSwitchMode }: RegisterFormProps) {
                             Check your email
                         </Title>
                         <Alert color="blue" variant="light">
-                            We sent a confirmation link to{' '}
-                            <strong>{registeredEmail}</strong>. Click the link
-                            to activate your account.
+                            We sent a confirmation link to <strong>{registeredEmail}</strong>. Click the link to
+                            activate your account.
                         </Alert>
-                        <Button
-                            variant="light"
-                            fullWidth
-                            loading={resending}
-                            onClick={handleResend}
-                        >
+                        <Button variant="light" fullWidth loading={resending} onClick={handleResend}>
                             Resend confirmation email
                         </Button>
                         <Text size="sm" ta="center">
-                            <Anchor
-                                component="button"
-                                type="button"
-                                onClick={onSwitchMode}
-                            >
+                            <Anchor component="button" type="button" onClick={onSwitchMode}>
                                 Back to login
                             </Anchor>
                         </Text>
@@ -156,11 +132,7 @@ export function RegisterForm({ onSwitchMode }: RegisterFormProps) {
 
                         <Text size="sm" ta="center">
                             Already have an account?{' '}
-                            <Anchor
-                                component="button"
-                                type="button"
-                                onClick={onSwitchMode}
-                            >
+                            <Anchor component="button" type="button" onClick={onSwitchMode}>
                                 Log in
                             </Anchor>
                         </Text>

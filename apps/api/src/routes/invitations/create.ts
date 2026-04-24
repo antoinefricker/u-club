@@ -2,10 +2,7 @@ import { Router, Request, Response } from 'express';
 import crypto from 'node:crypto';
 import db from '../../db.js';
 import mailer from '../../mailer.js';
-import {
-    requireAuth,
-    type AuthenticatedRequest,
-} from '../../middleware/auth.js';
+import { requireAuth, type AuthenticatedRequest } from '../../middleware/auth.js';
 import { validate } from '../../middleware/validate.js';
 import { createInvitationSchema } from '../../schemas/invitation.js';
 
@@ -55,48 +52,41 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post(
-    '/',
-    requireAuth,
-    validate(createInvitationSchema),
-    async (req: Request, res: Response) => {
-        const user = (req as AuthenticatedRequest).user;
-        const isPrivileged = user.role === 'admin' || user.role === 'manager';
-        const { memberId, email, type, description } = req.body;
+router.post('/', requireAuth, validate(createInvitationSchema), async (req: Request, res: Response) => {
+    const user = (req as AuthenticatedRequest).user;
+    const isPrivileged = user.role === 'admin' || user.role === 'manager';
+    const { memberId, email, type, description } = req.body;
 
-        if (!isPrivileged) {
-            const link = await db('userMembers')
-                .where({ userId: user.id, memberId })
-                .first();
-            if (!link) {
-                res.status(403).json({ error: 'not linked to this member' });
-                return;
-            }
+    if (!isPrivileged) {
+        const link = await db('userMembers').where({ userId: user.id, memberId }).first();
+        if (!link) {
+            res.status(403).json({ error: 'not linked to this member' });
+            return;
         }
+    }
 
-        const token = crypto.randomBytes(32).toString('hex');
-        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-        await db('memberInvitations').insert({
-            memberId,
-            invitedBy: user.id,
-            email,
-            type,
-            description: description ?? null,
-            token,
-            expiresAt,
-        });
+    await db('memberInvitations').insert({
+        memberId,
+        invitedBy: user.id,
+        email,
+        type,
+        description: description ?? null,
+        token,
+        expiresAt,
+    });
 
-        const appUrl = process.env.APP_URL || 'http://localhost:5173';
-        await mailer.sendMail({
-            from: process.env.SMTP_FROM || 'noreply@eggplant.app',
-            to: email,
-            subject: "You've been invited to Eggplant",
-            text: `You've been invited to join a member on Eggplant.\n\nClick here to accept: ${appUrl}/invitation?token=${token}&email=${encodeURIComponent(email)}\n\nThis link expires in 7 days.`,
-        });
+    const appUrl = process.env.APP_URL || 'http://localhost:5173';
+    await mailer.sendMail({
+        from: process.env.SMTP_FROM || 'noreply@eggplant.app',
+        to: email,
+        subject: "You've been invited to Eggplant",
+        text: `You've been invited to join a member on Eggplant.\n\nClick here to accept: ${appUrl}/invitation?token=${token}&email=${encodeURIComponent(email)}\n\nThis link expires in 7 days.`,
+    });
 
-        res.status(201).json({ message: 'invitation sent' });
-    },
-);
+    res.status(201).json({ message: 'invitation sent' });
+});
 
 export default router;

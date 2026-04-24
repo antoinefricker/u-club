@@ -77,80 +77,29 @@ createRoot(document.getElementById('root')!).render(
                 <AuthContextProvider>
                     <BrowserRouter>
                         <Routes>
-                            <Route
-                                path="verify-email"
-                                element={<ConfirmEmailPage />}
-                            />
-                            <Route
-                                path="reset-password"
-                                element={<ResetPasswordPage />}
-                            />
-                            <Route
-                                path="invitation"
-                                element={<InvitationPage />}
-                            />
+                            <Route path="verify-email" element={<ConfirmEmailPage />} />
+                            <Route path="reset-password" element={<ResetPasswordPage />} />
+                            <Route path="invitation" element={<InvitationPage />} />
                             <Route element={<App />}>
                                 <Route index element={<DashboardPage />} />
                                 <Route path="club" element={<ClubPage />} />
                                 <Route path="teams" element={<TeamsPage />} />
-                                <Route
-                                    path="account"
-                                    element={<AccountPage />}
-                                />
+                                <Route path="account" element={<AccountPage />} />
                                 <Route path="agenda" element={<AgendaPage />} />
                                 <Route path="admin" element={<AdminGuard />}>
-                                    <Route
-                                        index
-                                        element={<AdminDashboardPage />}
-                                    />
-                                    <Route
-                                        path="clubs"
-                                        element={<ClubsListPage />}
-                                    />
-                                    <Route
-                                        path="clubs/new"
-                                        element={<ClubFormPage />}
-                                    />
-                                    <Route
-                                        path="clubs/:id"
-                                        element={<ClubFormPage />}
-                                    />
-                                    <Route
-                                        path="teams"
-                                        element={<TeamsListPage />}
-                                    />
-                                    <Route
-                                        path="teams/new"
-                                        element={<TeamFormPage />}
-                                    />
-                                    <Route
-                                        path="teams/:id"
-                                        element={<TeamFormPage />}
-                                    />
-                                    <Route
-                                        path="team-categories"
-                                        element={<TeamCategoriesListPage />}
-                                    />
-                                    <Route
-                                        path="team-categories/new"
-                                        element={<TeamCategoryFormPage />}
-                                    />
-                                    <Route
-                                        path="team-categories/:id"
-                                        element={<TeamCategoryFormPage />}
-                                    />
-                                    <Route
-                                        path="members"
-                                        element={<MembersListPage />}
-                                    />
-                                    <Route
-                                        path="members/new"
-                                        element={<MemberFormPage />}
-                                    />
-                                    <Route
-                                        path="members/:id"
-                                        element={<MemberFormPage />}
-                                    />
+                                    <Route index element={<AdminDashboardPage />} />
+                                    <Route path="clubs" element={<ClubsListPage />} />
+                                    <Route path="clubs/new" element={<ClubFormPage />} />
+                                    <Route path="clubs/:id" element={<ClubFormPage />} />
+                                    <Route path="teams" element={<TeamsListPage />} />
+                                    <Route path="teams/new" element={<TeamFormPage />} />
+                                    <Route path="teams/:id" element={<TeamFormPage />} />
+                                    <Route path="team-categories" element={<TeamCategoriesListPage />} />
+                                    <Route path="team-categories/new" element={<TeamCategoryFormPage />} />
+                                    <Route path="team-categories/:id" element={<TeamCategoryFormPage />} />
+                                    <Route path="members" element={<MembersListPage />} />
+                                    <Route path="members/new" element={<MemberFormPage />} />
+                                    <Route path="members/:id" element={<MemberFormPage />} />
                                 </Route>
                             </Route>
                         </Routes>

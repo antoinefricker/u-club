@@ -28,11 +28,7 @@ describe('requireSelfOrRole', () => {
         const res = mockRes();
         const next = vi.fn() as NextFunction;
 
-        requireSelfOrRole('admin')(
-            req({ id: 'u1', email: 'a@b.com', role: 'user' }, 'u2'),
-            res,
-            next,
-        );
+        requireSelfOrRole('admin')(req({ id: 'u1', email: 'a@b.com', role: 'user' }, 'u2'), res, next);
 
         expect(res.status).toHaveBeenCalledWith(403);
         expect(next).not.toHaveBeenCalled();
@@ -42,11 +38,7 @@ describe('requireSelfOrRole', () => {
         const res = mockRes();
         const next = vi.fn() as NextFunction;
 
-        requireSelfOrRole('admin')(
-            req({ id: 'u1', email: 'a@b.com', role: 'user' }, 'u1'),
-            res,
-            next,
-        );
+        requireSelfOrRole('admin')(req({ id: 'u1', email: 'a@b.com', role: 'user' }, 'u1'), res, next);
 
         expect(next).toHaveBeenCalledOnce();
         expect(res.status).not.toHaveBeenCalled();
@@ -56,11 +48,7 @@ describe('requireSelfOrRole', () => {
         const res = mockRes();
         const next = vi.fn() as NextFunction;
 
-        requireSelfOrRole('admin')(
-            req({ id: 'admin-1', email: 'admin@b.com', role: 'admin' }, 'u2'),
-            res,
-            next,
-        );
+        requireSelfOrRole('admin')(req({ id: 'admin-1', email: 'admin@b.com', role: 'admin' }, 'u2'), res, next);
 
         expect(next).toHaveBeenCalledOnce();
     });
@@ -69,11 +57,7 @@ describe('requireSelfOrRole', () => {
         const middleware = requireSelfOrRole('admin', 'manager');
         const next = vi.fn() as NextFunction;
 
-        middleware(
-            req({ id: 'm1', email: 'm@b.com', role: 'manager' }, 'u2'),
-            mockRes(),
-            next,
-        );
+        middleware(req({ id: 'm1', email: 'm@b.com', role: 'manager' }, 'u2'), mockRes(), next);
 
         expect(next).toHaveBeenCalledOnce();
     });
