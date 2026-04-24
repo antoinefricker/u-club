@@ -52,52 +52,42 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post(
-  '/reset_password',
-  validate(resetPasswordSchema),
-  async (req: Request, res: Response) => {
+router.post('/reset_password', validate(resetPasswordSchema), async (req: Request, res: Response) => {
     const { token, email, password } = req.body;
 
     const resetToken = await db('authTokens')
-      .where({ token, email, type: 'password_reset' })
-      .where('expiresAt', '>', new Date())
-      .first();
+        .where({ token, email, type: 'password_reset' })
+        .where('expiresAt', '>', new Date())
+        .first();
 
     if (!resetToken) {
-      res.status(401).json({ error: 'invalid or expired token' });
-      return;
+        res.status(401).json({ error: 'invalid or expired token' });
+        return;
     }
 
     await db('authTokens').where({ id: resetToken.id }).del();
 
     const user = await db('users').where({ email: resetToken.email }).first();
     if (!user) {
-      res.status(401).json({ error: 'user not found' });
-      return;
+        res.status(401).json({ error: 'user not found' });
+        return;
     }
 
     const hashedPassword = await hashPassword(password);
 
-    await db('users')
-      .where({ id: user.id })
-      .update({ password: hashedPassword, updatedAt: new Date() });
+    await db('users').where({ id: user.id }).update({ password: hashedPassword, updatedAt: new Date() });
 
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
-      res.status(500).json({ error: 'server configuration error' });
-      return;
+        res.status(500).json({ error: 'server configuration error' });
+        return;
     }
 
-    const accessToken = jwt.sign(
-      { sub: user.id, email: user.email, role: user.role },
-      jwtSecret,
-      {
+    const accessToken = jwt.sign({ sub: user.id, email: user.email, role: user.role }, jwtSecret, {
         expiresIn: '7d',
-      },
-    );
+    });
 
     res.json({ accessToken });
-  },
-);
+});
 
 export default router;

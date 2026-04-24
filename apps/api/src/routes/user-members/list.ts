@@ -1,27 +1,21 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import db from '../../db.js';
-import {
-  requireAuth,
-  type AuthenticatedRequest,
-} from '../../middleware/auth.js';
+import { requireAuth, type AuthenticatedRequest } from '../../middleware/auth.js';
 import { paginationQuerySchema } from '../../schemas/pagination.js';
-import {
-  applyPagination,
-  buildPaginationMeta,
-} from '../../utils/pagination.js';
+import { applyPagination, buildPaginationMeta } from '../../utils/pagination.js';
 
 const router = Router();
 
 const listQuerySchema = paginationQuerySchema
-  .extend({
-    userId: z.uuid({ error: 'userId must be a UUID' }).optional(),
-    memberId: z.uuid({ error: 'memberId must be a UUID' }).optional(),
-  })
-  .refine((data) => !(data.userId && data.memberId), {
-    message: 'userId and memberId are mutually exclusive',
-    path: ['memberId'],
-  });
+    .extend({
+        userId: z.uuid({ error: 'userId must be a UUID' }).optional(),
+        memberId: z.uuid({ error: 'memberId must be a UUID' }).optional(),
+    })
+    .refine((data) => !(data.userId && data.memberId), {
+        message: 'userId and memberId are mutually exclusive',
+        path: ['memberId'],
+    });
 
 /**
  * @openapi
@@ -79,55 +73,55 @@ const listQuerySchema = paginationQuerySchema
  *               $ref: '#/components/schemas/Error'
  */
 router.get('/', requireAuth, async (req: Request, res: Response) => {
-  const parsed = listQuerySchema.safeParse(req.query);
-  if (!parsed.success) {
-    res.status(400).json({
-      error: 'validation error',
-      details: parsed.error.issues.map((e) => ({
-        field: e.path.join('.'),
-        message: e.message,
-      })),
-    });
-    return;
-  }
-
-  const user = (req as AuthenticatedRequest).user;
-  const isPrivileged = user.role === 'admin' || user.role === 'manager';
-
-  const query = db('userMembers')
-    .select(
-      'userMembers.id',
-      'userMembers.userId',
-      'userMembers.memberId',
-      'userMembers.type',
-      'userMembers.description',
-      'userMembers.createdAt',
-      'members.firstName as memberFirstName',
-      'members.lastName as memberLastName',
-      'users.displayName as userDisplayName',
-      'users.email as userEmail',
-    )
-    .join('members', 'userMembers.memberId', 'members.id')
-    .join('users', 'userMembers.userId', 'users.id')
-    .orderBy('userMembers.id', 'asc');
-
-  if (isPrivileged) {
-    const { userId, memberId } = parsed.data;
-    if (memberId) {
-      query.where('userMembers.memberId', memberId);
-    } else if (userId) {
-      query.where('userMembers.userId', userId);
+    const parsed = listQuerySchema.safeParse(req.query);
+    if (!parsed.success) {
+        res.status(400).json({
+            error: 'validation error',
+            details: parsed.error.issues.map((e) => ({
+                field: e.path.join('.'),
+                message: e.message,
+            })),
+        });
+        return;
     }
-  } else {
-    query.where('userMembers.userId', user.id);
-  }
 
-  const { data, totalItems } = await applyPagination(query, parsed.data);
+    const user = (req as AuthenticatedRequest).user;
+    const isPrivileged = user.role === 'admin' || user.role === 'manager';
 
-  res.json({
-    data,
-    pagination: buildPaginationMeta({ ...parsed.data, totalItems }),
-  });
+    const query = db('userMembers')
+        .select(
+            'userMembers.id',
+            'userMembers.userId',
+            'userMembers.memberId',
+            'userMembers.type',
+            'userMembers.description',
+            'userMembers.createdAt',
+            'members.firstName as memberFirstName',
+            'members.lastName as memberLastName',
+            'users.displayName as userDisplayName',
+            'users.email as userEmail',
+        )
+        .join('members', 'userMembers.memberId', 'members.id')
+        .join('users', 'userMembers.userId', 'users.id')
+        .orderBy('userMembers.id', 'asc');
+
+    if (isPrivileged) {
+        const { userId, memberId } = parsed.data;
+        if (memberId) {
+            query.where('userMembers.memberId', memberId);
+        } else if (userId) {
+            query.where('userMembers.userId', userId);
+        }
+    } else {
+        query.where('userMembers.userId', user.id);
+    }
+
+    const { data, totalItems } = await applyPagination(query, parsed.data);
+
+    res.json({
+        data,
+        pagination: buildPaginationMeta({ ...parsed.data, totalItems }),
+    });
 });
 
 export default router;

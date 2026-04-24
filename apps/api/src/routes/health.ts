@@ -26,8 +26,8 @@ const router = Router();
  *                   format: date-time
  */
 router.get('/health', async (req: Request, res: Response) => {
-  const result = await db.raw('SELECT NOW()');
-  res.json({ status: 'ok', time: result.rows[0].now });
+    const result = await db.raw('SELECT NOW()');
+    res.json({ status: 'ok', time: result.rows[0].now });
 });
 
 export default router;

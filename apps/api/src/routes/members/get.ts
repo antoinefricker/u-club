@@ -32,34 +32,20 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get(
-  '/:id',
-  requireAuth,
-  requireRole('admin', 'manager'),
-  async (req: Request, res: Response) => {
+router.get('/:id', requireAuth, requireRole('admin', 'manager'), async (req: Request, res: Response) => {
     const { id } = req.params;
 
     const member = await db('members')
-      .select(
-        'id',
-        'statusId',
-        'firstName',
-        'lastName',
-        'birthdate',
-        'gender',
-        'createdAt',
-        'updatedAt',
-      )
-      .where({ id })
-      .first();
+        .select('id', 'statusId', 'firstName', 'lastName', 'birthdate', 'gender', 'createdAt', 'updatedAt')
+        .where({ id })
+        .first();
 
     if (!member) {
-      res.status(404).json({ error: 'member not found' });
-      return;
+        res.status(404).json({ error: 'member not found' });
+        return;
     }
 
     res.json(member);
-  },
-);
+});
 
 export default router;

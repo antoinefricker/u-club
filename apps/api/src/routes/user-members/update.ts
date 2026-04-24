@@ -1,9 +1,6 @@
 import { Router, Request, Response } from 'express';
 import db from '../../db.js';
-import {
-  requireAuth,
-  type AuthenticatedRequest,
-} from '../../middleware/auth.js';
+import { requireAuth, type AuthenticatedRequest } from '../../middleware/auth.js';
 import { validate } from '../../middleware/validate.js';
 import { updateUserMemberSchema } from '../../schemas/userMember.js';
 
@@ -49,42 +46,34 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.put(
-  '/:id',
-  requireAuth,
-  validate(updateUserMemberSchema),
-  async (req: Request, res: Response) => {
+router.put('/:id', requireAuth, validate(updateUserMemberSchema), async (req: Request, res: Response) => {
     const user = (req as AuthenticatedRequest).user;
     const isPrivileged = user.role === 'admin' || user.role === 'manager';
     const { id } = req.params;
 
     const userMember = await db('userMembers').where({ id }).first();
     if (!userMember) {
-      res.status(404).json({ error: 'user-member association not found' });
-      return;
+        res.status(404).json({
+            error: 'user-member association not found',
+        });
+        return;
     }
 
     if (!isPrivileged && userMember.userId !== user.id) {
-      res.status(403).json({ error: 'not allowed to update this association' });
-      return;
+        res.status(403).json({
+            error: 'not allowed to update this association',
+        });
+        return;
     }
 
     const updates: Record<string, unknown> = { ...req.body };
 
     const [updated] = await db('userMembers')
-      .where({ id })
-      .update(updates)
-      .returning([
-        'id',
-        'userId',
-        'memberId',
-        'type',
-        'description',
-        'createdAt',
-      ]);
+        .where({ id })
+        .update(updates)
+        .returning(['id', 'userId', 'memberId', 'type', 'description', 'createdAt']);
 
     res.json(updated);
-  },
-);
+});
 
 export default router;

@@ -1,164 +1,139 @@
 import {
-  IconCalendarWeek,
-  IconCategory,
-  IconLayoutDashboard,
-  IconLogout,
-  IconShieldHalf,
-  IconCrown,
-  IconSettings,
-  IconUser,
-  IconUserStar,
-  IconShirtSport,
-  IconUserCog,
-  IconUsers,
+    IconCalendarWeek,
+    IconCategory,
+    IconLayoutDashboard,
+    IconLogout,
+    IconShieldHalf,
+    IconCrown,
+    IconSettings,
+    IconUser,
+    IconUserStar,
+    IconShirtSport,
+    IconUserCog,
+    IconUsers,
 } from '@tabler/icons-react';
-import { Box, Title } from '@mantine/core';
+import { Box, Title, UnstyledButton } from '@mantine/core';
 import classes from './AppNavigation.module.css';
 import { useAuthContext } from '../auth/useAuthContext';
-import { useNavigate } from 'react-router';
-import type { MouseEvent } from 'react';
+import { Link } from 'react-router';
 
 interface AppNavigationProps {
-  onNavigate?: () => void;
+    onNavigate?: () => void;
 }
 
 export function AppNavigation({ onNavigate }: AppNavigationProps) {
-  const { user, logout } = useAuthContext();
-  const navigate = useNavigate();
+    const { user, logout } = useAuthContext();
 
-  const navigateSection =
-    (section: string) => (event: MouseEvent<HTMLAnchorElement>) => {
-      event.preventDefault();
-      navigate(section);
-      onNavigate?.();
-    };
+    return (
+        <nav className={classes.navbar}>
+            <div className={classes.navbarMain}>
+                <Box visibleFrom="sm">
+                    <div className={classes.header}>
+                        <Title order={2} c="white">
+                            🍆 eggplant
+                        </Title>
+                    </div>
 
-  return (
-    <nav className={classes.navbar}>
-      <div className={classes.navbarMain}>
-        <Box visibleFrom="sm">
-          <div className={classes.header}>
-            <Title order={2} c="white">
-              🍆 eggplant
-            </Title>
-          </div>
+                    <div className={classes.separator} />
+                </Box>
 
-          <div className={classes.separator} />
-        </Box>
+                <Link to="/" className={classes.link} onClick={onNavigate}>
+                    <IconLayoutDashboard className={classes.linkIcon} stroke={1.5} />
+                    <Title order={3} size="sm">
+                        Dashboard
+                    </Title>
+                </Link>
 
-        <a href="#" className={classes.link} onClick={navigateSection('')}>
-          <IconLayoutDashboard className={classes.linkIcon} stroke={1.5} />
-          <Title order={3} size="sm">
-            Dashboard
-          </Title>
-        </a>
+                <Link to="/club" className={classes.link} onClick={onNavigate}>
+                    <IconShieldHalf className={classes.linkIcon} stroke={1.5} />
+                    <Title order={3} size="sm">
+                        My clubs
+                    </Title>
+                </Link>
 
-        <a href="#" className={classes.link} onClick={navigateSection('club')}>
-          <IconShieldHalf className={classes.linkIcon} stroke={1.5} />
-          <Title order={3} size="sm">
-            My clubs
-          </Title>
-        </a>
+                <Link to="/teams" className={classes.link} onClick={onNavigate}>
+                    <IconShirtSport className={classes.linkIcon} stroke={1.5} />
+                    <Title order={3} size="sm">
+                        My teams
+                    </Title>
+                </Link>
 
-        <a href="#" className={classes.link} onClick={navigateSection('teams')}>
-          <IconShirtSport className={classes.linkIcon} stroke={1.5} />
-          <Title order={3} size="sm">
-            My teams
-          </Title>
-        </a>
+                <Link to="/agenda" className={classes.link} onClick={onNavigate}>
+                    <IconCalendarWeek className={classes.linkIcon} stroke={1.5} />
+                    <Title order={3} size="sm">
+                        Agenda
+                    </Title>
+                </Link>
 
-        <a
-          href="#"
-          className={classes.link}
-          onClick={navigateSection('agenda')}
-        >
-          <IconCalendarWeek className={classes.linkIcon} stroke={1.5} />
-          <Title order={3} size="sm">
-            Agenda
-          </Title>
-        </a>
+                {user?.role === 'admin' && (
+                    <>
+                        <div className={classes.separator} />
+                        <Link to="/admin" className={classes.link} onClick={onNavigate}>
+                            <IconSettings className={classes.linkIcon} stroke={1.5} />
+                            <Title order={3} size="sm">
+                                Administration
+                            </Title>
+                        </Link>
+                        <Link
+                            to="/admin/clubs"
+                            className={[classes.link, classes.subLink].join(' ')}
+                            onClick={onNavigate}
+                        >
+                            <IconShieldHalf className={classes.linkIcon} stroke={1.5} />
+                            <span>Clubs</span>
+                        </Link>
+                        <Link
+                            to="/admin/teams"
+                            className={[classes.link, classes.subLink].join(' ')}
+                            onClick={onNavigate}
+                        >
+                            <IconShirtSport className={classes.linkIcon} stroke={1.5} />
+                            <span>Teams</span>
+                        </Link>
+                        <Link
+                            to="/admin/team-categories"
+                            className={[classes.link, classes.subLink].join(' ')}
+                            onClick={onNavigate}
+                        >
+                            <IconCategory className={classes.linkIcon} stroke={1.5} />
+                            <span>Team categories</span>
+                        </Link>
+                        <Link
+                            to="/admin/members"
+                            className={[classes.link, classes.subLink].join(' ')}
+                            onClick={onNavigate}
+                        >
+                            <IconUsers className={classes.linkIcon} stroke={1.5} />
+                            <span>Members</span>
+                        </Link>
+                    </>
+                )}
+            </div>
 
-        {user?.role === 'admin' && (
-          <>
-            <div className={classes.separator} />
-            <a
-              href="#"
-              className={classes.link}
-              onClick={navigateSection('admin')}
-            >
-              <IconSettings className={classes.linkIcon} stroke={1.5} />
-              <Title order={3} size="sm">
-                Administration
-              </Title>
-            </a>
-            <a
-              href="#"
-              className={[classes.link, classes.subLink].join(' ')}
-              onClick={navigateSection('admin/clubs')}
-            >
-              <IconShieldHalf className={classes.linkIcon} stroke={1.5} />
-              <span>Clubs</span>
-            </a>
-            <a
-              href="#"
-              className={[classes.link, classes.subLink].join(' ')}
-              onClick={navigateSection('admin/teams')}
-            >
-              <IconShirtSport className={classes.linkIcon} stroke={1.5} />
-              <span>Teams</span>
-            </a>
-            <a
-              href="#"
-              className={[classes.link, classes.subLink].join(' ')}
-              onClick={navigateSection('admin/team-categories')}
-            >
-              <IconCategory className={classes.linkIcon} stroke={1.5} />
-              <span>Team categories</span>
-            </a>
-            <a
-              href="#"
-              className={[classes.link, classes.subLink].join(' ')}
-              onClick={navigateSection('admin/members')}
-            >
-              <IconUsers className={classes.linkIcon} stroke={1.5} />
-              <span>Members</span>
-            </a>
-          </>
-        )}
-      </div>
+            <div className={[classes.footer, classes.separator].join(' ')}>
+                <div className={classes.link}>
+                    {user?.role === 'admin' ? (
+                        <IconCrown className={classes.linkIcon} stroke={1.5} />
+                    ) : user?.role === 'manager' ? (
+                        <IconUserStar className={classes.linkIcon} stroke={1.5} />
+                    ) : (
+                        <IconUser className={classes.linkIcon} stroke={1.5} />
+                    )}
+                    <Title order={3} size="sm">
+                        Hello {user?.displayName}!
+                    </Title>
+                </div>
 
-      <div className={[classes.footer, classes.separator].join(' ')}>
-        <div className={classes.link}>
-          {user?.role === 'admin' ? (
-            <IconCrown className={classes.linkIcon} stroke={1.5} />
-          ) : user?.role === 'manager' ? (
-            <IconUserStar className={classes.linkIcon} stroke={1.5} />
-          ) : (
-            <IconUser className={classes.linkIcon} stroke={1.5} />
-          )}
-          <Title order={3} size="sm">
-            Hello {user?.displayName}!
-          </Title>
-        </div>
+                <Link to="/account" className={[classes.link, classes.subLink].join(' ')} onClick={onNavigate}>
+                    <IconUserCog className={classes.linkIcon} stroke={1.5} />
+                    <span>Edit account</span>
+                </Link>
 
-        <a
-          href="#"
-          className={[classes.link, classes.subLink].join(' ')}
-          onClick={navigateSection('account')}
-        >
-          <IconUserCog className={classes.linkIcon} stroke={1.5} />
-          <span>Edit account</span>
-        </a>
-
-        <a
-          href="#"
-          className={[classes.link, classes.subLink].join(' ')}
-          onClick={logout}
-        >
-          <IconLogout className={classes.linkIcon} stroke={1.5} />
-          <span>Logout</span>
-        </a>
-      </div>
-    </nav>
-  );
+                <UnstyledButton className={[classes.link, classes.subLink].join(' ')} onClick={logout}>
+                    <IconLogout className={classes.linkIcon} stroke={1.5} />
+                    <span>Logout</span>
+                </UnstyledButton>
+            </div>
+        </nav>
+    );
 }

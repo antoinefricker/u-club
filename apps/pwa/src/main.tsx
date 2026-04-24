@@ -5,41 +5,41 @@ import { MantineProvider, createTheme } from '@mantine/core';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const theme = createTheme({
-  fontFamily: 'Roboto, sans-serif',
-  headings: {
-    fontFamily: 'Poppins, sans-serif',
-    sizes: {
-      h2: { fontWeight: '500' },
-      h3: { fontWeight: '500' },
+    fontFamily: 'Roboto, sans-serif',
+    headings: {
+        fontFamily: 'Poppins, sans-serif',
+        sizes: {
+            h2: { fontWeight: '500' },
+            h3: { fontWeight: '500' },
+        },
     },
-  },
-  primaryColor: 'brand',
-  colors: {
-    brand: [
-      '#f3f1f4',
-      '#e2dde4',
-      '#cdc5d0',
-      '#b5aab9',
-      '#a090a5',
-      '#8a7690',
-      '#76657c',
-      '#5d5060',
-      '#4a3f4d',
-      '#372f3a',
-    ],
-    success: [
-      '#fafbee',
-      '#f3f5d5',
-      '#e8edb4',
-      '#dde593',
-      '#d5df6d',
-      '#ced946',
-      '#b9c33f',
-      '#9ba335',
-      '#7c832a',
-      '#5d6320',
-    ],
-  },
+    primaryColor: 'brand',
+    colors: {
+        brand: [
+            '#f3f1f4',
+            '#e2dde4',
+            '#cdc5d0',
+            '#b5aab9',
+            '#a090a5',
+            '#8a7690',
+            '#76657c',
+            '#5d5060',
+            '#4a3f4d',
+            '#372f3a',
+        ],
+        success: [
+            '#fafbee',
+            '#f3f5d5',
+            '#e8edb4',
+            '#dde593',
+            '#d5df6d',
+            '#ced946',
+            '#b9c33f',
+            '#9ba335',
+            '#7c832a',
+            '#5d6320',
+        ],
+    },
 });
 import { Notifications } from '@mantine/notifications';
 import { AuthContextProvider } from './auth/AuthContextProvider.tsx';
@@ -70,51 +70,42 @@ import { MemberFormPage } from './pages/admin/MemberFormPage.tsx';
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <MantineProvider theme={theme}>
-      <Notifications />
-      <QueryClientProvider client={queryClient}>
-        <AuthContextProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="verify-email" element={<ConfirmEmailPage />} />
-              <Route path="reset-password" element={<ResetPasswordPage />} />
-              <Route path="invitation" element={<InvitationPage />} />
-              <Route element={<App />}>
-                <Route index element={<DashboardPage />} />
-                <Route path="club" element={<ClubPage />} />
-                <Route path="teams" element={<TeamsPage />} />
-                <Route path="account" element={<AccountPage />} />
-                <Route path="agenda" element={<AgendaPage />} />
-                <Route path="admin" element={<AdminGuard />}>
-                  <Route index element={<AdminDashboardPage />} />
-                  <Route path="clubs" element={<ClubsListPage />} />
-                  <Route path="clubs/new" element={<ClubFormPage />} />
-                  <Route path="clubs/:id" element={<ClubFormPage />} />
-                  <Route path="teams" element={<TeamsListPage />} />
-                  <Route path="teams/new" element={<TeamFormPage />} />
-                  <Route path="teams/:id" element={<TeamFormPage />} />
-                  <Route
-                    path="team-categories"
-                    element={<TeamCategoriesListPage />}
-                  />
-                  <Route
-                    path="team-categories/new"
-                    element={<TeamCategoryFormPage />}
-                  />
-                  <Route
-                    path="team-categories/:id"
-                    element={<TeamCategoryFormPage />}
-                  />
-                  <Route path="members" element={<MembersListPage />} />
-                  <Route path="members/new" element={<MemberFormPage />} />
-                  <Route path="members/:id" element={<MemberFormPage />} />
-                </Route>
-              </Route>
-            </Routes>
-          </BrowserRouter>
-        </AuthContextProvider>
-      </QueryClientProvider>
-    </MantineProvider>
-  </StrictMode>,
+    <StrictMode>
+        <MantineProvider theme={theme}>
+            <Notifications />
+            <QueryClientProvider client={queryClient}>
+                <AuthContextProvider>
+                    <BrowserRouter>
+                        <Routes>
+                            <Route path="verify-email" element={<ConfirmEmailPage />} />
+                            <Route path="reset-password" element={<ResetPasswordPage />} />
+                            <Route path="invitation" element={<InvitationPage />} />
+                            <Route element={<App />}>
+                                <Route index element={<DashboardPage />} />
+                                <Route path="club" element={<ClubPage />} />
+                                <Route path="teams" element={<TeamsPage />} />
+                                <Route path="account" element={<AccountPage />} />
+                                <Route path="agenda" element={<AgendaPage />} />
+                                <Route path="admin" element={<AdminGuard />}>
+                                    <Route index element={<AdminDashboardPage />} />
+                                    <Route path="clubs" element={<ClubsListPage />} />
+                                    <Route path="clubs/new" element={<ClubFormPage />} />
+                                    <Route path="clubs/:id" element={<ClubFormPage />} />
+                                    <Route path="teams" element={<TeamsListPage />} />
+                                    <Route path="teams/new" element={<TeamFormPage />} />
+                                    <Route path="teams/:id" element={<TeamFormPage />} />
+                                    <Route path="team-categories" element={<TeamCategoriesListPage />} />
+                                    <Route path="team-categories/new" element={<TeamCategoryFormPage />} />
+                                    <Route path="team-categories/:id" element={<TeamCategoryFormPage />} />
+                                    <Route path="members" element={<MembersListPage />} />
+                                    <Route path="members/new" element={<MemberFormPage />} />
+                                    <Route path="members/:id" element={<MemberFormPage />} />
+                                </Route>
+                            </Route>
+                        </Routes>
+                    </BrowserRouter>
+                </AuthContextProvider>
+            </QueryClientProvider>
+        </MantineProvider>
+    </StrictMode>,
 );

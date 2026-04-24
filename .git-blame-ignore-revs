@@ -1,0 +1,8 @@
+# Reformats to ignore in `git blame` (and GitHub's blame view).
+# Configure locally with: git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# style: reformat with prettier tabWidth 4
+7251e1f
+
+# style: tune prettier config and rewrap at printWidth 120
+ccb3a06

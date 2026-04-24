@@ -47,37 +47,28 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.put(
-  '/:id',
-  requireAuth,
-  requireRole('admin', 'manager'),
-  validate(updateTeamSchema),
-  async (req: Request, res: Response) => {
-    const { id } = req.params;
+    '/:id',
+    requireAuth,
+    requireRole('admin', 'manager'),
+    validate(updateTeamSchema),
+    async (req: Request, res: Response) => {
+        const { id } = req.params;
 
-    const updates = { ...req.body };
-    updates.updatedAt = new Date().toISOString();
+        const updates = { ...req.body };
+        updates.updatedAt = new Date().toISOString();
 
-    const [team] = await db('teams')
-      .where({ id })
-      .update(updates)
-      .returning([
-        'id',
-        'clubId',
-        'categoryId',
-        'label',
-        'gender',
-        'description',
-        'createdAt',
-        'updatedAt',
-      ]);
+        const [team] = await db('teams')
+            .where({ id })
+            .update(updates)
+            .returning(['id', 'clubId', 'categoryId', 'label', 'gender', 'description', 'createdAt', 'updatedAt']);
 
-    if (!team) {
-      res.status(404).json({ error: 'team not found' });
-      return;
-    }
+        if (!team) {
+            res.status(404).json({ error: 'team not found' });
+            return;
+        }
 
-    res.json(team);
-  },
+        res.json(team);
+    },
 );
 
 export default router;

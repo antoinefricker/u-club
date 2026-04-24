@@ -31,25 +31,16 @@ const router = Router({ mergeParams: true });
  *               items:
  *                 $ref: '#/components/schemas/TeamAssignment'
  */
-router.get(
-  '/',
-  requireAuth,
-  requireRole('admin', 'manager'),
-  async (req: Request, res: Response) => {
+router.get('/', requireAuth, requireRole('admin', 'manager'), async (req: Request, res: Response) => {
     const { teamId } = req.params;
 
     const members = await db('teamAssignments')
-      .join('members', 'teamAssignments.memberId', 'members.id')
-      .where('teamAssignments.teamId', teamId)
-      .select(
-        'members.*',
-        'teamAssignments.role',
-        'teamAssignments.createdAt as assignedAt',
-      );
+        .join('members', 'teamAssignments.memberId', 'members.id')
+        .where('teamAssignments.teamId', teamId)
+        .select('members.*', 'teamAssignments.role', 'teamAssignments.createdAt as assignedAt');
 
     res.json(members);
-  },
-);
+});
 
 /**
  * @openapi
@@ -100,35 +91,33 @@ router.get(
  *               $ref: '#/components/schemas/Error'
  */
 router.post(
-  '/',
-  requireAuth,
-  requireRole('admin', 'manager'),
-  validate(createTeamAssignmentSchema),
-  async (req: Request, res: Response) => {
-    const { teamId } = req.params;
-    const { memberId, role } = req.body;
+    '/',
+    requireAuth,
+    requireRole('admin', 'manager'),
+    validate(createTeamAssignmentSchema),
+    async (req: Request, res: Response) => {
+        const { teamId } = req.params;
+        const { memberId, role } = req.body;
 
-    const existing = await db('teamAssignments')
-      .where({ teamId, memberId })
-      .first();
+        const existing = await db('teamAssignments').where({ teamId, memberId }).first();
 
-    if (existing) {
-      res
-        .status(409)
-        .json({ error: 'Member is already assigned to this team' });
-      return;
-    }
+        if (existing) {
+            res.status(409).json({
+                error: 'Member is already assigned to this team',
+            });
+            return;
+        }
 
-    const [assignment] = await db('teamAssignments')
-      .insert({
-        teamId,
-        memberId,
-        role,
-      })
-      .returning(['id', 'teamId', 'memberId', 'role', 'createdAt']);
+        const [assignment] = await db('teamAssignments')
+            .insert({
+                teamId,
+                memberId,
+                role,
+            })
+            .returning(['id', 'teamId', 'memberId', 'role', 'createdAt']);
 
-    res.status(201).json(assignment);
-  },
+        res.status(201).json(assignment);
+    },
 );
 
 /**
@@ -162,24 +151,17 @@ router.post(
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.delete(
-  '/:memberId',
-  requireAuth,
-  requireRole('admin', 'manager'),
-  async (req: Request, res: Response) => {
+router.delete('/:memberId', requireAuth, requireRole('admin', 'manager'), async (req: Request, res: Response) => {
     const { teamId, memberId } = req.params;
 
-    const deleted = await db('teamAssignments')
-      .where({ teamId, memberId })
-      .del();
+    const deleted = await db('teamAssignments').where({ teamId, memberId }).del();
 
     if (!deleted) {
-      res.status(404).json({ error: 'Assignment not found' });
-      return;
+        res.status(404).json({ error: 'Assignment not found' });
+        return;
     }
 
     res.status(204).send();
-  },
-);
+});
 
 export default router;

@@ -3,10 +3,7 @@ import db from '../../db.js';
 import { requireAuth } from '../../middleware/auth.js';
 import { requireRole } from '../../middleware/requireRole.js';
 import { paginationQuerySchema } from '../../schemas/pagination.js';
-import {
-  applyPagination,
-  buildPaginationMeta,
-} from '../../utils/pagination.js';
+import { applyPagination, buildPaginationMeta } from '../../utils/pagination.js';
 
 const router = Router();
 
@@ -75,92 +72,81 @@ const escapeLike = (s: string) => s.replace(/[\\%_]/g, (ch) => `\\${ch}`);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get(
-  '/',
-  requireAuth,
-  requireRole('admin', 'manager'),
-  async (req: Request, res: Response) => {
+router.get('/', requireAuth, requireRole('admin', 'manager'), async (req: Request, res: Response) => {
     const parsed = paginationQuerySchema.safeParse(req.query);
     if (!parsed.success) {
-      res.status(400).json({
-        error: 'validation error',
-        details: parsed.error.issues.map((e) => ({
-          field: e.path.join('.'),
-          message: e.message,
-        })),
-      });
-      return;
+        res.status(400).json({
+            error: 'validation error',
+            details: parsed.error.issues.map((e) => ({
+                field: e.path.join('.'),
+                message: e.message,
+            })),
+        });
+        return;
     }
 
     const { teamId, search } = req.query;
 
     let searchTokens: string[] = [];
     if (search !== undefined) {
-      if (typeof search !== 'string') {
-        res.status(400).json({ error: 'search must be a string' });
-        return;
-      }
-      const trimmed = search.trim();
-      if (trimmed.length > SEARCH_MAX_LENGTH) {
-        res.status(400).json({
-          error: `search must be ${SEARCH_MAX_LENGTH} characters or fewer`,
-        });
-        return;
-      }
-      if (trimmed.length > 0) {
-        searchTokens = trimmed.split(/\s+/);
-        if (searchTokens.length > SEARCH_MAX_TOKENS) {
-          res.status(400).json({
-            error: `search must contain at most ${SEARCH_MAX_TOKENS} tokens`,
-          });
-          return;
+        if (typeof search !== 'string') {
+            res.status(400).json({ error: 'search must be a string' });
+            return;
         }
-      }
+        const trimmed = search.trim();
+        if (trimmed.length > SEARCH_MAX_LENGTH) {
+            res.status(400).json({
+                error: `search must be ${SEARCH_MAX_LENGTH} characters or fewer`,
+            });
+            return;
+        }
+        if (trimmed.length > 0) {
+            searchTokens = trimmed.split(/\s+/);
+            if (searchTokens.length > SEARCH_MAX_TOKENS) {
+                res.status(400).json({
+                    error: `search must contain at most ${SEARCH_MAX_TOKENS} tokens`,
+                });
+                return;
+            }
+        }
     }
 
     const query = db('members')
-      .leftJoin('memberStatuses', 'members.statusId', 'memberStatuses.id')
-      .select(
-        'members.id',
-        'members.statusId',
-        'members.firstName',
-        'members.lastName',
-        'members.birthdate',
-        'members.gender',
-        'members.createdAt',
-        'members.updatedAt',
-        'memberStatuses.label as statusLabel',
-      )
-      .orderBy('members.id', 'asc');
+        .leftJoin('memberStatuses', 'members.statusId', 'memberStatuses.id')
+        .select(
+            'members.id',
+            'members.statusId',
+            'members.firstName',
+            'members.lastName',
+            'members.birthdate',
+            'members.gender',
+            'members.createdAt',
+            'members.updatedAt',
+            'memberStatuses.label as statusLabel',
+        )
+        .orderBy('members.id', 'asc');
 
     if (teamId) {
-      query
-        .join('teamAssignments', 'members.id', 'teamAssignments.memberId')
-        .where('teamAssignments.teamId', teamId as string);
+        query
+            .join('teamAssignments', 'members.id', 'teamAssignments.memberId')
+            .where('teamAssignments.teamId', teamId as string);
     }
 
     for (const token of searchTokens) {
-      const pattern = `%${escapeLike(token)}%`;
-      query.andWhere((sub) => {
-        sub
-          .whereRaw('unaccent(members.first_name) ilike unaccent(?)', [pattern])
-          .orWhereRaw('unaccent(members.last_name) ilike unaccent(?)', [
-            pattern,
-          ])
-          .orWhereRaw(
-            "unaccent(to_char(members.birthdate, 'DD/MM/YYYY')) ilike unaccent(?)",
-            [pattern],
-          );
-      });
+        const pattern = `%${escapeLike(token)}%`;
+        query.andWhere((sub) => {
+            sub.whereRaw('unaccent(members.first_name) ilike unaccent(?)', [pattern])
+                .orWhereRaw('unaccent(members.last_name) ilike unaccent(?)', [pattern])
+                .orWhereRaw("unaccent(to_char(members.birthdate, 'DD/MM/YYYY')) ilike unaccent(?)", [pattern]);
+        });
     }
 
     const { data, totalItems } = await applyPagination(query, parsed.data);
 
     res.json({
-      data,
-      pagination: buildPaginationMeta({ ...parsed.data, totalItems }),
+        data,
+        pagination: buildPaginationMeta({ ...parsed.data, totalItems }),
     });
-  },
-);
+});
 
 export default router;

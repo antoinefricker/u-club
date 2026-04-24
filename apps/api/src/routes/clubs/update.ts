@@ -53,47 +53,37 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.put(
-  '/:id',
-  requireAuth,
-  requireRole('admin', 'manager'),
-  validate(updateClubSchema),
-  async (req: Request, res: Response) => {
-    const { id } = req.params;
+    '/:id',
+    requireAuth,
+    requireRole('admin', 'manager'),
+    validate(updateClubSchema),
+    async (req: Request, res: Response) => {
+        const { id } = req.params;
 
-    const updates: Record<string, unknown> = { ...req.body };
+        const updates: Record<string, unknown> = { ...req.body };
 
-    if (updates.code) {
-      const existing = await db('clubs')
-        .where({ code: updates.code })
-        .whereNot({ id })
-        .first();
-      if (existing) {
-        res.status(409).json({ error: 'code already in use' });
-        return;
-      }
-    }
+        if (updates.code) {
+            const existing = await db('clubs').where({ code: updates.code }).whereNot({ id }).first();
+            if (existing) {
+                res.status(409).json({ error: 'code already in use' });
+                return;
+            }
+        }
 
-    updates.updatedAt = new Date().toISOString();
+        updates.updatedAt = new Date().toISOString();
 
-    const [club] = await db('clubs')
-      .where({ id })
-      .update(updates)
-      .returning([
-        'id',
-        'name',
-        'code',
-        'description',
-        'createdAt',
-        'updatedAt',
-      ]);
+        const [club] = await db('clubs')
+            .where({ id })
+            .update(updates)
+            .returning(['id', 'name', 'code', 'description', 'createdAt', 'updatedAt']);
 
-    if (!club) {
-      res.status(404).json({ error: 'club not found' });
-      return;
-    }
+        if (!club) {
+            res.status(404).json({ error: 'club not found' });
+            return;
+        }
 
-    res.json(club);
-  },
+        res.json(club);
+    },
 );
 
 export default router;

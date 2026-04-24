@@ -57,47 +57,39 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post(
-  '/login',
-  validate(loginSchema),
-  async (req: Request, res: Response) => {
+router.post('/login', validate(loginSchema), async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     const user = await db('users').where({ email }).first();
 
     if (!user) {
-      res.status(401).json({ error: 'invalid email or password' });
-      return;
+        res.status(401).json({ error: 'invalid email or password' });
+        return;
     }
 
     const valid = await verifyPassword(password, user.password);
 
     if (!valid) {
-      res.status(401).json({ error: 'invalid email or password' });
-      return;
+        res.status(401).json({ error: 'invalid email or password' });
+        return;
     }
 
     if (!user.emailVerifiedAt) {
-      res.status(403).json({ error: 'email not verified' });
-      return;
+        res.status(403).json({ error: 'email not verified' });
+        return;
     }
 
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
-      res.status(500).json({ error: 'server configuration error' });
-      return;
+        res.status(500).json({ error: 'server configuration error' });
+        return;
     }
 
-    const accessToken = jwt.sign(
-      { sub: user.id, email: user.email, role: user.role },
-      jwtSecret,
-      {
+    const accessToken = jwt.sign({ sub: user.id, email: user.email, role: user.role }, jwtSecret, {
         expiresIn: '7d',
-      },
-    );
+    });
 
     res.json({ accessToken });
-  },
-);
+});
 
 export default router;

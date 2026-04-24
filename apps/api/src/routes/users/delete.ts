@@ -28,22 +28,17 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.delete(
-  '/:id',
-  requireAuth,
-  requireSelfOrRole('admin'),
-  async (req: Request, res: Response) => {
+router.delete('/:id', requireAuth, requireSelfOrRole('admin'), async (req: Request, res: Response) => {
     const { id } = req.params;
 
     const deleted = await db('users').where({ id }).del();
 
     if (!deleted) {
-      res.status(404).json({ error: 'user not found' });
-      return;
+        res.status(404).json({ error: 'user not found' });
+        return;
     }
 
     res.status(204).send();
-  },
-);
+});
 
 export default router;

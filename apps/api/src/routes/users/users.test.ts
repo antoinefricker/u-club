@@ -20,326 +20,302 @@ const mockLimit = vi.fn().mockReturnThis();
 const mockOffset = vi.fn();
 
 vi.mock('../../db.js', () => {
-  const db = Object.assign(
-    vi.fn(() => ({
-      select: mockSelect,
-      where: mockWhere,
-      whereNot: mockWhereNot,
-      first: mockFirst,
-      insert: mockInsert,
-      returning: mockReturning,
-      update: mockUpdate,
-      del: mockDel,
-      count: mockCount,
-      countDistinct: mockCountDistinct,
-      orderBy: mockOrderBy,
-      clone: mockClone,
-      clearSelect: mockClearSelect,
-      clearOrder: mockClearOrder,
-      limit: mockLimit,
-      offset: mockOffset,
-    })),
-    { raw: vi.fn() },
-  );
-  return { default: db };
+    const db = Object.assign(
+        vi.fn(() => ({
+            select: mockSelect,
+            where: mockWhere,
+            whereNot: mockWhereNot,
+            first: mockFirst,
+            insert: mockInsert,
+            returning: mockReturning,
+            update: mockUpdate,
+            del: mockDel,
+            count: mockCount,
+            countDistinct: mockCountDistinct,
+            orderBy: mockOrderBy,
+            clone: mockClone,
+            clearSelect: mockClearSelect,
+            clearOrder: mockClearOrder,
+            limit: mockLimit,
+            offset: mockOffset,
+        })),
+        { raw: vi.fn() },
+    );
+    return { default: db };
 });
 
 vi.mock('../../password.js', () => ({
-  hashPassword: vi.fn().mockResolvedValue('hashed:password'),
-  verifyPassword: vi.fn().mockResolvedValue(true),
+    hashPassword: vi.fn().mockResolvedValue('hashed:password'),
+    verifyPassword: vi.fn().mockResolvedValue(true),
 }));
 
 const mockSendMail = vi.fn().mockResolvedValue({});
 
 vi.mock('../../mailer.js', () => ({
-  default: { sendMail: mockSendMail },
+    default: { sendMail: mockSendMail },
 }));
 
 const { default: app } = await import('../../app.js');
 
 const sampleUser = {
-  id: 'uuid-1',
-  displayName: 'johnd',
-  bio: null,
-  phone: null,
-  email: 'john@example.com',
-  role: 'user',
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
+    id: 'uuid-1',
+    displayName: 'johnd',
+    bio: null,
+    phone: null,
+    email: 'john@example.com',
+    role: 'user',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
 };
 
 const adminToken = createTestToken('uuid-1', 'admin@example.com', 'admin');
 const selfToken = createTestToken('uuid-1', 'john@example.com', 'user');
 
 beforeEach(() => {
-  process.env.JWT_SECRET = 'test-secret';
-  vi.clearAllMocks();
-  // Reset chaining: each call to db('users') returns a fresh chain
-  mockSelect.mockReturnThis();
-  mockWhere.mockReturnThis();
-  mockWhereNot.mockReturnThis();
-  mockInsert.mockReturnThis();
-  mockUpdate.mockReturnThis();
-  mockCount.mockReturnThis();
-  mockCountDistinct.mockReturnThis();
-  mockOrderBy.mockReturnThis();
-  mockClone.mockReturnThis();
-  mockClearSelect.mockReturnThis();
-  mockClearOrder.mockReturnThis();
-  mockLimit.mockReturnThis();
+    process.env.JWT_SECRET = 'test-secret';
+    vi.clearAllMocks();
+    // Reset chaining: each call to db('users') returns a fresh chain
+    mockSelect.mockReturnThis();
+    mockWhere.mockReturnThis();
+    mockWhereNot.mockReturnThis();
+    mockInsert.mockReturnThis();
+    mockUpdate.mockReturnThis();
+    mockCount.mockReturnThis();
+    mockCountDistinct.mockReturnThis();
+    mockOrderBy.mockReturnThis();
+    mockClone.mockReturnThis();
+    mockClearSelect.mockReturnThis();
+    mockClearOrder.mockReturnThis();
+    mockLimit.mockReturnThis();
 });
 
 describe('GET /users', () => {
-  const mockList = (rows: unknown[], total: number) => {
-    mockFirst.mockResolvedValueOnce({ total });
-    mockOffset.mockResolvedValueOnce(rows);
-  };
+    const mockList = (rows: unknown[], total: number) => {
+        mockFirst.mockResolvedValueOnce({ total });
+        mockOffset.mockResolvedValueOnce(rows);
+    };
 
-  it('returns envelope with defaults when no query params', async () => {
-    mockList([sampleUser], 1);
+    it('returns envelope with defaults when no query params', async () => {
+        mockList([sampleUser], 1);
 
-    const res = await request(app)
-      .get('/users')
-      .set('Authorization', `Bearer ${adminToken}`);
+        const res = await request(app).get('/users').set('Authorization', `Bearer ${adminToken}`);
 
-    expect(res.status).toBe(200);
-    expect(res.body).toEqual({
-      data: [sampleUser],
-      pagination: {
-        page: 1,
-        itemsPerPage: 25,
-        totalItems: 1,
-        totalPages: 1,
-      },
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual({
+            data: [sampleUser],
+            pagination: {
+                page: 1,
+                itemsPerPage: 25,
+                totalItems: 1,
+                totalPages: 1,
+            },
+        });
+        expect(mockLimit).toHaveBeenCalledWith(25);
+        expect(mockOffset).toHaveBeenCalledWith(0);
     });
-    expect(mockLimit).toHaveBeenCalledWith(25);
-    expect(mockOffset).toHaveBeenCalledWith(0);
-  });
 
-  it('applies page=2 and itemsPerPage=10', async () => {
-    mockList([sampleUser], 42);
+    it('applies page=2 and itemsPerPage=10', async () => {
+        mockList([sampleUser], 42);
 
-    const res = await request(app)
-      .get('/users?page=2&itemsPerPage=10')
-      .set('Authorization', `Bearer ${adminToken}`);
+        const res = await request(app)
+            .get('/users?page=2&itemsPerPage=10')
+            .set('Authorization', `Bearer ${adminToken}`);
 
-    expect(res.status).toBe(200);
-    expect(mockLimit).toHaveBeenCalledWith(10);
-    expect(mockOffset).toHaveBeenCalledWith(10);
-    expect(res.body.pagination).toEqual({
-      page: 2,
-      itemsPerPage: 10,
-      totalItems: 42,
-      totalPages: 5,
+        expect(res.status).toBe(200);
+        expect(mockLimit).toHaveBeenCalledWith(10);
+        expect(mockOffset).toHaveBeenCalledWith(10);
+        expect(res.body.pagination).toEqual({
+            page: 2,
+            itemsPerPage: 10,
+            totalItems: 42,
+            totalPages: 5,
+        });
     });
-  });
 
-  it('returns empty envelope when no users', async () => {
-    mockList([], 0);
+    it('returns empty envelope when no users', async () => {
+        mockList([], 0);
 
-    const res = await request(app)
-      .get('/users')
-      .set('Authorization', `Bearer ${adminToken}`);
+        const res = await request(app).get('/users').set('Authorization', `Bearer ${adminToken}`);
 
-    expect(res.body).toEqual({
-      data: [],
-      pagination: {
-        page: 1,
-        itemsPerPage: 25,
-        totalItems: 0,
-        totalPages: 1,
-      },
+        expect(res.body).toEqual({
+            data: [],
+            pagination: {
+                page: 1,
+                itemsPerPage: 25,
+                totalItems: 0,
+                totalPages: 1,
+            },
+        });
     });
-  });
 
-  it('orders results by id ascending', async () => {
-    mockList([sampleUser], 1);
-    await request(app)
-      .get('/users')
-      .set('Authorization', `Bearer ${adminToken}`);
-    expect(mockOrderBy).toHaveBeenCalledWith('id', 'asc');
-  });
+    it('orders results by id ascending', async () => {
+        mockList([sampleUser], 1);
+        await request(app).get('/users').set('Authorization', `Bearer ${adminToken}`);
+        expect(mockOrderBy).toHaveBeenCalledWith('id', 'asc');
+    });
 
-  it.each([['page=0'], ['itemsPerPage=101']])(
-    'returns 400 for %s',
-    async (qs) => {
-      const res = await request(app)
-        .get(`/users?${qs}`)
-        .set('Authorization', `Bearer ${adminToken}`);
-      expect(res.status).toBe(400);
-      expect(res.body).toHaveProperty('error', 'validation error');
-    },
-  );
+    it.each([['page=0'], ['itemsPerPage=101']])('returns 400 for %s', async (qs) => {
+        const res = await request(app).get(`/users?${qs}`).set('Authorization', `Bearer ${adminToken}`);
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'validation error');
+    });
 });
 
 describe('GET /users/:id', () => {
-  it('should return a user by id', async () => {
-    mockFirst.mockResolvedValueOnce(sampleUser);
+    it('should return a user by id', async () => {
+        mockFirst.mockResolvedValueOnce(sampleUser);
 
-    const res = await request(app)
-      .get('/users/uuid-1')
-      .set('Authorization', `Bearer ${adminToken}`);
+        const res = await request(app).get('/users/uuid-1').set('Authorization', `Bearer ${adminToken}`);
 
-    expect(res.status).toBe(200);
-    expect(res.body).toEqual(sampleUser);
-  });
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual(sampleUser);
+    });
 
-  it('should return 404 if user not found', async () => {
-    mockFirst.mockResolvedValueOnce(undefined);
+    it('should return 404 if user not found', async () => {
+        mockFirst.mockResolvedValueOnce(undefined);
 
-    const res = await request(app)
-      .get('/users/nonexistent')
-      .set('Authorization', `Bearer ${adminToken}`);
+        const res = await request(app).get('/users/nonexistent').set('Authorization', `Bearer ${adminToken}`);
 
-    expect(res.status).toBe(404);
-    expect(res.body).toHaveProperty('error', 'user not found');
-  });
+        expect(res.status).toBe(404);
+        expect(res.body).toHaveProperty('error', 'user not found');
+    });
 });
 
 describe('POST /users', () => {
-  it('should return 400 if displayName is missing', async () => {
-    const res = await request(app).post('/users').send({});
+    it('should return 400 if displayName is missing', async () => {
+        const res = await request(app).post('/users').send({});
 
-    expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'validation error');
-  });
-
-  it('should return 400 if email is missing', async () => {
-    const res = await request(app)
-      .post('/users')
-      .send({ displayName: 'johnd' });
-
-    expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'validation error');
-  });
-
-  it('should return 400 if password is missing', async () => {
-    const res = await request(app).post('/users').send({
-      displayName: 'johnd',
-      email: 'john@example.com',
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'validation error');
     });
 
-    expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'validation error');
-  });
+    it('should return 400 if email is missing', async () => {
+        const res = await request(app).post('/users').send({ displayName: 'johnd' });
 
-  it('should return 409 if email already exists', async () => {
-    mockFirst.mockResolvedValueOnce(sampleUser); // email check
-
-    const res = await request(app).post('/users').send({
-      displayName: 'johnd',
-      email: 'john@example.com',
-      password: 'secret',
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'validation error');
     });
 
-    expect(res.status).toBe(409);
-    expect(res.body).toHaveProperty('error', 'email already in use');
-  });
+    it('should return 400 if password is missing', async () => {
+        const res = await request(app).post('/users').send({
+            displayName: 'johnd',
+            email: 'john@example.com',
+        });
 
-  it('should create a user and return 201', async () => {
-    mockFirst.mockResolvedValueOnce(undefined); // no existing email
-    mockFirst.mockResolvedValueOnce({ count: 1 }); // count query (not first user)
-    mockReturning.mockResolvedValueOnce([sampleUser]);
-
-    const res = await request(app).post('/users').send({
-      displayName: 'johnd',
-      email: 'john@example.com',
-      password: 'secret',
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'validation error');
     });
 
-    expect(res.status).toBe(201);
-    expect(res.body).toEqual(sampleUser);
-  });
+    it('should return 409 if email already exists', async () => {
+        mockFirst.mockResolvedValueOnce(sampleUser); // email check
 
-  it('should send confirmation email after creation', async () => {
-    mockFirst.mockResolvedValueOnce(undefined); // no existing email
-    mockFirst.mockResolvedValueOnce({ count: 1 }); // count query
-    mockReturning.mockResolvedValueOnce([sampleUser]);
+        const res = await request(app).post('/users').send({
+            displayName: 'johnd',
+            email: 'john@example.com',
+            password: 'secret',
+        });
 
-    await request(app).post('/users').send({
-      displayName: 'johnd',
-      email: 'john@example.com',
-      password: 'secret',
+        expect(res.status).toBe(409);
+        expect(res.body).toHaveProperty('error', 'email already in use');
     });
 
-    expect(mockInsert).toHaveBeenCalled();
-    expect(mockSendMail).toHaveBeenCalledWith(
-      expect.objectContaining({
-        to: 'john@example.com',
-        subject: 'Verify your email',
-      }),
-    );
-  });
+    it('should create a user and return 201', async () => {
+        mockFirst.mockResolvedValueOnce(undefined); // no existing email
+        mockFirst.mockResolvedValueOnce({ count: 1 }); // count query (not first user)
+        mockReturning.mockResolvedValueOnce([sampleUser]);
+
+        const res = await request(app).post('/users').send({
+            displayName: 'johnd',
+            email: 'john@example.com',
+            password: 'secret',
+        });
+
+        expect(res.status).toBe(201);
+        expect(res.body).toEqual(sampleUser);
+    });
+
+    it('should send confirmation email after creation', async () => {
+        mockFirst.mockResolvedValueOnce(undefined); // no existing email
+        mockFirst.mockResolvedValueOnce({ count: 1 }); // count query
+        mockReturning.mockResolvedValueOnce([sampleUser]);
+
+        await request(app).post('/users').send({
+            displayName: 'johnd',
+            email: 'john@example.com',
+            password: 'secret',
+        });
+
+        expect(mockInsert).toHaveBeenCalled();
+        expect(mockSendMail).toHaveBeenCalledWith(
+            expect.objectContaining({
+                to: 'john@example.com',
+                subject: 'Verify your email',
+            }),
+        );
+    });
 });
 
 describe('PUT /users/:id', () => {
-  it('should return 400 if no valid fields provided', async () => {
-    const res = await request(app)
-      .put('/users/uuid-1')
-      .set('Authorization', `Bearer ${selfToken}`)
-      .send({});
+    it('should return 400 if no valid fields provided', async () => {
+        const res = await request(app).put('/users/uuid-1').set('Authorization', `Bearer ${selfToken}`).send({});
 
-    expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'validation error');
-  });
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'validation error');
+    });
 
-  it('should return 409 if updated email already in use', async () => {
-    mockFirst.mockResolvedValueOnce(sampleUser); // email taken
+    it('should return 409 if updated email already in use', async () => {
+        mockFirst.mockResolvedValueOnce(sampleUser); // email taken
 
-    const res = await request(app)
-      .put('/users/uuid-2')
-      .set('Authorization', `Bearer ${adminToken}`)
-      .send({ email: 'john@example.com' });
+        const res = await request(app)
+            .put('/users/uuid-2')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ email: 'john@example.com' });
 
-    expect(res.status).toBe(409);
-    expect(res.body).toHaveProperty('error', 'email already in use');
-  });
+        expect(res.status).toBe(409);
+        expect(res.body).toHaveProperty('error', 'email already in use');
+    });
 
-  it('should return 404 if user not found', async () => {
-    mockReturning.mockResolvedValueOnce([]);
+    it('should return 404 if user not found', async () => {
+        mockReturning.mockResolvedValueOnce([]);
 
-    const res = await request(app)
-      .put('/users/nonexistent')
-      .set('Authorization', `Bearer ${adminToken}`)
-      .send({ displayName: 'janed' });
+        const res = await request(app)
+            .put('/users/nonexistent')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ displayName: 'janed' });
 
-    expect(res.status).toBe(404);
-    expect(res.body).toHaveProperty('error', 'user not found');
-  });
+        expect(res.status).toBe(404);
+        expect(res.body).toHaveProperty('error', 'user not found');
+    });
 
-  it('should update and return the user', async () => {
-    const updated = { ...sampleUser, displayName: 'janed' };
-    mockReturning.mockResolvedValueOnce([updated]);
+    it('should update and return the user', async () => {
+        const updated = { ...sampleUser, displayName: 'janed' };
+        mockReturning.mockResolvedValueOnce([updated]);
 
-    const res = await request(app)
-      .put('/users/uuid-1')
-      .set('Authorization', `Bearer ${selfToken}`)
-      .send({ displayName: 'janed' });
+        const res = await request(app)
+            .put('/users/uuid-1')
+            .set('Authorization', `Bearer ${selfToken}`)
+            .send({ displayName: 'janed' });
 
-    expect(res.status).toBe(200);
-    expect(res.body).toEqual(updated);
-  });
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual(updated);
+    });
 });
 
 describe('DELETE /users/:id', () => {
-  it('should return 404 if user not found', async () => {
-    mockDel.mockResolvedValueOnce(0);
+    it('should return 404 if user not found', async () => {
+        mockDel.mockResolvedValueOnce(0);
 
-    const res = await request(app)
-      .delete('/users/nonexistent')
-      .set('Authorization', `Bearer ${adminToken}`);
+        const res = await request(app).delete('/users/nonexistent').set('Authorization', `Bearer ${adminToken}`);
 
-    expect(res.status).toBe(404);
-    expect(res.body).toHaveProperty('error', 'user not found');
-  });
+        expect(res.status).toBe(404);
+        expect(res.body).toHaveProperty('error', 'user not found');
+    });
 
-  it('should delete and return 204', async () => {
-    mockDel.mockResolvedValueOnce(1);
+    it('should delete and return 204', async () => {
+        mockDel.mockResolvedValueOnce(1);
 
-    const res = await request(app)
-      .delete('/users/uuid-1')
-      .set('Authorization', `Bearer ${selfToken}`);
+        const res = await request(app).delete('/users/uuid-1').set('Authorization', `Bearer ${selfToken}`);
 
-    expect(res.status).toBe(204);
-  });
+        expect(res.status).toBe(204);
+    });
 });

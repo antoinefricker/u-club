@@ -1,9 +1,6 @@
 import { Router, Request, Response } from 'express';
 import db from '../../db.js';
-import {
-  requireAuth,
-  type AuthenticatedRequest,
-} from '../../middleware/auth.js';
+import { requireAuth, type AuthenticatedRequest } from '../../middleware/auth.js';
 
 const router = Router();
 
@@ -38,24 +35,26 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.delete('/:id', requireAuth, async (req: Request, res: Response) => {
-  const user = (req as AuthenticatedRequest).user;
-  const isPrivileged = user.role === 'admin' || user.role === 'manager';
-  const { id } = req.params;
+    const user = (req as AuthenticatedRequest).user;
+    const isPrivileged = user.role === 'admin' || user.role === 'manager';
+    const { id } = req.params;
 
-  const userMember = await db('userMembers').where({ id }).first();
-  if (!userMember) {
-    res.status(404).json({ error: 'user-member association not found' });
-    return;
-  }
+    const userMember = await db('userMembers').where({ id }).first();
+    if (!userMember) {
+        res.status(404).json({ error: 'user-member association not found' });
+        return;
+    }
 
-  if (!isPrivileged && userMember.userId !== user.id) {
-    res.status(403).json({ error: 'not allowed to delete this association' });
-    return;
-  }
+    if (!isPrivileged && userMember.userId !== user.id) {
+        res.status(403).json({
+            error: 'not allowed to delete this association',
+        });
+        return;
+    }
 
-  await db('userMembers').where({ id }).del();
+    await db('userMembers').where({ id }).del();
 
-  res.status(204).send();
+    res.status(204).send();
 });
 
 export default router;

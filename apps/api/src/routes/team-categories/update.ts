@@ -53,48 +53,47 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.put(
-  '/:id',
-  requireAuth,
-  requireRole('admin', 'manager'),
-  validate(updateTeamCategorySchema),
-  async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const updates = { ...req.body };
+    '/:id',
+    requireAuth,
+    requireRole('admin', 'manager'),
+    validate(updateTeamCategorySchema),
+    async (req: Request, res: Response) => {
+        const { id } = req.params;
+        const updates = { ...req.body };
 
-    if (updates.label) {
-      const current = await db('teamCategories')
-        .select('clubId')
-        .where({ id })
-        .first();
-      if (!current) {
-        res.status(404).json({ error: 'team category not found' });
-        return;
-      }
+        if (updates.label) {
+            const current = await db('teamCategories').select('clubId').where({ id }).first();
+            if (!current) {
+                res.status(404).json({ error: 'team category not found' });
+                return;
+            }
 
-      const existing = await db('teamCategories')
-        .where({ clubId: current.clubId, label: updates.label })
-        .whereNot({ id })
-        .first();
-      if (existing) {
-        res.status(409).json({ error: 'label already in use for this club' });
-        return;
-      }
-    }
+            const existing = await db('teamCategories')
+                .where({ clubId: current.clubId, label: updates.label })
+                .whereNot({ id })
+                .first();
+            if (existing) {
+                res.status(409).json({
+                    error: 'label already in use for this club',
+                });
+                return;
+            }
+        }
 
-    updates.updatedAt = new Date().toISOString();
+        updates.updatedAt = new Date().toISOString();
 
-    const [category] = await db('teamCategories')
-      .where({ id })
-      .update(updates)
-      .returning(['id', 'clubId', 'label', 'createdAt', 'updatedAt']);
+        const [category] = await db('teamCategories')
+            .where({ id })
+            .update(updates)
+            .returning(['id', 'clubId', 'label', 'createdAt', 'updatedAt']);
 
-    if (!category) {
-      res.status(404).json({ error: 'team category not found' });
-      return;
-    }
+        if (!category) {
+            res.status(404).json({ error: 'team category not found' });
+            return;
+        }
 
-    res.json(category);
-  },
+        res.json(category);
+    },
 );
 
 export default router;

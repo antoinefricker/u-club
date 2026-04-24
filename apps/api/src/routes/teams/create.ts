@@ -34,34 +34,25 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.post(
-  '/',
-  requireAuth,
-  requireRole('admin', 'manager'),
-  validate(createTeamSchema),
-  async (req: Request, res: Response) => {
-    const { clubId, label, gender, description, categoryId } = req.body;
+    '/',
+    requireAuth,
+    requireRole('admin', 'manager'),
+    validate(createTeamSchema),
+    async (req: Request, res: Response) => {
+        const { clubId, label, gender, description, categoryId } = req.body;
 
-    const [team] = await db('teams')
-      .insert({
-        clubId,
-        label,
-        gender,
-        description: description || null,
-        categoryId: categoryId || null,
-      })
-      .returning([
-        'id',
-        'clubId',
-        'categoryId',
-        'label',
-        'gender',
-        'description',
-        'createdAt',
-        'updatedAt',
-      ]);
+        const [team] = await db('teams')
+            .insert({
+                clubId,
+                label,
+                gender,
+                description: description || null,
+                categoryId: categoryId || null,
+            })
+            .returning(['id', 'clubId', 'categoryId', 'label', 'gender', 'description', 'createdAt', 'updatedAt']);
 
-    res.status(201).json(team);
-  },
+        res.status(201).json(team);
+    },
 );
 
 export default router;

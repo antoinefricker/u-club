@@ -44,25 +44,23 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.post(
-  '/',
-  requireAuth,
-  requireRole('admin'),
-  validate(createMemberStatusSchema),
-  async (req: Request, res: Response) => {
-    const { label } = req.body;
+    '/',
+    requireAuth,
+    requireRole('admin'),
+    validate(createMemberStatusSchema),
+    async (req: Request, res: Response) => {
+        const { label } = req.body;
 
-    const existing = await db('memberStatuses').where({ label }).first();
-    if (existing) {
-      res.status(409).json({ error: 'label already in use' });
-      return;
-    }
+        const existing = await db('memberStatuses').where({ label }).first();
+        if (existing) {
+            res.status(409).json({ error: 'label already in use' });
+            return;
+        }
 
-    const [status] = await db('memberStatuses')
-      .insert({ label })
-      .returning(['id', 'label']);
+        const [status] = await db('memberStatuses').insert({ label }).returning(['id', 'label']);
 
-    res.status(201).json(status);
-  },
+        res.status(201).json(status);
+    },
 );
 
 export default router;

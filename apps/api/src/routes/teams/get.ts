@@ -32,36 +32,31 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get(
-  '/:id',
-  requireAuth,
-  requireRole('admin', 'manager'),
-  async (req: Request, res: Response) => {
+router.get('/:id', requireAuth, requireRole('admin', 'manager'), async (req: Request, res: Response) => {
     const { id } = req.params;
 
     const team = await db('teams')
-      .leftJoin('teamCategories', 'teams.categoryId', 'teamCategories.id')
-      .select(
-        'teams.id',
-        'teams.clubId',
-        'teams.categoryId',
-        'teams.label',
-        'teams.gender',
-        'teams.description',
-        'teams.createdAt',
-        'teams.updatedAt',
-        'teamCategories.label as categoryLabel',
-      )
-      .where('teams.id', id)
-      .first();
+        .leftJoin('teamCategories', 'teams.categoryId', 'teamCategories.id')
+        .select(
+            'teams.id',
+            'teams.clubId',
+            'teams.categoryId',
+            'teams.label',
+            'teams.gender',
+            'teams.description',
+            'teams.createdAt',
+            'teams.updatedAt',
+            'teamCategories.label as categoryLabel',
+        )
+        .where('teams.id', id)
+        .first();
 
     if (!team) {
-      res.status(404).json({ error: 'team not found' });
-      return;
+        res.status(404).json({ error: 'team not found' });
+        return;
     }
 
     res.json(team);
-  },
-);
+});
 
 export default router;

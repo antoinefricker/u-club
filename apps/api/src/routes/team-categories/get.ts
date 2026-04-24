@@ -32,25 +32,20 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get(
-  '/:id',
-  requireAuth,
-  requireRole('admin', 'manager'),
-  async (req: Request, res: Response) => {
+router.get('/:id', requireAuth, requireRole('admin', 'manager'), async (req: Request, res: Response) => {
     const { id } = req.params;
 
     const category = await db('teamCategories')
-      .select('id', 'clubId', 'label', 'createdAt', 'updatedAt')
-      .where({ id })
-      .first();
+        .select('id', 'clubId', 'label', 'createdAt', 'updatedAt')
+        .where({ id })
+        .first();
 
     if (!category) {
-      res.status(404).json({ error: 'team category not found' });
-      return;
+        res.status(404).json({ error: 'team category not found' });
+        return;
     }
 
     res.json(category);
-  },
-);
+});
 
 export default router;

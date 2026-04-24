@@ -56,38 +56,32 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.put(
-  '/:id',
-  requireAuth,
-  requireRole('admin'),
-  validate(updateMemberStatusSchema),
-  async (req: Request, res: Response) => {
-    const { id } = req.params;
+    '/:id',
+    requireAuth,
+    requireRole('admin'),
+    validate(updateMemberStatusSchema),
+    async (req: Request, res: Response) => {
+        const { id } = req.params;
 
-    const updates = { ...req.body };
+        const updates = { ...req.body };
 
-    if (updates.label) {
-      const existing = await db('memberStatuses')
-        .where({ label: updates.label })
-        .whereNot({ id })
-        .first();
-      if (existing) {
-        res.status(409).json({ error: 'label already in use' });
-        return;
-      }
-    }
+        if (updates.label) {
+            const existing = await db('memberStatuses').where({ label: updates.label }).whereNot({ id }).first();
+            if (existing) {
+                res.status(409).json({ error: 'label already in use' });
+                return;
+            }
+        }
 
-    const [status] = await db('memberStatuses')
-      .where({ id })
-      .update(updates)
-      .returning(['id', 'label']);
+        const [status] = await db('memberStatuses').where({ id }).update(updates).returning(['id', 'label']);
 
-    if (!status) {
-      res.status(404).json({ error: 'member status not found' });
-      return;
-    }
+        if (!status) {
+            res.status(404).json({ error: 'member status not found' });
+            return;
+        }
 
-    res.json(status);
-  },
+        res.json(status);
+    },
 );
 
 export default router;

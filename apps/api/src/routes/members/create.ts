@@ -34,34 +34,25 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.post(
-  '/',
-  requireAuth,
-  requireRole('admin', 'manager'),
-  validate(createMemberSchema),
-  async (req: Request, res: Response) => {
-    const { firstName, lastName, gender, statusId, birthdate } = req.body;
+    '/',
+    requireAuth,
+    requireRole('admin', 'manager'),
+    validate(createMemberSchema),
+    async (req: Request, res: Response) => {
+        const { firstName, lastName, gender, statusId, birthdate } = req.body;
 
-    const [member] = await db('members')
-      .insert({
-        firstName,
-        lastName,
-        gender,
-        statusId: statusId || null,
-        birthdate: birthdate || null,
-      })
-      .returning([
-        'id',
-        'statusId',
-        'firstName',
-        'lastName',
-        'birthdate',
-        'gender',
-        'createdAt',
-        'updatedAt',
-      ]);
+        const [member] = await db('members')
+            .insert({
+                firstName,
+                lastName,
+                gender,
+                statusId: statusId || null,
+                birthdate: birthdate || null,
+            })
+            .returning(['id', 'statusId', 'firstName', 'lastName', 'birthdate', 'gender', 'createdAt', 'updatedAt']);
 
-    res.status(201).json(member);
-  },
+        res.status(201).json(member);
+    },
 );
 
 export default router;

@@ -5,23 +5,23 @@ import { AccountEditForm } from './AccountEditForm';
 import { UserMemberLinks } from '../components/admin/user/UserMemberLinks';
 
 export function AccountPage() {
-  return (
-    <>
-      <PageTitle label="My account" />
+    return (
+        <>
+            <PageTitle label="My account" />
 
-      <FormWrapper>
-        <Title order={3} mt="xl" mb="md">
-          Account details
-        </Title>
-        <AccountEditForm />
-      </FormWrapper>
+            <FormWrapper>
+                <Title order={3} mt="xl" mb="md">
+                    Account details
+                </Title>
+                <AccountEditForm />
+            </FormWrapper>
 
-      <FormWrapper>
-        <Title order={3} mt="xl" mb="md">
-          Family & members
-        </Title>
-        <UserMemberLinks useUserPointOfView={true} />
-      </FormWrapper>
-    </>
-  );
+            <FormWrapper>
+                <Title order={3} mt="xl" mb="md">
+                    Family & members
+                </Title>
+                <UserMemberLinks useUserPointOfView={true} />
+            </FormWrapper>
+        </>
+    );
 }

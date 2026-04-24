@@ -42,16 +42,13 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post(
-  '/forgot_password',
-  validate(forgotPasswordSchema),
-  async (req: Request, res: Response) => {
+router.post('/forgot_password', validate(forgotPasswordSchema), async (req: Request, res: Response) => {
     const { email } = req.body;
 
     const user = await db('users').where({ email }).first();
     if (!user) {
-      res.json({ message: 'password reset email sent' });
-      return;
+        res.json({ message: 'password reset email sent' });
+        return;
     }
 
     await db('authTokens').where({ email, type: 'password_reset' }).del();
@@ -60,22 +57,21 @@ router.post(
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
 
     await db('authTokens').insert({
-      email,
-      token,
-      expiresAt,
-      type: 'password_reset',
+        email,
+        token,
+        expiresAt,
+        type: 'password_reset',
     });
 
     const appUrl = process.env.APP_URL || 'http://localhost:5173';
     await mailer.sendMail({
-      from: process.env.SMTP_FROM || 'noreply@eggplant.app',
-      to: email,
-      subject: 'Reset your password',
-      text: `Click here to reset your password: ${appUrl}/reset-password?token=${token}&email=${encodeURIComponent(email)}\n\nThis link expires in 1 hour.`,
+        from: process.env.SMTP_FROM || 'noreply@eggplant.app',
+        to: email,
+        subject: 'Reset your password',
+        text: `Click here to reset your password: ${appUrl}/reset-password?token=${token}&email=${encodeURIComponent(email)}\n\nThis link expires in 1 hour.`,
     });
 
     res.json({ message: 'password reset email sent' });
-  },
-);
+});
 
 export default router;
