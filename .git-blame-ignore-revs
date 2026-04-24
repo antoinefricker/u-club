@@ -3,3 +3,6 @@
 
 # style: reformat with prettier tabWidth 4
 7251e1f
+
+# style: tune prettier config and rewrap at printWidth 120
+ccb3a06
