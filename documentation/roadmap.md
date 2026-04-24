@@ -48,22 +48,22 @@
 
 ### 5. Pages
 
-- Markdown editor
-  - typography
-  - separator
-  - download link
-  - grid
+- [ ] Markdown editor
+  - [ ] typography
+  - [ ] separator
+  - [ ] download link
+  - [ ] grid
 
 ### 6. Media library
 
-- CRUD images
-- CRUD files
-- insert image in markdown
+- [ ] CRUD images
+- [ ] CRUD files
+- [ ] insert image in markdown
 
 ### 7. Publication
 
-- Internationalization with react-i18next (French/English)
-- Production env
+- [ ] Internationalization with react-i18next (French/English)
+- [ ] Production env
 
 ## Later features
 
