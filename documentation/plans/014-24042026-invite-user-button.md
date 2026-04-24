@@ -57,6 +57,54 @@ Motivated by the observation that `auth_tokens` and `member_invitations` both st
 - Inside the existing `<FormWrapper>` that wraps the "Family & members" section, render the `<InviteUserButton memberId={member.id} memberName={`${member.firstName} ${member.lastName}`} />` under the section title, above `<UserMemberLinks>`.
 - Button only appears when `member?.id` is truthy (i.e. the member is loaded — we're on an edit page, not a create page).
 
+### API — public invitation lookup and register-and-accept
+
+Adds two token-gated (no auth) routes so an invited user arriving at `/invitation?token=…` can see the invitation and, if they don't have an account yet, complete registration in a single form — skipping the separate email-verification round-trip since the click on the emailed link already proves email ownership.
+
+**`GET /invitations/by-token/:token`** — public, no auth.
+- Looks up the invitation by token. 404 if not found.
+- Returns 400 if expired (`expiresAt < now()`) or already accepted (`acceptedAt != null`).
+- Response body:
+  ```json
+  {
+    "invitation": { "id", "email", "memberId", "memberFirstName", "memberLastName", "type", "description", "expiresAt" },
+    "userExists": true | false
+  }
+  ```
+- `userExists` = `db('users').where({ email: invitation.email }).first() !== undefined`. This is a minor information disclosure (anyone with the token can learn whether an account exists for the invited email) but consistent with how password-reset flows routinely behave. Accepted trade-off for simpler UX.
+- The token itself is the authorization; no JWT required.
+
+**`POST /invitations/by-token/:token/register-and-accept`** — public, no auth.
+- Body: `{ displayName: string, password: string }`. Email comes from the invitation server-side; any `email` in the body is ignored.
+- Validations:
+  - Invitation exists / not expired / not accepted (same as GET).
+  - No user already exists for `invitation.email` → 409 with message "an account already exists for this email; log in instead".
+- Performs atomically in a transaction:
+  1. Insert `users` row with `email = invitation.email`, hashed `password`, provided `displayName`, `role = 'user'`, `emailVerifiedAt = now()` (pre-verified — token click proves ownership).
+  2. Insert `userMembers` row linking the new user to `invitation.memberId`, carrying `invitation.type` and `invitation.description`.
+  3. Mark `memberInvitations.acceptedAt = now()`.
+- Returns the same shape as `POST /auth/login`: `{ token, user }`. UI immediately calls `login()` with the token to hydrate `AuthContext`.
+- OpenAPI annotation and Bruno file included.
+
+**Schema**: new Zod schema `registerAndAcceptInvitationSchema` in `apps/api/src/schemas/invitation.ts`:
+```ts
+{ displayName: z.string().min(1), password: z.string().min(8) }
+```
+(Minimum password length matches existing `POST /users` policy.)
+
+### PWA — invitation page redesign
+
+- **Route placement**: revert the earlier route-move so `/invitation` sits **outside** `<App />`. `InvitationPage` becomes self-contained and handles all three auth/registration states itself. Rationale: the unauthenticated branch is invitation-specific (not the generic `Unauthenticated` login flow), so putting it outside `App` avoids adding invitation-awareness to `PageLayout`.
+- **Hook**: new `useInvitationByToken(token)` in `hooks/useInvitations.ts` — `useQuery` calling the new GET endpoint. Disabled when `!token`. Includes `token` in the key.
+- **Hook**: new `useRegisterAndAcceptInvitation()` mutation calling the new POST endpoint. On success, calls `useAuthContext().loginWithToken(authToken, user)` (or equivalent) to hydrate the session, then navigates to `/`.
+- **`AuthContext` change**: expose a lightweight `hydrate(token, user)` method alongside `login(email, password)` so the register-and-accept flow can set the session without re-calling `POST /auth/login`. Low-blast-radius: the existing `login` implementation already sets both; factor out a helper and expose it.
+- **Page layout inside `InvitationPage`**: when authenticated, wrap the content in the same `AppShell` that `PageLayout` uses (or better: keep the page self-contained with its own minimal centered layout, showing the user's name + a Logout link in the corner if they're logged in). Final choice decided when previewing with the user.
+- **Three rendered states**:
+  - **Authenticated**: show the invitation accept form (existing UX). Keep nav if we choose AppShell; otherwise a minimal header.
+  - **Unauthenticated + `userExists`**: show login form. Fields: email (prefilled from `invitation.email`, disabled), password. On submit → standard `login()`. Page re-renders authenticated; the accept form appears.
+  - **Unauthenticated + `!userExists`**: show register form. Fields: email (prefilled, disabled), `displayName`, `password`. On submit → `useRegisterAndAcceptInvitation()` → on success hydrate session + show success screen → redirect to `/` after a short delay.
+- **Dead code**: drop the current `if (!isAuthenticated)` branch that renders a "Log in or Register" button navigating to `/` (it's superseded by the new flow).
+
 ### Out of scope
 
 - Listing pending invitations for a member (API has `GET /invitations/sent` but no PWA view yet — separate task).
@@ -79,7 +127,20 @@ Motivated by the observation that `auth_tokens` and `member_invitations` both st
 ### API
 
 - **`createEmailToken` helper**: call sites exercised indirectly by the existing auth and invitation tests (which mock the DB, not the token generator). Manually verify that `forgotPassword`, `magicLink`, `verifyEmailResend`, `users/create`, and `invitations/create` still produce a 64-char hex token and the correct `expiresAt` after the refactor.
-- **Invitations route**: no route changes. Existing test suite (`invitations.test.ts`) already covers the flow.
+- **Existing invitations routes**: no changes to `POST /invitations`, `GET /invitations`, `POST /invitations/:id/accept`, `DELETE /invitations/:id`. Existing test suite already covers them.
+- **New `GET /invitations/by-token/:token`**:
+  - 200 with invitation body + `userExists: true` when an account exists for the email.
+  - 200 with invitation body + `userExists: false` when no account.
+  - 400 when expired.
+  - 400 when already accepted.
+  - 404 when token not found.
+- **New `POST /invitations/by-token/:token/register-and-accept`**:
+  - 201 happy path → returns `{ token, user }` with the user pre-verified; the `memberInvitations.acceptedAt` is set; a `userMembers` row is inserted linking the new user to the invitation's member.
+  - 409 when a user already exists for the invitation's email.
+  - 400 when the invitation is expired or already accepted.
+  - 404 when token not found.
+  - 400 when `displayName` missing or `password` < 8 chars.
+  - Transaction atomicity: if any step fails mid-way, no partial rows are written.
 
 ## Implementation steps
 
@@ -89,7 +150,13 @@ Motivated by the observation that `auth_tokens` and `member_invitations` both st
 4. **PWA hook**: add `useCreateInvitation` in new `hooks/useInvitations.ts`.
 5. **PWA component**: preview the modal layout with the user first (per CLAUDE.md React Views rule), then add `components/admin/user/InviteUserButton.tsx`.
 6. **PWA page**: wire the button into `MemberFormPage.tsx`.
-7. **Validate**: `pnpm --filter=pwa lint`, `pnpm -r typecheck`. Manual check on the admin member form.
+7. **API `GET /invitations/by-token/:token`**: new route + Zod schema + OpenAPI + Bruno. Tests.
+8. **API `POST /invitations/by-token/:token/register-and-accept`**: new route + Zod schema + transaction + OpenAPI + Bruno. Tests.
+9. **PWA auth**: expose `hydrate(token, user)` on `AuthContext` so the register flow can set the session without re-calling login.
+10. **PWA hooks**: add `useInvitationByToken` and `useRegisterAndAcceptInvitation` in `hooks/useInvitations.ts`.
+11. **PWA page**: rewrite `InvitationPage` to handle the three states. Preview the layout with the user first.
+12. **Route placement**: revert the earlier route-move in `main.tsx` so `/invitation` sits outside `<App />`.
+13. **Validate**: `pnpm --filter=pwa lint`, `pnpm -r typecheck`, `pnpm --filter=api test`. Manual check on the three flows (authenticated accept, login-then-accept, register-and-accept).
 
 ## Decisions
 
@@ -97,6 +164,10 @@ Motivated by the observation that `auth_tokens` and `member_invitations` both st
 - **Modal, not inline form** — matches `UserMemberLinks` edit UX and keeps the page tidy.
 - **Type default `relative`** — the most common real-world case (admin inviting a parent/relative). Self-invites are usually rare.
 - **Description collapse on `self`** — mirrors `UserMemberLinks` and the `memberInvitations` schema that doesn't meaningfully use description for self.
+- **Skip email verification for invitation-driven registration**: clicking the emailed invitation link proves email ownership, so the register-and-accept flow marks the new user's email as verified in the same transaction. No separate verification round-trip.
+- **`userExists` exposed on `GET /invitations/by-token/:token`**: accepts the minor information disclosure ("is there an account for this email?") to drive a simpler UX (no Login/Register tabs). Same trade-off made by typical password-reset flows.
+- **Invitation-driven registration uses a dedicated public endpoint** (`POST /invitations/by-token/:token/register-and-accept`) rather than reusing `POST /users` with a flag. Rationale: the new endpoint is atomic (user + userMembers + accepted_at in one transaction), skips the email-verification emails, and never allows creating a user *without* an invitation context via that path.
+- **Password minimum 8 chars**: consistent with existing `POST /users`.
 - **Invalidate `['user-members']` on success** — the link isn't created yet, but the invited user may accept quickly and we'd rather re-fetch than show stale.
 
 ## Open considerations

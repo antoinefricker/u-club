@@ -13,4 +13,4 @@
 - [011 - 22/04/2026 - Team Categories CRUD](011-22042026-team-categories-crud.md) — Full CRUD API for team_categories + categoryId Select in the team create/edit form
 - [012 - 22/04/2026 - Admin Members Search](012-22042026-admin-members-search.md) — Free-text search on admin members list over first name, last name, and DD/MM/YYYY birthdate
 - [013 - 24/04/2026 - Show & Edit Member Relationships](013-24042026-show-edit-member-relationships.md) — Scope `UserRelationships` by `memberId` (admin/manager) with flipped user-side labels + API `GET /user-members?memberId=…`
-- [014 - 24/04/2026 - Invite User Button](014-24042026-invite-user-button.md) — Admin member-form modal posting to `POST /invitations` + shared `createEmailToken` helper to DRY token generation across auth/invitation flows
+- [014 - 24/04/2026 - Invite User Button](014-24042026-invite-user-button.md) — Admin member-form modal posting to `POST /invitations` + shared `createEmailToken` helper + public token-gated `GET /invitations/by-token/:token` and `register-and-accept` routes so invited users can register and accept in one form without separate email verification
