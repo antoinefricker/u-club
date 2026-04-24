@@ -11,13 +11,13 @@
 ### 2. Admin
 
 - [ ] Member list
-  - [ ] Fix search filter UI
+  - [x] Fix search filter UI
   - [ ] Show member related team assignements
   - [ ] Create/Edit/Delete member team assignements
-  - [ ] Show member relationships
-  - [ ] Create/edit/delete member relationships
-  - [ ] Show member pending invitations
+  - [x] Show member relationships
+  - [x] Edit/delete member relationships
   - [ ] Send invite
+  - [ ] Show member pending invitations
 - [ ] Member statuses CRUD
 
 ### 3. User
