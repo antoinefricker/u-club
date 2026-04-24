@@ -1,10 +1,10 @@
 import { Router, Request, Response } from 'express';
-import crypto from 'node:crypto';
 import db from '../../db.js';
 import { hashPassword } from '../../password.js';
 import mailer from '../../mailer.js';
 import { validate } from '../../middleware/validate.js';
 import { createUserSchema } from '../../schemas/user.js';
+import { createEmailToken } from '../../utils/emailToken.js';
 
 const router = Router();
 
@@ -65,8 +65,7 @@ router.post('/', validate(createUserSchema), async (req: Request, res: Response)
         })
         .returning(['id', 'displayName', 'bio', 'phone', 'email', 'role', 'createdAt', 'updatedAt']);
 
-    const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const { token, expiresAt } = createEmailToken(24 * 60 * 60 * 1000);
 
     await db('authTokens').insert({
         email,
