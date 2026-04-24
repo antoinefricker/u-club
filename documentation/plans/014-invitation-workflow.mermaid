@@ -1,0 +1,39 @@
+flowchart TD
+    START{Who is inviting?}
+
+    START -->|User linked to member| A1[User A is linked to a member]
+    START -->|Admin or Manager| A2[Admin/Manager selects a member]
+
+    A1 --> B[Invite User B by email]
+    A2 --> B
+
+    B --> C[Email sent with invitation link]
+    C --> D[User B clicks link]
+    D --> E["GET /invitations/by-token/:token\n(public)"]
+
+    E --> F{Token valid?}
+    F -->|No: 404/400| F1[Show error: invalid or expired]
+    F -->|Yes| G{Authenticated?}
+
+    G -->|Yes| H[Show Accept form]
+    G -->|No| I{"userExists\nfor invitation.email?"}
+
+    I -->|Yes| J[Show Login form<br/>email prefilled & disabled]
+    J --> K[POST /auth/login]
+    K --> H
+
+    I -->|No| L[Show Register form<br/>email prefilled & disabled<br/>fields: displayName + password]
+    L --> M["POST /invitations/by-token/:token/register-and-accept<br/>(public, atomic)"]
+    M --> N["Create user\nemailVerifiedAt = now()<br/>(token click proves email)"]
+    N --> O["Insert userMembers row\nfrom invitation"]
+    O --> P["Mark invitation accepted"]
+    P --> Q["Return { accessToken }"]
+    Q --> R["hydrate(accessToken) →\nsession active"]
+    R --> S[Redirect to /]
+
+    H --> T["POST /invitations/:id/accept"]
+    T --> U["Insert userMembers row\nMark invitation accepted"]
+    U --> S
+
+    classDef error fill:#fee,stroke:#c33;
+    class F1 error;

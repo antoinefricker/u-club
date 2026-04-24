@@ -8,6 +8,8 @@ Per the invitation workflow (`documentation/plans/006-invitation-workflow.mermai
 
 The roadmap's admin section has "Send invite" as an open item; this closes it.
 
+See `014-invitation-workflow.mermaid` for the full updated end-to-end flow after this plan lands (public `GET /invitations/by-token/:token`, `POST .../register-and-accept`, unified `/invitation` page handling login/register/accept).
+
 ## Scope
 
 ### API — shared `createEmailToken` helper (preliminary)
