@@ -5,10 +5,12 @@ import createRouter from './create.js';
 import acceptRouter from './accept.js';
 import deleteRouter from './delete.js';
 import getByTokenRouter from './getByToken.js';
+import registerAndAcceptRouter from './registerAndAccept.js';
 
 const router = Router();
 
 router.use(getByTokenRouter);
+router.use(registerAndAcceptRouter);
 router.use(listSentRouter);
 router.use(listReceivedRouter);
 router.use(createRouter);
