@@ -16,7 +16,7 @@
   - [ ] Create/Edit/Delete member team assignements
   - [x] Show member relationships
   - [x] Edit/delete member relationships
-  - [ ] Send invite
+  - [x] Send invite
   - [ ] Show member pending invitations
 - [ ] Member statuses CRUD
 
