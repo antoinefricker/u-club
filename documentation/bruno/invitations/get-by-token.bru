@@ -1,0 +1,15 @@
+meta {
+  name: Get Invitation by Token
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/invitations/by-token/:token
+  body: none
+  auth: none
+}
+
+params:path {
+  token: paste-invitation-token-here
+}

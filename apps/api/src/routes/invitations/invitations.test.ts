@@ -414,3 +414,108 @@ describe('DELETE /invitations/:id', () => {
         expect(res.body).toHaveProperty('error', 'invitation not found');
     });
 });
+
+describe('GET /invitations/by-token/:token', () => {
+    const validInvitationRow = {
+        id: 'inv-1',
+        email: 'invited@example.com',
+        memberId: 'member-1',
+        type: 'relative',
+        description: 'father',
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+        acceptedAt: null,
+        memberFirstName: 'Alice',
+        memberLastName: 'Dupont',
+    };
+
+    it('returns 200 with userExists=true when a user already exists for the email', async () => {
+        mockFirst.mockResolvedValueOnce(validInvitationRow);
+        mockFirst.mockResolvedValueOnce({ id: 'uuid-existing', email: 'invited@example.com' });
+
+        const res = await request(app).get('/invitations/by-token/abc123');
+
+        expect(res.status).toBe(200);
+        expect(res.body.userExists).toBe(true);
+        expect(res.body.invitation).toMatchObject({
+            id: 'inv-1',
+            email: 'invited@example.com',
+            memberId: 'member-1',
+            memberFirstName: 'Alice',
+            memberLastName: 'Dupont',
+            type: 'relative',
+            description: 'father',
+        });
+    });
+
+    it('returns 200 with userExists=false when no user exists for the email', async () => {
+        mockFirst.mockResolvedValueOnce(validInvitationRow);
+        mockFirst.mockResolvedValueOnce(undefined);
+
+        const res = await request(app).get('/invitations/by-token/abc123');
+
+        expect(res.status).toBe(200);
+        expect(res.body.userExists).toBe(false);
+    });
+
+    it('response body does not leak acceptedAt, token, or invitedBy', async () => {
+        mockFirst.mockResolvedValueOnce(validInvitationRow);
+        mockFirst.mockResolvedValueOnce(undefined);
+
+        const res = await request(app).get('/invitations/by-token/abc123');
+
+        expect(res.body.invitation).not.toHaveProperty('acceptedAt');
+        expect(res.body.invitation).not.toHaveProperty('token');
+        expect(res.body.invitation).not.toHaveProperty('invitedBy');
+    });
+
+    it('returns 404 when the token is not found', async () => {
+        mockFirst.mockResolvedValueOnce(undefined);
+
+        const res = await request(app).get('/invitations/by-token/does-not-exist');
+
+        expect(res.status).toBe(404);
+        expect(res.body).toHaveProperty('error', 'invitation not found');
+    });
+
+    it('returns 400 when the invitation has expired', async () => {
+        mockFirst.mockResolvedValueOnce({
+            ...validInvitationRow,
+            expiresAt: new Date(Date.now() - 60 * 1000),
+        });
+
+        const res = await request(app).get('/invitations/by-token/expired');
+
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'invitation has expired');
+    });
+
+    it('returns 400 when the invitation has already been accepted', async () => {
+        mockFirst.mockResolvedValueOnce({
+            ...validInvitationRow,
+            acceptedAt: new Date(),
+        });
+
+        const res = await request(app).get('/invitations/by-token/already-accepted');
+
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'invitation already accepted');
+    });
+
+    it('does not require an Authorization header', async () => {
+        mockFirst.mockResolvedValueOnce(validInvitationRow);
+        mockFirst.mockResolvedValueOnce(undefined);
+
+        const res = await request(app).get('/invitations/by-token/abc123');
+
+        expect(res.status).toBe(200);
+    });
+
+    it('looks up the invitation with a case-sensitive token match', async () => {
+        mockFirst.mockResolvedValueOnce(undefined);
+
+        const res = await request(app).get('/invitations/by-token/ABC123');
+
+        expect(res.status).toBe(404);
+        expect(mockWhere).toHaveBeenCalledWith({ 'memberInvitations.token': 'ABC123' });
+    });
+});
