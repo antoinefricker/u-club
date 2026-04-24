@@ -216,6 +216,10 @@ const options: swaggerJsdoc.Options = {
             type: { type: 'string', enum: ['self', 'relative'] },
             description: { type: 'string', nullable: true },
             createdAt: { type: 'string', format: 'date-time' },
+            memberFirstName: { type: 'string' },
+            memberLastName: { type: 'string' },
+            userDisplayName: { type: 'string' },
+            userEmail: { type: 'string', format: 'email' },
           },
         },
         MemberInvitation: {

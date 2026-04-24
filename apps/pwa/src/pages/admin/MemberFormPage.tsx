@@ -1,5 +1,13 @@
 import { useEffect } from 'react';
-import { Button, Grid, Group, Loader, Select, TextInput } from '@mantine/core';
+import {
+  Button,
+  Grid,
+  Group,
+  Loader,
+  Select,
+  TextInput,
+  Title,
+} from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import dayjs from 'dayjs';
@@ -13,6 +21,7 @@ import {
 } from '../../hooks/useMembers';
 import { useMemberStatuses } from '../../hooks/useMemberStatuses';
 import { MEMBER_GENDER_OPTIONS, type MemberGender } from '../../types/Member';
+import { UserMemberLinks } from '../../components/admin/user/UserMemberLinks';
 
 export function MemberFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -170,6 +179,12 @@ export function MemberFormPage() {
             </Grid.Col>
           </Grid>
         </form>
+      </FormWrapper>
+      <FormWrapper>
+        <Title order={3} mt="xl" mb="md">
+          Family & members
+        </Title>
+        <UserMemberLinks memberId={member?.id} useUserPointOfView={false} />
       </FormWrapper>
     </>
   );

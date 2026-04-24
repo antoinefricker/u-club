@@ -2,25 +2,25 @@ import { Title } from '@mantine/core';
 import { PageTitle } from '../components/layout/PageTitle';
 import { FormWrapper } from '../components/admin/forms/FormWrapper';
 import { AccountEditForm } from './AccountEditForm';
-import { UserRelationships } from './UserRelationships';
+import { UserMemberLinks } from '../components/admin/user/UserMemberLinks';
 
 export function AccountPage() {
   return (
     <>
       <PageTitle label="My account" />
 
-      <Title order={3} mt="xl" mb="md">
-        Account details
-      </Title>
       <FormWrapper>
+        <Title order={3} mt="xl" mb="md">
+          Account details
+        </Title>
         <AccountEditForm />
       </FormWrapper>
 
-      <Title order={3} mt="xl" mb="md">
-        Family & members
-      </Title>
       <FormWrapper>
-        <UserRelationships />
+        <Title order={3} mt="xl" mb="md">
+          Family & members
+        </Title>
+        <UserMemberLinks useUserPointOfView={true} />
       </FormWrapper>
     </>
   );

@@ -1,6 +1,7 @@
 import {
   ActionIcon,
   Alert,
+  Anchor,
   Button,
   Group,
   Loader,
@@ -16,7 +17,7 @@ import { PageTitle } from '../../components/layout/PageTitle';
 import { ListFilters } from '../../components/admin/lists/ListFilters';
 import { ListPagination } from '../../components/admin/lists/ListPagination';
 import { EmptyListRow } from '../../components/admin/lists/EmptyListRow';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import { useMembers, useDeleteMember } from '../../hooks/useMembers';
 import { useTeams } from '../../hooks/useTeams';
@@ -116,7 +117,7 @@ export function MembersListPage() {
               </ActionIcon>
             ) : null
           }
-          maw={320}
+          w={300}
         />
         <Select
           label="Filter by team"
@@ -132,8 +133,7 @@ export function MembersListPage() {
       <Table striped highlightOnHover layout="fixed">
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>First name</Table.Th>
-            <Table.Th>Last name</Table.Th>
+            <Table.Th>Name</Table.Th>
             <Table.Th w={120}>Birthdate</Table.Th>
             <Table.Th w={100}>Gender</Table.Th>
             <Table.Th w={100}>Status</Table.Th>
@@ -141,11 +141,19 @@ export function MembersListPage() {
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {members?.length === 0 && <EmptyListRow colSpan={6} />}
+          {members?.length === 0 && <EmptyListRow colSpan={5} />}
           {members?.map((member) => (
             <Table.Tr key={member.id}>
-              <Table.Td>{member.firstName}</Table.Td>
-              <Table.Td>{member.lastName}</Table.Td>
+              <Table.Td>
+                <Anchor
+                  component={Link}
+                  to={`/admin/members/${member.id}`}
+                  c="inherit"
+                  underline="hover"
+                >
+                  {member.firstName} {member.lastName}
+                </Anchor>
+              </Table.Td>
               <Table.Td>
                 {member.birthdate
                   ? dayjs(member.birthdate).format('DD/MM/YYYY')

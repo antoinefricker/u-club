@@ -14,6 +14,7 @@ import type { UserMember } from '../types/UserMember';
 
 interface UseUserMembersArgs extends PaginationArgs {
   userId?: string;
+  memberId?: string;
 }
 
 function useAuthHeaders() {
@@ -30,17 +31,22 @@ export function useUserMembers(args: UseUserMembersArgs = {}) {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,
   };
-  const { page, itemsPerPage } = args;
-  const userId = args.userId ?? user?.id;
+  const { page, itemsPerPage, memberId } = args;
+  const userId = memberId ? args.userId : (args.userId ?? user?.id);
   return useQuery<Paginated<UserMember>>({
-    queryKey: ['user-members', { page, itemsPerPage, userId }],
+    queryKey: ['user-members', { page, itemsPerPage, userId, memberId }],
     queryFn: async () => {
-      const qs = buildListQueryString({ page, itemsPerPage, userId });
+      const qs = buildListQueryString({
+        page,
+        itemsPerPage,
+        userId,
+        memberId,
+      });
       const res = await fetch(`/api/user-members${qs}`, { headers });
       if (!res.ok) throw new Error('Failed to fetch relationships');
       return res.json();
     },
-    enabled: !!userId,
+    enabled: !!userId || !!memberId,
     placeholderData: keepPreviousData,
   });
 }

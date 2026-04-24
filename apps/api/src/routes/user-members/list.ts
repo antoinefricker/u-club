@@ -1,4 +1,5 @@
 import { Router, Request, Response } from 'express';
+import { z } from 'zod';
 import db from '../../db.js';
 import {
   requireAuth,
@@ -12,20 +13,36 @@ import {
 
 const router = Router();
 
+const listQuerySchema = paginationQuerySchema
+  .extend({
+    userId: z.uuid({ error: 'userId must be a UUID' }).optional(),
+    memberId: z.uuid({ error: 'memberId must be a UUID' }).optional(),
+  })
+  .refine((data) => !(data.userId && data.memberId), {
+    message: 'userId and memberId are mutually exclusive',
+    path: ['memberId'],
+  });
+
 /**
  * @openapi
  * /user-members:
  *   get:
  *     tags: [UserMembers]
  *     summary: List user-member associations
- *     description: Admin/manager can list all (optionally filtered by userId). Regular users only see their own.
+ *     description: Admin/manager can list all (optionally filtered by userId OR memberId). Regular users only see their own.
  *     parameters:
  *       - in: query
  *         name: userId
  *         schema:
  *           type: string
  *           format: uuid
- *         description: Filter by user ID (admin/manager only; ignored for regular users)
+ *         description: Filter by user ID (admin/manager only; ignored for regular users). Mutually exclusive with memberId.
+ *       - in: query
+ *         name: memberId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Filter by member ID (admin/manager only; ignored for regular users). Mutually exclusive with userId.
  *       - in: query
  *         name: page
  *         schema:
@@ -55,14 +72,14 @@ const router = Router();
  *                 pagination:
  *                   $ref: '#/components/schemas/PaginationMeta'
  *       400:
- *         description: Invalid pagination parameters
+ *         description: Invalid query parameters (including `userId` and `memberId` used together)
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
 router.get('/', requireAuth, async (req: Request, res: Response) => {
-  const parsed = paginationQuerySchema.safeParse(req.query);
+  const parsed = listQuerySchema.safeParse(req.query);
   if (!parsed.success) {
     res.status(400).json({
       error: 'validation error',
@@ -87,13 +104,18 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
       'userMembers.createdAt',
       'members.firstName as memberFirstName',
       'members.lastName as memberLastName',
+      'users.displayName as userDisplayName',
+      'users.email as userEmail',
     )
     .join('members', 'userMembers.memberId', 'members.id')
+    .join('users', 'userMembers.userId', 'users.id')
     .orderBy('userMembers.id', 'asc');
 
   if (isPrivileged) {
-    const { userId } = req.query;
-    if (userId) {
+    const { userId, memberId } = parsed.data;
+    if (memberId) {
+      query.where('userMembers.memberId', memberId);
+    } else if (userId) {
       query.where('userMembers.userId', userId);
     }
   } else {
