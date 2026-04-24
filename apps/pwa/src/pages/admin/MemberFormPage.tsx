@@ -10,6 +10,7 @@ import { useMember, useCreateMember, useUpdateMember } from '../../hooks/useMemb
 import { useMemberStatuses } from '../../hooks/useMemberStatuses';
 import { MEMBER_GENDER_OPTIONS, type MemberGender } from '../../types/Member';
 import { UserMemberLinks } from '../../components/admin/user/UserMemberLinks';
+import { InviteUserButton } from '../../components/admin/user/InviteUserButton';
 
 export function MemberFormPage() {
     const { id } = useParams<{ id: string }>();
@@ -156,9 +157,18 @@ export function MemberFormPage() {
                 </form>
             </FormWrapper>
             <FormWrapper>
-                <Title order={3} mt="xl" mb="md">
-                    Family & members
-                </Title>
+                <Group justify="space-between" mt="xl" mb="md">
+                    <Title order={3} m={0}>
+                        Family & members
+                    </Title>
+                    {member?.id && (
+                        <InviteUserButton
+                            memberId={member.id}
+                            memberFirstName={member.firstName}
+                            memberLastName={member.lastName}
+                        />
+                    )}
+                </Group>
                 <UserMemberLinks memberId={member?.id} useUserPointOfView={false} />
             </FormWrapper>
         </>
