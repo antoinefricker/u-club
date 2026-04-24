@@ -10,6 +10,7 @@
 
 ### 2. Admin
 
+- [x] Add link to edition page on all resource label from list view
 - [ ] Member list
   - [x] Fix search filter UI
   - [ ] Show member related team assignements

@@ -1,9 +1,9 @@
-import { ActionIcon, Alert, Button, Group, Loader, Table } from '@mantine/core';
+import { ActionIcon, Alert, Anchor, Button, Group, Loader, Table } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { PageTitle } from '../../components/layout/PageTitle';
 import { ListPagination } from '../../components/admin/lists/ListPagination';
 import { EmptyListRow } from '../../components/admin/lists/EmptyListRow';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import { useClubs, useDeleteClub } from '../../hooks/useClubs';
 import { usePagination } from '../../hooks/usePagination';
@@ -51,7 +51,17 @@ export function ClubsListPage() {
                     {clubs?.length === 0 && <EmptyListRow colSpan={4} />}
                     {clubs?.map((club) => (
                         <Table.Tr key={club.id}>
-                            <Table.Td>{club.name}</Table.Td>
+                            <Table.Td>
+                                <Anchor
+                                    component={Link}
+                                    to={`/admin/clubs/${club.id}`}
+                                    c="inherit"
+                                    underline="hover"
+                                    size="sm"
+                                >
+                                    {club.name}
+                                </Anchor>
+                            </Table.Td>
                             <Table.Td>{club.code}</Table.Td>
                             <Table.Td>{club.description}</Table.Td>
                             <Table.Td>
