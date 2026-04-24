@@ -26,48 +26,48 @@ const mockTrxUpdate = vi.fn().mockResolvedValue(1);
 const mockTrxWhere = vi.fn().mockReturnThis();
 
 vi.mock('../../db.js', () => {
-  const db = Object.assign(
-    vi.fn(() => ({
-      select: mockSelect,
-      where: mockWhere,
-      whereNull: mockWhereNull,
-      first: mockFirst,
-      insert: mockInsert,
-      returning: mockReturning,
-      update: mockUpdate,
-      del: mockDel,
-      join: mockJoin,
-      orderBy: mockOrderBy,
-      clone: mockClone,
-      clearSelect: mockClearSelect,
-      clearOrder: mockClearOrder,
-      count: mockCount,
-      countDistinct: mockCountDistinct,
-      limit: mockLimit,
-      offset: mockOffset,
-    })),
-    {
-      raw: vi.fn(),
-      transaction: vi.fn(async (cb: (trx: unknown) => Promise<void>) => {
-        const trx = vi.fn(() => ({
-          insert: mockTrxInsert,
-          where: mockTrxWhere,
-          update: mockTrxUpdate,
-        }));
-        await cb(trx);
-      }),
-    },
-  );
-  return { default: db };
+    const db = Object.assign(
+        vi.fn(() => ({
+            select: mockSelect,
+            where: mockWhere,
+            whereNull: mockWhereNull,
+            first: mockFirst,
+            insert: mockInsert,
+            returning: mockReturning,
+            update: mockUpdate,
+            del: mockDel,
+            join: mockJoin,
+            orderBy: mockOrderBy,
+            clone: mockClone,
+            clearSelect: mockClearSelect,
+            clearOrder: mockClearOrder,
+            count: mockCount,
+            countDistinct: mockCountDistinct,
+            limit: mockLimit,
+            offset: mockOffset,
+        })),
+        {
+            raw: vi.fn(),
+            transaction: vi.fn(async (cb: (trx: unknown) => Promise<void>) => {
+                const trx = vi.fn(() => ({
+                    insert: mockTrxInsert,
+                    where: mockTrxWhere,
+                    update: mockTrxUpdate,
+                }));
+                await cb(trx);
+            }),
+        },
+    );
+    return { default: db };
 });
 
 vi.mock('../../password.js', () => ({
-  hashPassword: vi.fn().mockResolvedValue('hashed:password'),
-  verifyPassword: vi.fn().mockResolvedValue(true),
+    hashPassword: vi.fn().mockResolvedValue('hashed:password'),
+    verifyPassword: vi.fn().mockResolvedValue(true),
 }));
 
 vi.mock('../../mailer.js', () => ({
-  default: { sendMail: mockSendMail },
+    default: { sendMail: mockSendMail },
 }));
 
 const { default: app } = await import('../../app.js');
@@ -75,370 +75,379 @@ const adminToken = createTestToken('uuid-admin', 'admin@test.com', 'admin');
 const userToken = createTestToken('uuid-1', 'user@test.com', 'user');
 
 beforeEach(() => {
-  process.env.JWT_SECRET = 'test-secret';
-  vi.clearAllMocks();
-  mockSelect.mockReturnThis();
-  mockWhere.mockReturnThis();
-  mockWhereNull.mockReturnThis();
-  mockInsert.mockReturnThis();
-  mockUpdate.mockReturnThis();
-  mockJoin.mockReturnThis();
-  mockOrderBy.mockReturnThis();
-  mockClone.mockReturnThis();
-  mockClearSelect.mockReturnThis();
-  mockClearOrder.mockReturnThis();
-  mockCount.mockReturnThis();
-  mockCountDistinct.mockReturnThis();
-  mockLimit.mockReturnThis();
-  mockTrxWhere.mockReturnThis();
+    process.env.JWT_SECRET = 'test-secret';
+    vi.clearAllMocks();
+    mockSelect.mockReturnThis();
+    mockWhere.mockReturnThis();
+    mockWhereNull.mockReturnThis();
+    mockInsert.mockReturnThis();
+    mockUpdate.mockReturnThis();
+    mockJoin.mockReturnThis();
+    mockOrderBy.mockReturnThis();
+    mockClone.mockReturnThis();
+    mockClearSelect.mockReturnThis();
+    mockClearOrder.mockReturnThis();
+    mockCount.mockReturnThis();
+    mockCountDistinct.mockReturnThis();
+    mockLimit.mockReturnThis();
+    mockTrxWhere.mockReturnThis();
 });
 
 describe('POST /invitations', () => {
-  const validBody = {
-    memberId: 'member-1',
-    email: 'invited@test.com',
-    type: 'self',
-  };
+    const validBody = {
+        memberId: 'member-1',
+        email: 'invited@test.com',
+        type: 'self',
+    };
 
-  it('should return 201 when admin invites for any member', async () => {
-    mockInsert.mockResolvedValueOnce([]);
+    it('should return 201 when admin invites for any member', async () => {
+        mockInsert.mockResolvedValueOnce([]);
 
-    const res = await request(app)
-      .post('/invitations')
-      .set('Authorization', `Bearer ${adminToken}`)
-      .send(validBody);
+        const res = await request(app)
+            .post('/invitations')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send(validBody);
 
-    expect(res.status).toBe(201);
-    expect(res.body).toEqual({ message: 'invitation sent' });
-    expect(mockSendMail).toHaveBeenCalledTimes(1);
-  });
+        expect(res.status).toBe(201);
+        expect(res.body).toEqual({ message: 'invitation sent' });
+        expect(mockSendMail).toHaveBeenCalledTimes(1);
+    });
 
-  it('should return 403 when regular user is not linked to member', async () => {
-    mockFirst.mockResolvedValueOnce(undefined);
+    it('should return 403 when regular user is not linked to member', async () => {
+        mockFirst.mockResolvedValueOnce(undefined);
 
-    const res = await request(app)
-      .post('/invitations')
-      .set('Authorization', `Bearer ${userToken}`)
-      .send(validBody);
+        const res = await request(app)
+            .post('/invitations')
+            .set('Authorization', `Bearer ${userToken}`)
+            .send(validBody);
 
-    expect(res.status).toBe(403);
-    expect(res.body).toHaveProperty('error', 'not linked to this member');
-  });
+        expect(res.status).toBe(403);
+        expect(res.body).toHaveProperty('error', 'not linked to this member');
+    });
 
-  it('should return 400 for missing required fields', async () => {
-    const res = await request(app)
-      .post('/invitations')
-      .set('Authorization', `Bearer ${adminToken}`)
-      .send({ email: 'invited@test.com' });
+    it('should return 400 for missing required fields', async () => {
+        const res = await request(app)
+            .post('/invitations')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ email: 'invited@test.com' });
 
-    expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'validation error');
-  });
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'validation error');
+    });
 });
 
 describe('GET /invitations (received)', () => {
-  const sampleInvitation = {
-    id: 'inv-1',
-    memberId: 'member-1',
-    email: 'user@test.com',
-    type: 'self',
-  };
+    const sampleInvitation = {
+        id: 'inv-1',
+        memberId: 'member-1',
+        email: 'user@test.com',
+        type: 'self',
+    };
 
-  const mockList = (rows: unknown[], total: number) => {
-    // First .first() call: db('users').where({ id }).first() -> user record
-    mockFirst.mockResolvedValueOnce({ id: 'uuid-1', email: 'user@test.com' });
-    // Second .first() call: count query
-    mockFirst.mockResolvedValueOnce({ total });
-    // Data query resolves via offset
-    mockOffset.mockResolvedValueOnce(rows);
-  };
+    const mockList = (rows: unknown[], total: number) => {
+        // First .first() call: db('users').where({ id }).first() -> user record
+        mockFirst.mockResolvedValueOnce({
+            id: 'uuid-1',
+            email: 'user@test.com',
+        });
+        // Second .first() call: count query
+        mockFirst.mockResolvedValueOnce({ total });
+        // Data query resolves via offset
+        mockOffset.mockResolvedValueOnce(rows);
+    };
 
-  it('returns envelope with defaults for current user email', async () => {
-    mockList([sampleInvitation], 1);
+    it('returns envelope with defaults for current user email', async () => {
+        mockList([sampleInvitation], 1);
 
-    const res = await request(app)
-      .get('/invitations')
-      .set('Authorization', `Bearer ${userToken}`);
+        const res = await request(app)
+            .get('/invitations')
+            .set('Authorization', `Bearer ${userToken}`);
 
-    expect(res.status).toBe(200);
-    expect(res.body).toEqual({
-      data: [sampleInvitation],
-      pagination: {
-        page: 1,
-        itemsPerPage: 25,
-        totalItems: 1,
-        totalPages: 1,
-      },
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual({
+            data: [sampleInvitation],
+            pagination: {
+                page: 1,
+                itemsPerPage: 25,
+                totalItems: 1,
+                totalPages: 1,
+            },
+        });
     });
-  });
 
-  it('applies page=2 and itemsPerPage=10', async () => {
-    mockList([sampleInvitation], 42);
+    it('applies page=2 and itemsPerPage=10', async () => {
+        mockList([sampleInvitation], 42);
 
-    const res = await request(app)
-      .get('/invitations?page=2&itemsPerPage=10')
-      .set('Authorization', `Bearer ${userToken}`);
+        const res = await request(app)
+            .get('/invitations?page=2&itemsPerPage=10')
+            .set('Authorization', `Bearer ${userToken}`);
 
-    expect(res.status).toBe(200);
-    expect(mockLimit).toHaveBeenCalledWith(10);
-    expect(mockOffset).toHaveBeenCalledWith(10);
-    expect(res.body.pagination.totalPages).toBe(5);
-  });
-
-  it('returns empty envelope when no pending invitations', async () => {
-    mockList([], 0);
-
-    const res = await request(app)
-      .get('/invitations')
-      .set('Authorization', `Bearer ${userToken}`);
-
-    expect(res.body).toEqual({
-      data: [],
-      pagination: {
-        page: 1,
-        itemsPerPage: 25,
-        totalItems: 0,
-        totalPages: 1,
-      },
+        expect(res.status).toBe(200);
+        expect(mockLimit).toHaveBeenCalledWith(10);
+        expect(mockOffset).toHaveBeenCalledWith(10);
+        expect(res.body.pagination.totalPages).toBe(5);
     });
-  });
 
-  it('returns 404 when user record not found', async () => {
-    mockFirst.mockResolvedValueOnce(undefined);
+    it('returns empty envelope when no pending invitations', async () => {
+        mockList([], 0);
 
-    const res = await request(app)
-      .get('/invitations')
-      .set('Authorization', `Bearer ${userToken}`);
+        const res = await request(app)
+            .get('/invitations')
+            .set('Authorization', `Bearer ${userToken}`);
 
-    expect(res.status).toBe(404);
-    expect(res.body).toHaveProperty('error', 'user not found');
-  });
+        expect(res.body).toEqual({
+            data: [],
+            pagination: {
+                page: 1,
+                itemsPerPage: 25,
+                totalItems: 0,
+                totalPages: 1,
+            },
+        });
+    });
 
-  it('orders results by memberInvitations.id ascending', async () => {
-    mockList([sampleInvitation], 1);
-    await request(app)
-      .get('/invitations')
-      .set('Authorization', `Bearer ${userToken}`);
-    expect(mockOrderBy).toHaveBeenCalledWith('memberInvitations.id', 'asc');
-  });
+    it('returns 404 when user record not found', async () => {
+        mockFirst.mockResolvedValueOnce(undefined);
 
-  it.each([['page=0'], ['itemsPerPage=101']])(
-    'returns 400 for %s',
-    async (qs) => {
-      const res = await request(app)
-        .get(`/invitations?${qs}`)
-        .set('Authorization', `Bearer ${userToken}`);
-      expect(res.status).toBe(400);
-      expect(res.body).toHaveProperty('error', 'validation error');
-    },
-  );
+        const res = await request(app)
+            .get('/invitations')
+            .set('Authorization', `Bearer ${userToken}`);
+
+        expect(res.status).toBe(404);
+        expect(res.body).toHaveProperty('error', 'user not found');
+    });
+
+    it('orders results by memberInvitations.id ascending', async () => {
+        mockList([sampleInvitation], 1);
+        await request(app)
+            .get('/invitations')
+            .set('Authorization', `Bearer ${userToken}`);
+        expect(mockOrderBy).toHaveBeenCalledWith('memberInvitations.id', 'asc');
+    });
+
+    it.each([['page=0'], ['itemsPerPage=101']])(
+        'returns 400 for %s',
+        async (qs) => {
+            const res = await request(app)
+                .get(`/invitations?${qs}`)
+                .set('Authorization', `Bearer ${userToken}`);
+            expect(res.status).toBe(400);
+            expect(res.body).toHaveProperty('error', 'validation error');
+        },
+    );
 });
 
 describe('GET /invitations/sent', () => {
-  const sampleInvitation = {
-    id: 'inv-1',
-    memberId: 'member-1',
-    invitedBy: 'uuid-1',
-    email: 'someone@test.com',
-  };
+    const sampleInvitation = {
+        id: 'inv-1',
+        memberId: 'member-1',
+        invitedBy: 'uuid-1',
+        email: 'someone@test.com',
+    };
 
-  const mockList = (rows: unknown[], total: number) => {
-    mockFirst.mockResolvedValueOnce({ total });
-    mockOffset.mockResolvedValueOnce(rows);
-  };
+    const mockList = (rows: unknown[], total: number) => {
+        mockFirst.mockResolvedValueOnce({ total });
+        mockOffset.mockResolvedValueOnce(rows);
+    };
 
-  it('returns envelope with defaults for invitations sent by current user', async () => {
-    mockList([sampleInvitation], 1);
+    it('returns envelope with defaults for invitations sent by current user', async () => {
+        mockList([sampleInvitation], 1);
 
-    const res = await request(app)
-      .get('/invitations/sent')
-      .set('Authorization', `Bearer ${userToken}`);
+        const res = await request(app)
+            .get('/invitations/sent')
+            .set('Authorization', `Bearer ${userToken}`);
 
-    expect(res.status).toBe(200);
-    expect(res.body).toEqual({
-      data: [sampleInvitation],
-      pagination: {
-        page: 1,
-        itemsPerPage: 25,
-        totalItems: 1,
-        totalPages: 1,
-      },
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual({
+            data: [sampleInvitation],
+            pagination: {
+                page: 1,
+                itemsPerPage: 25,
+                totalItems: 1,
+                totalPages: 1,
+            },
+        });
+        expect(mockWhere).toHaveBeenCalledWith(
+            'memberInvitations.invitedBy',
+            'uuid-1',
+        );
     });
-    expect(mockWhere).toHaveBeenCalledWith(
-      'memberInvitations.invitedBy',
-      'uuid-1',
+
+    it('applies page=2 and itemsPerPage=10', async () => {
+        mockList([sampleInvitation], 42);
+
+        const res = await request(app)
+            .get('/invitations/sent?page=2&itemsPerPage=10')
+            .set('Authorization', `Bearer ${userToken}`);
+
+        expect(res.status).toBe(200);
+        expect(mockLimit).toHaveBeenCalledWith(10);
+        expect(mockOffset).toHaveBeenCalledWith(10);
+        expect(res.body.pagination.totalPages).toBe(5);
+    });
+
+    it('returns empty envelope when no sent invitations', async () => {
+        mockList([], 0);
+
+        const res = await request(app)
+            .get('/invitations/sent')
+            .set('Authorization', `Bearer ${userToken}`);
+
+        expect(res.body).toEqual({
+            data: [],
+            pagination: {
+                page: 1,
+                itemsPerPage: 25,
+                totalItems: 0,
+                totalPages: 1,
+            },
+        });
+    });
+
+    it('orders results by memberInvitations.id ascending', async () => {
+        mockList([sampleInvitation], 1);
+        await request(app)
+            .get('/invitations/sent')
+            .set('Authorization', `Bearer ${userToken}`);
+        expect(mockOrderBy).toHaveBeenCalledWith('memberInvitations.id', 'asc');
+    });
+
+    it.each([['page=0'], ['itemsPerPage=101']])(
+        'returns 400 for %s',
+        async (qs) => {
+            const res = await request(app)
+                .get(`/invitations/sent?${qs}`)
+                .set('Authorization', `Bearer ${userToken}`);
+            expect(res.status).toBe(400);
+            expect(res.body).toHaveProperty('error', 'validation error');
+        },
     );
-  });
-
-  it('applies page=2 and itemsPerPage=10', async () => {
-    mockList([sampleInvitation], 42);
-
-    const res = await request(app)
-      .get('/invitations/sent?page=2&itemsPerPage=10')
-      .set('Authorization', `Bearer ${userToken}`);
-
-    expect(res.status).toBe(200);
-    expect(mockLimit).toHaveBeenCalledWith(10);
-    expect(mockOffset).toHaveBeenCalledWith(10);
-    expect(res.body.pagination.totalPages).toBe(5);
-  });
-
-  it('returns empty envelope when no sent invitations', async () => {
-    mockList([], 0);
-
-    const res = await request(app)
-      .get('/invitations/sent')
-      .set('Authorization', `Bearer ${userToken}`);
-
-    expect(res.body).toEqual({
-      data: [],
-      pagination: {
-        page: 1,
-        itemsPerPage: 25,
-        totalItems: 0,
-        totalPages: 1,
-      },
-    });
-  });
-
-  it('orders results by memberInvitations.id ascending', async () => {
-    mockList([sampleInvitation], 1);
-    await request(app)
-      .get('/invitations/sent')
-      .set('Authorization', `Bearer ${userToken}`);
-    expect(mockOrderBy).toHaveBeenCalledWith('memberInvitations.id', 'asc');
-  });
-
-  it.each([['page=0'], ['itemsPerPage=101']])(
-    'returns 400 for %s',
-    async (qs) => {
-      const res = await request(app)
-        .get(`/invitations/sent?${qs}`)
-        .set('Authorization', `Bearer ${userToken}`);
-      expect(res.status).toBe(400);
-      expect(res.body).toHaveProperty('error', 'validation error');
-    },
-  );
 });
 
 describe('POST /invitations/:id/accept', () => {
-  const futureDate = new Date(Date.now() + 86400000).toISOString();
-  const pastDate = new Date(Date.now() - 86400000).toISOString();
+    const futureDate = new Date(Date.now() + 86400000).toISOString();
+    const pastDate = new Date(Date.now() - 86400000).toISOString();
 
-  it('should return 200 on successful accept', async () => {
-    // First call: db('memberInvitations').where({ id }).first() -> invitation
-    mockFirst.mockResolvedValueOnce({
-      id: 'inv-1',
-      memberId: 'member-1',
-      email: 'user@test.com',
-      type: 'self',
-      description: null,
-      acceptedAt: null,
-      expiresAt: futureDate,
-    });
-    // Second call: db('users').where({ id: user.id }).first() -> user
-    mockFirst.mockResolvedValueOnce({ id: 'uuid-1', email: 'user@test.com' });
+    it('should return 200 on successful accept', async () => {
+        // First call: db('memberInvitations').where({ id }).first() -> invitation
+        mockFirst.mockResolvedValueOnce({
+            id: 'inv-1',
+            memberId: 'member-1',
+            email: 'user@test.com',
+            type: 'self',
+            description: null,
+            acceptedAt: null,
+            expiresAt: futureDate,
+        });
+        // Second call: db('users').where({ id: user.id }).first() -> user
+        mockFirst.mockResolvedValueOnce({
+            id: 'uuid-1',
+            email: 'user@test.com',
+        });
 
-    const res = await request(app)
-      .post('/invitations/inv-1/accept')
-      .set('Authorization', `Bearer ${userToken}`)
-      .send({});
+        const res = await request(app)
+            .post('/invitations/inv-1/accept')
+            .set('Authorization', `Bearer ${userToken}`)
+            .send({});
 
-    expect(res.status).toBe(200);
-    expect(res.body).toEqual({ message: 'invitation accepted' });
-  });
-
-  it('should return 404 if invitation not found', async () => {
-    mockFirst.mockResolvedValueOnce(undefined);
-
-    const res = await request(app)
-      .post('/invitations/nonexistent/accept')
-      .set('Authorization', `Bearer ${userToken}`)
-      .send({});
-
-    expect(res.status).toBe(404);
-    expect(res.body).toHaveProperty('error', 'invitation not found');
-  });
-
-  it('should return 400 if already accepted', async () => {
-    mockFirst.mockResolvedValueOnce({
-      id: 'inv-1',
-      acceptedAt: '2026-01-01T00:00:00.000Z',
-      expiresAt: futureDate,
-      email: 'user@test.com',
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual({ message: 'invitation accepted' });
     });
 
-    const res = await request(app)
-      .post('/invitations/inv-1/accept')
-      .set('Authorization', `Bearer ${userToken}`)
-      .send({});
+    it('should return 404 if invitation not found', async () => {
+        mockFirst.mockResolvedValueOnce(undefined);
 
-    expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'invitation already accepted');
-  });
+        const res = await request(app)
+            .post('/invitations/nonexistent/accept')
+            .set('Authorization', `Bearer ${userToken}`)
+            .send({});
 
-  it('should return 400 if invitation has expired', async () => {
-    mockFirst.mockResolvedValueOnce({
-      id: 'inv-1',
-      acceptedAt: null,
-      expiresAt: pastDate,
-      email: 'user@test.com',
+        expect(res.status).toBe(404);
+        expect(res.body).toHaveProperty('error', 'invitation not found');
     });
 
-    const res = await request(app)
-      .post('/invitations/inv-1/accept')
-      .set('Authorization', `Bearer ${userToken}`)
-      .send({});
+    it('should return 400 if already accepted', async () => {
+        mockFirst.mockResolvedValueOnce({
+            id: 'inv-1',
+            acceptedAt: '2026-01-01T00:00:00.000Z',
+            expiresAt: futureDate,
+            email: 'user@test.com',
+        });
 
-    expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty('error', 'invitation has expired');
-  });
+        const res = await request(app)
+            .post('/invitations/inv-1/accept')
+            .set('Authorization', `Bearer ${userToken}`)
+            .send({});
 
-  it('should return 403 if email does not match', async () => {
-    mockFirst.mockResolvedValueOnce({
-      id: 'inv-1',
-      acceptedAt: null,
-      expiresAt: futureDate,
-      email: 'other@test.com',
-    });
-    mockFirst.mockResolvedValueOnce({
-      id: 'uuid-1',
-      email: 'user@test.com',
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'invitation already accepted');
     });
 
-    const res = await request(app)
-      .post('/invitations/inv-1/accept')
-      .set('Authorization', `Bearer ${userToken}`)
-      .send({});
+    it('should return 400 if invitation has expired', async () => {
+        mockFirst.mockResolvedValueOnce({
+            id: 'inv-1',
+            acceptedAt: null,
+            expiresAt: pastDate,
+            email: 'user@test.com',
+        });
 
-    expect(res.status).toBe(403);
-    expect(res.body).toHaveProperty('error', 'email does not match invitation');
-  });
+        const res = await request(app)
+            .post('/invitations/inv-1/accept')
+            .set('Authorization', `Bearer ${userToken}`)
+            .send({});
+
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'invitation has expired');
+    });
+
+    it('should return 403 if email does not match', async () => {
+        mockFirst.mockResolvedValueOnce({
+            id: 'inv-1',
+            acceptedAt: null,
+            expiresAt: futureDate,
+            email: 'other@test.com',
+        });
+        mockFirst.mockResolvedValueOnce({
+            id: 'uuid-1',
+            email: 'user@test.com',
+        });
+
+        const res = await request(app)
+            .post('/invitations/inv-1/accept')
+            .set('Authorization', `Bearer ${userToken}`)
+            .send({});
+
+        expect(res.status).toBe(403);
+        expect(res.body).toHaveProperty(
+            'error',
+            'email does not match invitation',
+        );
+    });
 });
 
 describe('DELETE /invitations/:id', () => {
-  it('should return 204 when sender deletes their invitation', async () => {
-    mockFirst.mockResolvedValueOnce({
-      id: 'inv-1',
-      invitedBy: 'uuid-1',
+    it('should return 204 when sender deletes their invitation', async () => {
+        mockFirst.mockResolvedValueOnce({
+            id: 'inv-1',
+            invitedBy: 'uuid-1',
+        });
+        mockDel.mockResolvedValueOnce(1);
+
+        const res = await request(app)
+            .delete('/invitations/inv-1')
+            .set('Authorization', `Bearer ${userToken}`);
+
+        expect(res.status).toBe(204);
     });
-    mockDel.mockResolvedValueOnce(1);
 
-    const res = await request(app)
-      .delete('/invitations/inv-1')
-      .set('Authorization', `Bearer ${userToken}`);
+    it('should return 404 if invitation not found', async () => {
+        mockFirst.mockResolvedValueOnce(undefined);
 
-    expect(res.status).toBe(204);
-  });
+        const res = await request(app)
+            .delete('/invitations/nonexistent')
+            .set('Authorization', `Bearer ${userToken}`);
 
-  it('should return 404 if invitation not found', async () => {
-    mockFirst.mockResolvedValueOnce(undefined);
-
-    const res = await request(app)
-      .delete('/invitations/nonexistent')
-      .set('Authorization', `Bearer ${userToken}`);
-
-    expect(res.status).toBe(404);
-    expect(res.body).toHaveProperty('error', 'invitation not found');
-  });
+        expect(res.status).toBe(404);
+        expect(res.body).toHaveProperty('error', 'invitation not found');
+    });
 });

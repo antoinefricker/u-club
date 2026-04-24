@@ -1,4 +1,4 @@
 export interface MemberStatus {
-  id: string;
-  label: string;
+    id: string;
+    label: string;
 }

@@ -33,24 +33,24 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.get(
-  '/:id',
-  requireAuth,
-  requireRole('admin', 'manager'),
-  async (req: Request, res: Response) => {
-    const { id } = req.params;
+    '/:id',
+    requireAuth,
+    requireRole('admin', 'manager'),
+    async (req: Request, res: Response) => {
+        const { id } = req.params;
 
-    const category = await db('teamCategories')
-      .select('id', 'clubId', 'label', 'createdAt', 'updatedAt')
-      .where({ id })
-      .first();
+        const category = await db('teamCategories')
+            .select('id', 'clubId', 'label', 'createdAt', 'updatedAt')
+            .where({ id })
+            .first();
 
-    if (!category) {
-      res.status(404).json({ error: 'team category not found' });
-      return;
-    }
+        if (!category) {
+            res.status(404).json({ error: 'team category not found' });
+            return;
+        }
 
-    res.json(category);
-  },
+        res.json(category);
+    },
 );
 
 export default router;

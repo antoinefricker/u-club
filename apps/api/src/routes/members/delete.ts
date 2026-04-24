@@ -29,21 +29,21 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.delete(
-  '/:id',
-  requireAuth,
-  requireRole('admin'),
-  async (req: Request, res: Response) => {
-    const { id } = req.params;
+    '/:id',
+    requireAuth,
+    requireRole('admin'),
+    async (req: Request, res: Response) => {
+        const { id } = req.params;
 
-    const deleted = await db('members').where({ id }).del();
+        const deleted = await db('members').where({ id }).del();
 
-    if (!deleted) {
-      res.status(404).json({ error: 'member not found' });
-      return;
-    }
+        if (!deleted) {
+            res.status(404).json({ error: 'member not found' });
+            return;
+        }
 
-    res.status(204).send();
-  },
+        res.status(204).send();
+    },
 );
 
 export default router;

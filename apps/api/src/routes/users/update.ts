@@ -54,53 +54,53 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.put(
-  '/:id',
-  requireAuth,
-  requireSelfOrRole('admin'),
-  validate(updateUserSchema),
-  async (req: Request, res: Response) => {
-    const { id } = req.params;
+    '/:id',
+    requireAuth,
+    requireSelfOrRole('admin'),
+    validate(updateUserSchema),
+    async (req: Request, res: Response) => {
+        const { id } = req.params;
 
-    const updates: Record<string, unknown> = { ...req.body };
+        const updates: Record<string, unknown> = { ...req.body };
 
-    if (updates.email) {
-      const existing = await db('users')
-        .where({ email: updates.email })
-        .whereNot({ id })
-        .first();
-      if (existing) {
-        res.status(409).json({ error: 'email already in use' });
-        return;
-      }
-    }
+        if (updates.email) {
+            const existing = await db('users')
+                .where({ email: updates.email })
+                .whereNot({ id })
+                .first();
+            if (existing) {
+                res.status(409).json({ error: 'email already in use' });
+                return;
+            }
+        }
 
-    if (updates.password && typeof updates.password === 'string') {
-      updates.password = await hashPassword(updates.password);
-    }
+        if (updates.password && typeof updates.password === 'string') {
+            updates.password = await hashPassword(updates.password);
+        }
 
-    updates.updatedAt = new Date().toISOString();
+        updates.updatedAt = new Date().toISOString();
 
-    const [user] = await db('users')
-      .where({ id })
-      .update(updates)
-      .returning([
-        'id',
-        'displayName',
-        'bio',
-        'phone',
-        'email',
-        'role',
-        'createdAt',
-        'updatedAt',
-      ]);
+        const [user] = await db('users')
+            .where({ id })
+            .update(updates)
+            .returning([
+                'id',
+                'displayName',
+                'bio',
+                'phone',
+                'email',
+                'role',
+                'createdAt',
+                'updatedAt',
+            ]);
 
-    if (!user) {
-      res.status(404).json({ error: 'user not found' });
-      return;
-    }
+        if (!user) {
+            res.status(404).json({ error: 'user not found' });
+            return;
+        }
 
-    res.json(user);
-  },
+        res.json(user);
+    },
 );
 
 export default router;

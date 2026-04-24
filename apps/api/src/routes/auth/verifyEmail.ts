@@ -50,49 +50,51 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.post(
-  '/verify_email',
-  validate(verifyEmailSchema),
-  async (req: Request, res: Response) => {
-    const { token, email } = req.body;
+    '/verify_email',
+    validate(verifyEmailSchema),
+    async (req: Request, res: Response) => {
+        const { token, email } = req.body;
 
-    const loginToken = await db('authTokens')
-      .where({ token, email, type: 'confirmation' })
-      .where('expiresAt', '>', new Date())
-      .first();
+        const loginToken = await db('authTokens')
+            .where({ token, email, type: 'confirmation' })
+            .where('expiresAt', '>', new Date())
+            .first();
 
-    if (!loginToken) {
-      res.status(401).json({ error: 'invalid or expired token' });
-      return;
-    }
+        if (!loginToken) {
+            res.status(401).json({ error: 'invalid or expired token' });
+            return;
+        }
 
-    await db('authTokens').where({ id: loginToken.id }).del();
+        await db('authTokens').where({ id: loginToken.id }).del();
 
-    const user = await db('users').where({ email: loginToken.email }).first();
-    if (!user) {
-      res.status(401).json({ error: 'user not found' });
-      return;
-    }
+        const user = await db('users')
+            .where({ email: loginToken.email })
+            .first();
+        if (!user) {
+            res.status(401).json({ error: 'user not found' });
+            return;
+        }
 
-    await db('users')
-      .where({ id: user.id })
-      .update({ emailVerifiedAt: new Date() });
+        await db('users')
+            .where({ id: user.id })
+            .update({ emailVerifiedAt: new Date() });
 
-    const jwtSecret = process.env.JWT_SECRET;
-    if (!jwtSecret) {
-      res.status(500).json({ error: 'server configuration error' });
-      return;
-    }
+        const jwtSecret = process.env.JWT_SECRET;
+        if (!jwtSecret) {
+            res.status(500).json({ error: 'server configuration error' });
+            return;
+        }
 
-    const accessToken = jwt.sign(
-      { sub: user.id, email: user.email, role: user.role },
-      jwtSecret,
-      {
-        expiresIn: '7d',
-      },
-    );
+        const accessToken = jwt.sign(
+            { sub: user.id, email: user.email, role: user.role },
+            jwtSecret,
+            {
+                expiresIn: '7d',
+            },
+        );
 
-    res.json({ accessToken });
-  },
+        res.json({ accessToken });
+    },
 );
 
 export default router;

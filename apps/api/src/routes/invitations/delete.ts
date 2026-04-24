@@ -1,8 +1,8 @@
 import { Router, Request, Response } from 'express';
 import db from '../../db.js';
 import {
-  requireAuth,
-  type AuthenticatedRequest,
+    requireAuth,
+    type AuthenticatedRequest,
 } from '../../middleware/auth.js';
 
 const router = Router();
@@ -32,23 +32,23 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.delete('/:id', requireAuth, async (req: Request, res: Response) => {
-  const user = (req as AuthenticatedRequest).user;
-  const { id } = req.params;
+    const user = (req as AuthenticatedRequest).user;
+    const { id } = req.params;
 
-  const invitation = await db('memberInvitations').where({ id }).first();
-  if (!invitation) {
-    res.status(404).json({ error: 'invitation not found' });
-    return;
-  }
+    const invitation = await db('memberInvitations').where({ id }).first();
+    if (!invitation) {
+        res.status(404).json({ error: 'invitation not found' });
+        return;
+    }
 
-  if (invitation.invitedBy !== user.id && user.role !== 'admin') {
-    res.status(404).json({ error: 'invitation not found' });
-    return;
-  }
+    if (invitation.invitedBy !== user.id && user.role !== 'admin') {
+        res.status(404).json({ error: 'invitation not found' });
+        return;
+    }
 
-  await db('memberInvitations').where({ id }).del();
+    await db('memberInvitations').where({ id }).del();
 
-  res.status(204).send();
+    res.status(204).send();
 });
 
 export default router;

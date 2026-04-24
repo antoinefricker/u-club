@@ -40,27 +40,29 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.post(
-  '/',
-  requireAuth,
-  requireRole('admin', 'manager'),
-  validate(createTeamCategorySchema),
-  async (req: Request, res: Response) => {
-    const { clubId, label } = req.body;
+    '/',
+    requireAuth,
+    requireRole('admin', 'manager'),
+    validate(createTeamCategorySchema),
+    async (req: Request, res: Response) => {
+        const { clubId, label } = req.body;
 
-    const existing = await db('teamCategories')
-      .where({ clubId, label })
-      .first();
-    if (existing) {
-      res.status(409).json({ error: 'label already in use for this club' });
-      return;
-    }
+        const existing = await db('teamCategories')
+            .where({ clubId, label })
+            .first();
+        if (existing) {
+            res.status(409).json({
+                error: 'label already in use for this club',
+            });
+            return;
+        }
 
-    const [category] = await db('teamCategories')
-      .insert({ clubId, label })
-      .returning(['id', 'clubId', 'label', 'createdAt', 'updatedAt']);
+        const [category] = await db('teamCategories')
+            .insert({ clubId, label })
+            .returning(['id', 'clubId', 'label', 'createdAt', 'updatedAt']);
 
-    res.status(201).json(category);
-  },
+        res.status(201).json(category);
+    },
 );
 
 export default router;

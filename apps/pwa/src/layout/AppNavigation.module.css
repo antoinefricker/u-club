@@ -1,73 +1,73 @@
 .navbar {
-  height: 100%;
-  width: 300px;
-  padding: var(--mantine-spacing-xs);
-  display: flex;
-  flex-direction: column;
-  background-color: var(--mantine-primary-color-5);
+    height: 100%;
+    width: 300px;
+    padding: var(--mantine-spacing-xs);
+    display: flex;
+    flex-direction: column;
+    background-color: var(--mantine-primary-color-5);
 }
 
 .navbarMain {
-  flex: 1;
-  color: var(--mantine-color-white);
+    flex: 1;
+    color: var(--mantine-color-white);
 }
 
 .header {
 }
 
 .footer {
-  .userIdentity {
-    padding-bottom: var(--mantine-spacing-md);
-  }
+    .userIdentity {
+        padding-bottom: var(--mantine-spacing-md);
+    }
 }
 
 .separator {
-  padding-top: var(--mantine-spacing-md);
-  margin-top: var(--mantine-spacing-md);
-  border-top: 1px solid var(--mantine-primary-color-6);
+    padding-top: var(--mantine-spacing-md);
+    margin-top: var(--mantine-spacing-md);
+    border-top: 1px solid var(--mantine-primary-color-6);
 }
 
 .link {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  font-size: var(--mantine-font-size-sm);
-  color: var(--mantine-color-white);
-  padding: var(--mantine-spacing-xs);
-  border-radius: var(--mantine-radius-sm);
-  font-weight: 700;
-  &:hover {
-    background-color: var(--mantine-primary-color-7);
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    font-size: var(--mantine-font-size-sm);
     color: var(--mantine-color-white);
-
-    .linkIcon {
-      color: var(--mantine-color-white);
-    }
-  }
-
-  &[data-active] {
-    &,
+    padding: var(--mantine-spacing-xs);
+    border-radius: var(--mantine-radius-sm);
+    font-weight: 700;
     &:hover {
-      box-shadow: var(--mantine-shadow-sm);
-      background-color: var(--mantine-color-white);
-      color: var(--mantine-primary-color-5);
+        background-color: var(--mantine-primary-color-7);
+        color: var(--mantine-color-white);
 
-      .linkIcon {
-        color: var(--mantine-primary-color-5);
-      }
+        .linkIcon {
+            color: var(--mantine-color-white);
+        }
     }
-  }
 
-  &.subLink {
-    font-weight: 500;
-    color: var(--mantine-primary-color-1);
-    padding-left: var(--mantine-spacing-lg);
-  }
+    &[data-active] {
+        &,
+        &:hover {
+            box-shadow: var(--mantine-shadow-sm);
+            background-color: var(--mantine-color-white);
+            color: var(--mantine-primary-color-5);
+
+            .linkIcon {
+                color: var(--mantine-primary-color-5);
+            }
+        }
+    }
+
+    &.subLink {
+        font-weight: 500;
+        color: var(--mantine-primary-color-1);
+        padding-left: var(--mantine-spacing-lg);
+    }
 }
 
 .linkIcon {
-  color: var(--mantine-primary-color-1);
-  margin-right: var(--mantine-spacing-xs);
-  width: 24px;
-  height: 24px;
+    color: var(--mantine-primary-color-1);
+    margin-right: var(--mantine-spacing-xs);
+    width: 24px;
+    height: 24px;
 }
