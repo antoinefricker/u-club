@@ -1,76 +1,125 @@
-import { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router';
-import { Alert, Button, Loader, Paper, Select, Stack, Text, TextInput, Title } from '@mantine/core';
+import { useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router';
+import {
+    Alert,
+    Button,
+    Center,
+    Container,
+    Group,
+    Loader,
+    Paper,
+    PasswordInput,
+    Select,
+    Stack,
+    Text,
+    TextInput,
+    Title,
+} from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { notifications } from '@mantine/notifications';
+import { IconHandFingerRight, IconHeartHandshake } from '@tabler/icons-react';
 import { useAuthContext } from '../auth/useAuthContext';
-
-interface InvitationDetails {
-    id: string;
-    memberId: string;
-    memberFirstName: string;
-    memberLastName: string;
-    type: string;
-    description: string | null;
-}
+import { useInvitationByToken, useRegisterAndAcceptInvitation, type InvitationByToken } from '../hooks/useInvitations';
 
 export function InvitationPage() {
     const [searchParams] = useSearchParams();
-    const navigate = useNavigate();
-    const { token: authToken, isAuthenticated } = useAuthContext();
-
     const invitationToken = searchParams.get('token');
-    const email = searchParams.get('email');
-    const isValid = Boolean(invitationToken && email);
+    const { isAuthenticated } = useAuthContext();
 
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [invitation, setInvitation] = useState<InvitationDetails | null>(null);
-    const [accepted, setAccepted] = useState(false);
-    const [accepting, setAccepting] = useState(false);
+    const { data, isLoading, error } = useInvitationByToken(invitationToken);
+
+    return (
+        <Container size="xs" py="xl">
+            <Paper shadow="sm" p="xl" radius="md">
+                <Stack>
+                    <Title order={2} ta="center">
+                        You&apos;ve been invited!
+                    </Title>
+
+                    {!invitationToken ? (
+                        <InvalidTokenAlert message="This invitation link is missing a token." />
+                    ) : isLoading ? (
+                        <Center py="xl">
+                            <Loader />
+                        </Center>
+                    ) : error || !data ? (
+                        <InvalidTokenAlert
+                            message={error?.message ?? 'This invitation link is invalid or has expired.'}
+                        />
+                    ) : (
+                        <InvitationBody
+                            invitation={data.invitation}
+                            userExists={data.userExists}
+                            invitationToken={invitationToken}
+                            isAuthenticated={isAuthenticated}
+                        />
+                    )}
+                </Stack>
+            </Paper>
+        </Container>
+    );
+}
+
+function InvalidTokenAlert({ message }: { message: string }) {
+    const navigate = useNavigate();
+    return (
+        <Stack>
+            <Alert color="red" variant="light">
+                {message}
+            </Alert>
+            <Button variant="subtle" onClick={() => navigate('/')}>
+                Go to home
+            </Button>
+        </Stack>
+    );
+}
+
+function InvitationBody({
+    invitation,
+    userExists,
+    invitationToken,
+    isAuthenticated,
+}: {
+    invitation: InvitationByToken;
+    userExists: boolean;
+    invitationToken: string;
+    isAuthenticated: boolean;
+}) {
+    return (
+        <Stack>
+            <Text ta="center">
+                <Text span fw={700}>
+                    {invitation.memberFirstName} {invitation.memberLastName}
+                </Text>
+                {' would like to link their account with you.'}
+            </Text>
+
+            {isAuthenticated ? (
+                <AcceptForm invitation={invitation} />
+            ) : userExists ? (
+                <LoginAndAcceptForm invitation={invitation} />
+            ) : (
+                <RegisterAndAcceptForm invitation={invitation} invitationToken={invitationToken} />
+            )}
+        </Stack>
+    );
+}
+
+function AcceptForm({ invitation }: { invitation: InvitationByToken }) {
+    const navigate = useNavigate();
+    const { token: authToken } = useAuthContext();
+    const [submitting, setSubmitting] = useState(false);
 
     const form = useForm({
         initialValues: {
-            type: 'relative',
-            description: '',
+            type: invitation.type,
+            description: invitation.description ?? '',
         },
     });
 
-    // Fetch invitation details when logged in
-    useEffect(() => {
-        if (!isAuthenticated || !authToken) {
-            setLoading(false);
-            return;
-        }
-
-        fetch('/api/invitations', {
-            headers: { Authorization: `Bearer ${authToken}` },
-        })
-            .then(async (res) => {
-                if (!res.ok) throw new Error('Failed to load invitations');
-                return res.json();
-            })
-            .then((invitations: InvitationDetails[]) => {
-                // Find the matching invitation by token — we match by email since token isn't in the list response
-                // We'll just show the accept form and let the API validate
-                if (invitations.length > 0) {
-                    const inv = invitations[0];
-                    setInvitation(inv);
-                    form.setFieldValue('type', inv.type || 'relative');
-                    form.setFieldValue('description', inv.description || '');
-                }
-                setLoading(false);
-            })
-            .catch((err) => {
-                setError(err instanceof Error ? err.message : 'Failed to load');
-                setLoading(false);
-            });
-    }, [isAuthenticated, authToken]);
-
-    const handleAccept = async (values: typeof form.values) => {
-        if (!invitation || !authToken) return;
-        setAccepting(true);
-        setError(null);
-
+    const handleSubmit = async (values: typeof form.values) => {
+        if (!authToken) return;
+        setSubmitting(true);
         try {
             const res = await fetch(`/api/invitations/${invitation.id}/accept`, {
                 method: 'POST',
@@ -80,132 +129,177 @@ export function InvitationPage() {
                 },
                 body: JSON.stringify({
                     type: values.type,
-                    description: values.description || null,
+                    description: values.description.trim() || null,
                 }),
             });
-
             if (!res.ok) {
                 const body = await res.json();
                 throw new Error(body.error ?? 'Failed to accept invitation');
             }
-
-            setAccepted(true);
+            notifications.show({
+                title: 'Invitation accepted',
+                message: `You are now linked to ${invitation.memberFirstName} ${invitation.memberLastName}.`,
+                color: 'green',
+            });
+            navigate('/');
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to accept');
+            notifications.show({
+                title: 'Failed to accept invitation',
+                message: err instanceof Error ? err.message : 'Unknown error',
+                color: 'red',
+            });
         } finally {
-            setAccepting(false);
+            setSubmitting(false);
         }
     };
 
-    if (!isValid) {
-        return (
-            <Stack align="center" mt="xl">
-                <Paper shadow="sm" p="xl" radius="md" w="100%" maw={400}>
-                    <Stack align="center">
-                        <Title order={3}>Invitation</Title>
-                        <Alert color="red" variant="light" w="100%">
-                            Invalid invitation link.
-                        </Alert>
-                    </Stack>
-                </Paper>
-            </Stack>
-        );
-    }
-
-    if (!isAuthenticated) {
-        return (
-            <Stack align="center" mt="xl">
-                <Paper shadow="sm" p="xl" radius="md" w="100%" maw={400}>
-                    <Stack>
-                        <Title order={3} ta="center">
-                            You&apos;ve been invited!
-                        </Title>
-                        <Alert color="blue" variant="light">
-                            Please log in or create an account to accept this invitation.
-                        </Alert>
-                        <Button fullWidth onClick={() => navigate('/')}>
-                            Log in or Register
-                        </Button>
-                    </Stack>
-                </Paper>
-            </Stack>
-        );
-    }
-
-    if (accepted) {
-        return (
-            <Stack align="center" mt="xl">
-                <Paper shadow="sm" p="xl" radius="md" w="100%" maw={400}>
-                    <Stack align="center">
-                        <Title order={3}>Invitation accepted!</Title>
-                        <Text>You are now linked to this member.</Text>
-                        <Button fullWidth onClick={() => navigate('/')}>
-                            Go to Dashboard
-                        </Button>
-                    </Stack>
-                </Paper>
-            </Stack>
-        );
-    }
-
-    if (loading) {
-        return (
-            <Stack align="center" mt="xl">
-                <Paper shadow="sm" p="xl" radius="md" w="100%" maw={400}>
-                    <Stack align="center">
-                        <Loader />
-                        <Text>Loading invitation...</Text>
-                    </Stack>
-                </Paper>
-            </Stack>
-        );
-    }
+    const showDescription = form.values.type !== 'self';
 
     return (
-        <Stack align="center" mt="xl">
-            <Paper shadow="sm" p="xl" radius="md" w="100%" maw={400}>
-                <form onSubmit={form.onSubmit(handleAccept)} noValidate>
-                    <Stack>
-                        <Title order={3} ta="center">
-                            Accept Invitation
-                        </Title>
+        <form onSubmit={form.onSubmit(handleSubmit)}>
+            <Stack>
+                <TextInput label="Email" value={invitation.email} disabled />
+                <Select
+                    label="Relationship"
+                    required
+                    data={[
+                        { value: 'self', label: "It's me!" },
+                        { value: 'relative', label: "It's a relative" },
+                    ]}
+                    allowDeselect={false}
+                    leftSection={
+                        form.values.type === 'self' ? (
+                            <IconHandFingerRight size={16} />
+                        ) : (
+                            <IconHeartHandshake size={16} />
+                        )
+                    }
+                    {...form.getInputProps('type')}
+                />
+                {showDescription && (
+                    <TextInput
+                        label={`You are ${invitation.memberFirstName}'s`}
+                        placeholder="father, mother…"
+                        {...form.getInputProps('description')}
+                    />
+                )}
+                <Group justify="flex-end" mt="md">
+                    <Button type="submit" loading={submitting}>
+                        Accept invitation
+                    </Button>
+                </Group>
+            </Stack>
+        </form>
+    );
+}
 
-                        {invitation && (
-                            <Alert color="blue" variant="light">
-                                You&apos;ve been invited to link with{' '}
-                                <strong>
-                                    {invitation.memberFirstName} {invitation.memberLastName}
-                                </strong>
-                            </Alert>
-                        )}
+function LoginAndAcceptForm({ invitation }: { invitation: InvitationByToken }) {
+    const { login } = useAuthContext();
+    const [submitting, setSubmitting] = useState(false);
 
-                        {error && (
-                            <Alert color="red" variant="light">
-                                {error}
-                            </Alert>
-                        )}
+    const form = useForm({
+        initialValues: { password: '' },
+        validate: {
+            password: (v) => (v.length === 0 ? 'Password is required' : null),
+        },
+    });
 
-                        <Select
-                            label="Relationship type"
-                            data={[
-                                { value: 'self', label: 'Self (this is me)' },
-                                { value: 'relative', label: 'Relative' },
-                            ]}
-                            {...form.getInputProps('type')}
-                        />
+    const handleSubmit = async (values: typeof form.values) => {
+        setSubmitting(true);
+        try {
+            await login(invitation.email, values.password);
+            // On success the page re-renders authenticated and AcceptForm takes over.
+        } catch (err) {
+            notifications.show({
+                title: 'Login failed',
+                message: err instanceof Error ? err.message : 'Unknown error',
+                color: 'red',
+            });
+            setSubmitting(false);
+        }
+    };
 
-                        <TextInput
-                            label="Description"
-                            placeholder="e.g. mother, father, uncle"
-                            {...form.getInputProps('description')}
-                        />
+    return (
+        <form onSubmit={form.onSubmit(handleSubmit)}>
+            <Stack>
+                <Alert color="blue" variant="light">
+                    An account already exists for this email. Log in to accept the invitation.
+                </Alert>
+                <TextInput label="Email" value={invitation.email} disabled />
+                <PasswordInput label="Password" required {...form.getInputProps('password')} />
+                <Group justify="flex-end" mt="md">
+                    <Button type="submit" loading={submitting}>
+                        Log in &amp; accept
+                    </Button>
+                </Group>
+            </Stack>
+        </form>
+    );
+}
 
-                        <Button type="submit" fullWidth loading={accepting}>
-                            Accept invitation
-                        </Button>
-                    </Stack>
-                </form>
-            </Paper>
-        </Stack>
+function RegisterAndAcceptForm({
+    invitation,
+    invitationToken,
+}: {
+    invitation: InvitationByToken;
+    invitationToken: string;
+}) {
+    const navigate = useNavigate();
+    const { hydrate } = useAuthContext();
+    const mutation = useRegisterAndAcceptInvitation(invitationToken);
+
+    const form = useForm({
+        initialValues: { displayName: '', password: '' },
+        validate: {
+            displayName: (v) => (v.trim().length === 0 ? 'Display name is required' : null),
+            password: (v) => (v.length < 8 ? 'Password must be at least 8 characters' : null),
+        },
+    });
+
+    const handleSubmit = (values: typeof form.values) => {
+        mutation.mutate(
+            { displayName: values.displayName.trim(), password: values.password },
+            {
+                onSuccess: ({ accessToken }) => {
+                    hydrate(accessToken);
+                    notifications.show({
+                        title: 'Welcome to Eggplant!',
+                        message: `You are now linked to ${invitation.memberFirstName} ${invitation.memberLastName}.`,
+                        color: 'green',
+                    });
+                    navigate('/');
+                },
+                onError: (err: Error) => {
+                    notifications.show({
+                        title: 'Failed to create account',
+                        message: err.message,
+                        color: 'red',
+                    });
+                },
+            },
+        );
+    };
+
+    return (
+        <form onSubmit={form.onSubmit(handleSubmit)}>
+            <Stack>
+                <Alert color="blue" variant="light">
+                    Create your account to accept the invitation.
+                </Alert>
+                <TextInput label="Email" value={invitation.email} disabled />
+                <TextInput label="Display name" required {...form.getInputProps('displayName')} />
+                <PasswordInput
+                    label="Password"
+                    required
+                    description="At least 8 characters"
+                    {...form.getInputProps('password')}
+                />
+                <Group justify="flex-end" mt="md">
+                    <Button type="submit" loading={mutation.isPending}>
+                        Create account &amp; accept
+                    </Button>
+                </Group>
+            </Stack>
+        </form>
     );
 }

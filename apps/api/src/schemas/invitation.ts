@@ -17,3 +17,8 @@ export const acceptInvitationSchema = z.object({
         })
         .optional(),
 });
+
+export const registerAndAcceptInvitationSchema = z.object({
+    displayName: z.string({ error: 'displayName is required' }).min(1, { error: 'displayName is required' }),
+    password: z.string({ error: 'password is required' }).min(8, { error: 'password must be at least 8 characters' }),
+});

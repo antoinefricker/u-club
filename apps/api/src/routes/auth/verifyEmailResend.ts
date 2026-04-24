@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
-import crypto from 'node:crypto';
 import db from '../../db.js';
 import mailer from '../../mailer.js';
 import { validate } from '../../middleware/validate.js';
 import { verifyEmailResendSchema } from '../../schemas/auth.js';
+import { createEmailToken } from '../../utils/emailToken.js';
 
 const router = Router();
 
@@ -53,8 +53,7 @@ router.post('/verify_email_resend', validate(verifyEmailResendSchema), async (re
 
     await db('authTokens').where({ email, type: 'confirmation' }).del();
 
-    const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const { token, expiresAt } = createEmailToken(24 * 60 * 60 * 1000);
 
     await db('authTokens').insert({
         email,

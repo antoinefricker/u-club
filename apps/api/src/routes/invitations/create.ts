@@ -1,10 +1,10 @@
 import { Router, Request, Response } from 'express';
-import crypto from 'node:crypto';
 import db from '../../db.js';
 import mailer from '../../mailer.js';
 import { requireAuth, type AuthenticatedRequest } from '../../middleware/auth.js';
 import { validate } from '../../middleware/validate.js';
 import { createInvitationSchema } from '../../schemas/invitation.js';
+import { createEmailToken } from '../../utils/emailToken.js';
 
 const router = Router();
 
@@ -65,8 +65,7 @@ router.post('/', requireAuth, validate(createInvitationSchema), async (req: Requ
         }
     }
 
-    const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const { token, expiresAt } = createEmailToken(7 * 24 * 60 * 60 * 1000);
 
     await db('memberInvitations').insert({
         memberId,

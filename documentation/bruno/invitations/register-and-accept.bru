@@ -1,0 +1,22 @@
+meta {
+  name: Register and Accept Invitation
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/invitations/by-token/:token/register-and-accept
+  body: json
+  auth: none
+}
+
+params:path {
+  token: paste-invitation-token-here
+}
+
+body:json {
+  {
+    "displayName": "New User",
+    "password": "supersecret"
+  }
+}

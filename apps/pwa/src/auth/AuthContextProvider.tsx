@@ -37,6 +37,11 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
             .finally(() => setLoading(false));
     }, [token]);
 
+    const hydrate = useCallback((accessToken: string) => {
+        localStorage.setItem(TOKEN_KEY, accessToken);
+        setToken(accessToken);
+    }, []);
+
     const login = useCallback(async (email: string, password: string) => {
         const res = await fetch('/api/auth/login', {
             method: 'POST',
@@ -82,8 +87,9 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
             login,
             logout,
             updateUser,
+            hydrate,
         }),
-        [token, user, login, logout, updateUser],
+        [token, user, login, logout, updateUser, hydrate],
     );
 
     if (loading) return null;

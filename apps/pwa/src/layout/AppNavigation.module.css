@@ -30,6 +30,8 @@
 .link {
     display: flex;
     align-items: center;
+    width: 100%;
+    text-align: left;
     text-decoration: none;
     font-size: var(--mantine-font-size-sm);
     color: var(--mantine-color-white);

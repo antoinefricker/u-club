@@ -1,8 +1,22 @@
 import { useState } from 'react';
 import { Alert, Loader, Select, Table, TextInput, Text, ActionIcon, Group } from '@mantine/core';
-import { IconCheck, IconHandFingerRight, IconHeartHandshake, IconTrash, IconX } from '@tabler/icons-react';
+import {
+    IconCheck,
+    IconHandFingerRight,
+    IconHeartHandshake,
+    IconTrash,
+    IconUserPlus,
+    IconX,
+} from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { useUserMembers, useUpdateUserMember, useDeleteUserMember } from '../../../hooks/useUserMembers';
+import { InviteUserModal } from './InviteUserModal';
+
+interface InvitingFor {
+    memberId: string;
+    firstName: string;
+    lastName: string;
+}
 
 interface RowEdit {
     type: string;
@@ -21,6 +35,7 @@ export function UserMemberLinks({ userId, useUserPointOfView, memberId }: UserMe
     const updateMutation = useUpdateUserMember();
     const deleteMutation = useDeleteUserMember();
     const [edits, setEdits] = useState<Record<string, RowEdit>>({});
+    const [invitingFor, setInvitingFor] = useState<InvitingFor | null>(null);
 
     if (bothProvided) {
         console.warn('UserMemberLinks: pass either userId or memberId, not both.');
@@ -116,165 +131,193 @@ export function UserMemberLinks({ userId, useUserPointOfView, memberId }: UserMe
           ];
 
     return (
-        <Table>
-            <Table.Thead>
-                <Table.Tr>
-                    <Table.Th w={24}>#</Table.Th>
-                    <Table.Th>{mode === 'member' ? 'User' : 'Member'}</Table.Th>
-                    <Table.Th w={240}>Type</Table.Th>
-                    <Table.Th w={80} />
-                </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-                {relationships.map((rel, index) => {
-                    const edit = getEdit(rel);
-                    const dirty = isDirty(rel);
-                    const showDescription = edit.type !== 'self';
+        <>
+            <Table>
+                <Table.Thead>
+                    <Table.Tr>
+                        <Table.Th w={24}>#</Table.Th>
+                        <Table.Th>{mode === 'member' ? 'User' : 'Member'}</Table.Th>
+                        <Table.Th w={240}>Type</Table.Th>
+                        <Table.Th w={80} />
+                    </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                    {relationships.map((rel, index) => {
+                        const edit = getEdit(rel);
+                        const dirty = isDirty(rel);
+                        const showDescription = edit.type !== 'self';
 
-                    return (
-                        <>
-                            <Table.Tr
-                                key={rel.id}
-                                style={{
-                                    borderBottom: showDescription ? 'none' : undefined,
-                                }}
-                            >
-                                <Table.Td
-                                    w={24}
+                        return (
+                            <>
+                                <Table.Tr
+                                    key={rel.id}
                                     style={{
-                                        paddingBottom: showDescription ? 4 : undefined,
+                                        borderBottom: showDescription ? 'none' : undefined,
                                     }}
                                 >
-                                    <Text size="xs" c="dimmed">
-                                        {index + 1}
-                                    </Text>
-                                </Table.Td>
-                                <Table.Td
-                                    style={{
-                                        paddingBottom: showDescription ? 4 : undefined,
-                                    }}
-                                >
-                                    {mode === 'member' ? (
-                                        <>
-                                            <Text fw={700}>{rel.userDisplayName}</Text>
-                                            <Text size="xs" c="dimmed">
-                                                {rel.userEmail}
+                                    <Table.Td
+                                        w={24}
+                                        style={{
+                                            paddingBottom: showDescription ? 4 : undefined,
+                                        }}
+                                    >
+                                        <Text size="xs" c="dimmed">
+                                            {index + 1}
+                                        </Text>
+                                    </Table.Td>
+                                    <Table.Td
+                                        style={{
+                                            paddingBottom: showDescription ? 4 : undefined,
+                                        }}
+                                    >
+                                        {mode === 'member' ? (
+                                            <>
+                                                <Text fw={700}>{rel.userDisplayName}</Text>
+                                                <Text size="xs" c="dimmed">
+                                                    {rel.userEmail}
+                                                </Text>
+                                            </>
+                                        ) : (
+                                            <Text fw={700}>
+                                                {rel.memberFirstName} {rel.memberLastName}
                                             </Text>
-                                        </>
-                                    ) : (
-                                        <Text fw={700}>
-                                            {rel.memberFirstName} {rel.memberLastName}
-                                        </Text>
-                                    )}
-                                </Table.Td>
-                                <Table.Td
-                                    style={{
-                                        paddingBottom: showDescription ? 4 : undefined,
-                                    }}
-                                >
-                                    <Select
-                                        data={typeOptions}
-                                        value={edit.type}
-                                        onChange={(v) =>
-                                            v &&
-                                            setEdit(rel.id, {
-                                                type: v,
-                                                description: '',
-                                            })
-                                        }
-                                        leftSection={
-                                            edit.type === 'self' ? (
-                                                <IconHandFingerRight size={16} />
-                                            ) : (
-                                                <IconHeartHandshake size={16} />
-                                            )
-                                        }
-                                    />
-                                </Table.Td>
-                                <Table.Td
-                                    rowSpan={2}
-                                    style={{
-                                        paddingBottom: showDescription ? 0 : undefined,
-                                    }}
-                                >
-                                    {dirty ? (
-                                        <Group gap="xs">
-                                            <ActionIcon
-                                                color="green"
-                                                variant="light"
-                                                size="sm"
-                                                onClick={() => handleSave(rel.id)}
-                                                loading={updateMutation.isPending}
-                                            >
-                                                <IconCheck size={14} />
-                                            </ActionIcon>
-                                            <ActionIcon
-                                                color="gray"
-                                                variant="light"
-                                                size="sm"
-                                                onClick={() => handleCancel(rel)}
-                                            >
-                                                <IconX size={14} />
-                                            </ActionIcon>
-                                        </Group>
-                                    ) : (
-                                        <ActionIcon
-                                            color="red"
-                                            variant="light"
-                                            size="sm"
-                                            onClick={() => handleDelete(rel.id)}
-                                        >
-                                            <IconTrash size={14} />
-                                        </ActionIcon>
-                                    )}
-                                </Table.Td>
-                            </Table.Tr>
-                            <Table.Tr
-                                key={`description-${rel.id}`}
-                                style={{
-                                    visibility: showDescription ? 'visible' : 'collapse',
-                                }}
-                            >
-                                <Table.Td w={24} style={{ paddingTop: 0 }} />
-                                <Table.Td colSpan={2} style={{ paddingTop: 0 }}>
-                                    <Group w="100%" align="center" gap="xs">
-                                        <Text
-                                            size="sm"
-                                            style={{
-                                                flexShrink: 0,
-                                                flexBasis: 'auto',
-                                            }}
-                                        >
-                                            {useUserPointOfView
-                                                ? `I am ${rel.memberFirstName}'s`
-                                                : `${rel.userDisplayName} is ${rel.memberFirstName}'s`}
-                                        </Text>
-                                        <TextInput
-                                            size="sm"
-                                            width="100%"
-                                            type={showDescription ? 'text' : 'hidden'}
-                                            variant="default"
-                                            placeholder="father, mother..."
-                                            value={edit.description}
-                                            onChange={(e) =>
+                                        )}
+                                    </Table.Td>
+                                    <Table.Td
+                                        style={{
+                                            paddingBottom: showDescription ? 4 : undefined,
+                                        }}
+                                    >
+                                        <Select
+                                            data={typeOptions}
+                                            value={edit.type}
+                                            onChange={(v) =>
+                                                v &&
                                                 setEdit(rel.id, {
-                                                    description: e.target.value,
+                                                    type: v,
+                                                    description: '',
                                                 })
                                             }
-                                            style={{
-                                                flexShrink: 1,
-                                                flexGrow: 1,
-                                                flexBasis: 'auto',
-                                            }}
+                                            leftSection={
+                                                edit.type === 'self' ? (
+                                                    <IconHandFingerRight size={16} />
+                                                ) : (
+                                                    <IconHeartHandshake size={16} />
+                                                )
+                                            }
                                         />
-                                    </Group>
-                                </Table.Td>
-                            </Table.Tr>
-                        </>
-                    );
-                })}
-            </Table.Tbody>
-        </Table>
+                                    </Table.Td>
+                                    <Table.Td
+                                        rowSpan={2}
+                                        style={{
+                                            paddingBottom: showDescription ? 0 : undefined,
+                                        }}
+                                    >
+                                        {dirty ? (
+                                            <Group gap="xs">
+                                                <ActionIcon
+                                                    color="green"
+                                                    variant="light"
+                                                    size="sm"
+                                                    onClick={() => handleSave(rel.id)}
+                                                    loading={updateMutation.isPending}
+                                                >
+                                                    <IconCheck size={14} />
+                                                </ActionIcon>
+                                                <ActionIcon
+                                                    color="gray"
+                                                    variant="light"
+                                                    size="sm"
+                                                    onClick={() => handleCancel(rel)}
+                                                >
+                                                    <IconX size={14} />
+                                                </ActionIcon>
+                                            </Group>
+                                        ) : (
+                                            <Group gap="xs">
+                                                <ActionIcon
+                                                    color="red"
+                                                    variant="light"
+                                                    size="sm"
+                                                    onClick={() => handleDelete(rel.id)}
+                                                >
+                                                    <IconTrash size={14} />
+                                                </ActionIcon>
+                                                {mode === 'user' && (
+                                                    <ActionIcon
+                                                        color="blue"
+                                                        variant="light"
+                                                        size="sm"
+                                                        aria-label={`Invite a user to link with ${rel.memberFirstName} ${rel.memberLastName}`}
+                                                        onClick={() =>
+                                                            setInvitingFor({
+                                                                memberId: rel.memberId,
+                                                                firstName: rel.memberFirstName,
+                                                                lastName: rel.memberLastName,
+                                                            })
+                                                        }
+                                                    >
+                                                        <IconUserPlus size={14} />
+                                                    </ActionIcon>
+                                                )}
+                                            </Group>
+                                        )}
+                                    </Table.Td>
+                                </Table.Tr>
+                                <Table.Tr
+                                    key={`description-${rel.id}`}
+                                    style={{
+                                        visibility: showDescription ? 'visible' : 'collapse',
+                                    }}
+                                >
+                                    <Table.Td w={24} style={{ paddingTop: 0 }} />
+                                    <Table.Td colSpan={2} style={{ paddingTop: 0 }}>
+                                        <Group w="100%" align="center" gap="xs">
+                                            <Text
+                                                size="sm"
+                                                style={{
+                                                    flexShrink: 0,
+                                                    flexBasis: 'auto',
+                                                }}
+                                            >
+                                                {useUserPointOfView
+                                                    ? `I am ${rel.memberFirstName}'s`
+                                                    : `${rel.userDisplayName} is ${rel.memberFirstName}'s`}
+                                            </Text>
+                                            <TextInput
+                                                size="sm"
+                                                width="100%"
+                                                type={showDescription ? 'text' : 'hidden'}
+                                                variant="default"
+                                                placeholder="father, mother..."
+                                                value={edit.description}
+                                                onChange={(e) =>
+                                                    setEdit(rel.id, {
+                                                        description: e.target.value,
+                                                    })
+                                                }
+                                                style={{
+                                                    flexShrink: 1,
+                                                    flexGrow: 1,
+                                                    flexBasis: 'auto',
+                                                }}
+                                            />
+                                        </Group>
+                                    </Table.Td>
+                                </Table.Tr>
+                            </>
+                        );
+                    })}
+                </Table.Tbody>
+            </Table>
+            <InviteUserModal
+                opened={invitingFor !== null}
+                onClose={() => setInvitingFor(null)}
+                memberId={invitingFor?.memberId ?? ''}
+                memberFirstName={invitingFor?.firstName}
+                memberLastName={invitingFor?.lastName}
+            />
+        </>
     );
 }
 

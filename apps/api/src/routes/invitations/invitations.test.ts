@@ -21,7 +21,8 @@ const mockLimit = vi.fn().mockReturnThis();
 const mockOffset = vi.fn();
 const mockSendMail = vi.fn().mockResolvedValue({});
 
-const mockTrxInsert = vi.fn().mockResolvedValue([]);
+const mockTrxInsert = vi.fn().mockReturnThis();
+const mockTrxReturning = vi.fn().mockResolvedValue([]);
 const mockTrxUpdate = vi.fn().mockResolvedValue(1);
 const mockTrxWhere = vi.fn().mockReturnThis();
 
@@ -48,13 +49,14 @@ vi.mock('../../db.js', () => {
         })),
         {
             raw: vi.fn(),
-            transaction: vi.fn(async (cb: (trx: unknown) => Promise<void>) => {
+            transaction: vi.fn(async (cb: (trx: unknown) => Promise<unknown>) => {
                 const trx = vi.fn(() => ({
                     insert: mockTrxInsert,
+                    returning: mockTrxReturning,
                     where: mockTrxWhere,
                     update: mockTrxUpdate,
                 }));
-                await cb(trx);
+                return await cb(trx);
             }),
         },
     );
@@ -90,6 +92,7 @@ beforeEach(() => {
     mockCount.mockReturnThis();
     mockCountDistinct.mockReturnThis();
     mockLimit.mockReturnThis();
+    mockTrxInsert.mockReturnThis();
     mockTrxWhere.mockReturnThis();
 });
 
@@ -412,5 +415,236 @@ describe('DELETE /invitations/:id', () => {
 
         expect(res.status).toBe(404);
         expect(res.body).toHaveProperty('error', 'invitation not found');
+    });
+});
+
+describe('GET /invitations/by-token/:token', () => {
+    const validInvitationRow = {
+        id: 'inv-1',
+        email: 'invited@example.com',
+        memberId: 'member-1',
+        type: 'relative',
+        description: 'father',
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+        acceptedAt: null,
+        memberFirstName: 'Alice',
+        memberLastName: 'Dupont',
+    };
+
+    it('returns 200 with userExists=true when a user already exists for the email', async () => {
+        mockFirst.mockResolvedValueOnce(validInvitationRow);
+        mockFirst.mockResolvedValueOnce({ id: 'uuid-existing', email: 'invited@example.com' });
+
+        const res = await request(app).get('/invitations/by-token/abc123');
+
+        expect(res.status).toBe(200);
+        expect(res.body.userExists).toBe(true);
+        expect(res.body.invitation).toMatchObject({
+            id: 'inv-1',
+            email: 'invited@example.com',
+            memberId: 'member-1',
+            memberFirstName: 'Alice',
+            memberLastName: 'Dupont',
+            type: 'relative',
+            description: 'father',
+        });
+    });
+
+    it('returns 200 with userExists=false when no user exists for the email', async () => {
+        mockFirst.mockResolvedValueOnce(validInvitationRow);
+        mockFirst.mockResolvedValueOnce(undefined);
+
+        const res = await request(app).get('/invitations/by-token/abc123');
+
+        expect(res.status).toBe(200);
+        expect(res.body.userExists).toBe(false);
+    });
+
+    it('response body does not leak acceptedAt, token, or invitedBy', async () => {
+        mockFirst.mockResolvedValueOnce(validInvitationRow);
+        mockFirst.mockResolvedValueOnce(undefined);
+
+        const res = await request(app).get('/invitations/by-token/abc123');
+
+        expect(res.body.invitation).not.toHaveProperty('acceptedAt');
+        expect(res.body.invitation).not.toHaveProperty('token');
+        expect(res.body.invitation).not.toHaveProperty('invitedBy');
+    });
+
+    it('returns 404 when the token is not found', async () => {
+        mockFirst.mockResolvedValueOnce(undefined);
+
+        const res = await request(app).get('/invitations/by-token/does-not-exist');
+
+        expect(res.status).toBe(404);
+        expect(res.body).toHaveProperty('error', 'invitation not found');
+    });
+
+    it('returns 400 when the invitation has expired', async () => {
+        mockFirst.mockResolvedValueOnce({
+            ...validInvitationRow,
+            expiresAt: new Date(Date.now() - 60 * 1000),
+        });
+
+        const res = await request(app).get('/invitations/by-token/expired');
+
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'invitation has expired');
+    });
+
+    it('returns 400 when the invitation has already been accepted', async () => {
+        mockFirst.mockResolvedValueOnce({
+            ...validInvitationRow,
+            acceptedAt: new Date(),
+        });
+
+        const res = await request(app).get('/invitations/by-token/already-accepted');
+
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'invitation already accepted');
+    });
+
+    it('does not require an Authorization header', async () => {
+        mockFirst.mockResolvedValueOnce(validInvitationRow);
+        mockFirst.mockResolvedValueOnce(undefined);
+
+        const res = await request(app).get('/invitations/by-token/abc123');
+
+        expect(res.status).toBe(200);
+    });
+
+    it('looks up the invitation with a case-sensitive token match', async () => {
+        mockFirst.mockResolvedValueOnce(undefined);
+
+        const res = await request(app).get('/invitations/by-token/ABC123');
+
+        expect(res.status).toBe(404);
+        expect(mockWhere).toHaveBeenCalledWith({ 'memberInvitations.token': 'ABC123' });
+    });
+});
+
+describe('POST /invitations/by-token/:token/register-and-accept', () => {
+    const validInvitation = {
+        id: 'inv-1',
+        email: 'invited@example.com',
+        memberId: 'member-1',
+        type: 'relative',
+        description: 'father',
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+        acceptedAt: null,
+    };
+
+    const validBody = {
+        displayName: 'New User',
+        password: 'supersecret',
+    };
+
+    it('creates the user + userMembers row + accepts the invitation and returns a JWT', async () => {
+        mockFirst.mockResolvedValueOnce(validInvitation);
+        mockFirst.mockResolvedValueOnce(undefined);
+        mockTrxReturning.mockResolvedValueOnce([{ id: 'new-user-id', email: 'invited@example.com', role: 'user' }]);
+
+        const res = await request(app).post('/invitations/by-token/abc123/register-and-accept').send(validBody);
+
+        expect(res.status).toBe(201);
+        expect(res.body.accessToken).toEqual(expect.any(String));
+
+        const decoded = JSON.parse(Buffer.from(res.body.accessToken.split('.')[1], 'base64').toString());
+        expect(decoded).toMatchObject({ sub: 'new-user-id', email: 'invited@example.com', role: 'user' });
+
+        expect(mockTrxInsert).toHaveBeenCalledWith(
+            expect.objectContaining({
+                email: 'invited@example.com',
+                displayName: 'New User',
+                password: 'hashed:password',
+                role: 'user',
+                emailVerifiedAt: expect.any(Date),
+            }),
+        );
+        expect(mockTrxInsert).toHaveBeenCalledWith({
+            userId: 'new-user-id',
+            memberId: 'member-1',
+            type: 'relative',
+            description: 'father',
+        });
+        expect(mockTrxUpdate).toHaveBeenCalledWith({ acceptedAt: expect.any(Date) });
+    });
+
+    it('ignores any email field in the body and uses the invitation email instead', async () => {
+        mockFirst.mockResolvedValueOnce(validInvitation);
+        mockFirst.mockResolvedValueOnce(undefined);
+        mockTrxReturning.mockResolvedValueOnce([{ id: 'new-user-id', email: 'invited@example.com', role: 'user' }]);
+
+        const res = await request(app)
+            .post('/invitations/by-token/abc123/register-and-accept')
+            .send({ ...validBody, email: 'attacker@evil.com' });
+
+        expect(res.status).toBe(201);
+        expect(mockTrxInsert).toHaveBeenCalledWith(expect.objectContaining({ email: 'invited@example.com' }));
+        expect(mockTrxInsert).not.toHaveBeenCalledWith(expect.objectContaining({ email: 'attacker@evil.com' }));
+    });
+
+    it('returns 404 when the token is not found', async () => {
+        mockFirst.mockResolvedValueOnce(undefined);
+
+        const res = await request(app).post('/invitations/by-token/nope/register-and-accept').send(validBody);
+
+        expect(res.status).toBe(404);
+        expect(res.body).toHaveProperty('error', 'invitation not found');
+    });
+
+    it('returns 400 when the invitation has expired', async () => {
+        mockFirst.mockResolvedValueOnce({
+            ...validInvitation,
+            expiresAt: new Date(Date.now() - 60 * 1000),
+        });
+
+        const res = await request(app).post('/invitations/by-token/expired/register-and-accept').send(validBody);
+
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'invitation has expired');
+    });
+
+    it('returns 400 when the invitation has already been accepted', async () => {
+        mockFirst.mockResolvedValueOnce({
+            ...validInvitation,
+            acceptedAt: new Date(),
+        });
+
+        const res = await request(app).post('/invitations/by-token/accepted/register-and-accept').send(validBody);
+
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'invitation already accepted');
+    });
+
+    it('returns 409 when a user already exists for the invited email', async () => {
+        mockFirst.mockResolvedValueOnce(validInvitation);
+        mockFirst.mockResolvedValueOnce({ id: 'existing-user-id', email: 'invited@example.com' });
+
+        const res = await request(app).post('/invitations/by-token/abc123/register-and-accept').send(validBody);
+
+        expect(res.status).toBe(409);
+        expect(res.body.error).toMatch(/already exists/);
+    });
+
+    it.each([
+        ['missing displayName', { password: 'supersecret' }],
+        ['missing password', { displayName: 'New User' }],
+        ['password too short', { displayName: 'New User', password: 'short' }],
+    ])('returns 400 for %s', async (_label, body) => {
+        const res = await request(app).post('/invitations/by-token/abc123/register-and-accept').send(body);
+
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'validation error');
+    });
+
+    it('does not require an Authorization header', async () => {
+        mockFirst.mockResolvedValueOnce(validInvitation);
+        mockFirst.mockResolvedValueOnce(undefined);
+        mockTrxReturning.mockResolvedValueOnce([{ id: 'new-user-id', email: 'invited@example.com', role: 'user' }]);
+
+        const res = await request(app).post('/invitations/by-token/abc123/register-and-accept').send(validBody);
+
+        expect(res.status).toBe(201);
     });
 });
