@@ -50,7 +50,6 @@ import '@mantine/notifications/styles.css';
 import '@mantine/dates/styles.css';
 import App from './App.tsx';
 import { TeamsPage } from './pages/TeamsPage.tsx';
-import { ClubPage } from './pages/ClubPage.tsx';
 import { AccountPage } from './pages/AccountPage.tsx';
 import { AgendaPage } from './pages/AgendaPage.tsx';
 import { ConfirmEmailPage } from './pages/ConfirmEmailPage.tsx';
@@ -82,7 +81,6 @@ createRoot(document.getElementById('root')!).render(
                             <Route path="invitation" element={<InvitationPage />} />
                             <Route element={<App />}>
                                 <Route index element={<DashboardPage />} />
-                                <Route path="club" element={<ClubPage />} />
                                 <Route path="teams" element={<TeamsPage />} />
                                 <Route path="account" element={<AccountPage />} />
                                 <Route path="agenda" element={<AgendaPage />} />

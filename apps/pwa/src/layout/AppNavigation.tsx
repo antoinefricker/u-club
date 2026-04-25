@@ -44,13 +44,6 @@ export function AppNavigation({ onNavigate }: AppNavigationProps) {
                     </Title>
                 </Link>
 
-                <Link to="/club" className={classes.link} onClick={onNavigate}>
-                    <IconShieldHalf className={classes.linkIcon} stroke={1.5} />
-                    <Title order={3} size="sm">
-                        My clubs
-                    </Title>
-                </Link>
-
                 <Link to="/teams" className={classes.link} onClick={onNavigate}>
                     <IconShirtSport className={classes.linkIcon} stroke={1.5} />
                     <Title order={3} size="sm">
