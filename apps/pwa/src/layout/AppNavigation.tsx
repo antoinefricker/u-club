@@ -1,4 +1,5 @@
 import {
+    IconBadge,
     IconCalendarWeek,
     IconCategory,
     IconLayoutDashboard,
@@ -83,6 +84,14 @@ export function AppNavigation({ onNavigate }: AppNavigationProps) {
                         >
                             <IconCategory className={classes.linkIcon} stroke={1.5} />
                             <span>Team categories</span>
+                        </Link>
+                        <Link
+                            to="/admin/member-statuses"
+                            className={[classes.link, classes.subLink].join(' ')}
+                            onClick={onNavigate}
+                        >
+                            <IconBadge className={classes.linkIcon} stroke={1.5} />
+                            <span>Member statuses</span>
                         </Link>
                         <Link
                             to="/admin/members"
