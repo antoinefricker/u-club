@@ -19,7 +19,7 @@
   - [x] Edit/delete member relationships
   - [x] Send invite
   - [ ] Show member pending invitations
-- [ ] Member statuses CRUD
+- [ ] Create/Edit/Delete member Member statuses
 
 ### 3. User
 
