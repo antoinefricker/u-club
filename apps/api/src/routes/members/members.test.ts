@@ -70,6 +70,7 @@ vi.mock('../../mailer.js', () => ({
 
 const { default: app } = await import('../../app.js');
 const adminToken = createTestToken('uuid-1', 'admin@example.com', 'admin');
+const userToken = createTestToken('uuid-2', 'user@example.com', 'user');
 
 const sampleMember = {
     id: 'member-1',
@@ -312,6 +313,52 @@ describe('GET /members/:id', () => {
 
         expect(res.status).toBe(404);
         expect(res.body).toHaveProperty('error', 'member not found');
+    });
+});
+
+describe('GET /members/:memberId/teams', () => {
+    const sampleAssignment = {
+        id: 'assign-1',
+        teamId: 'team-1',
+        teamLabel: 'U13 A',
+        teamGender: 'mixed',
+        teamCategoryLabel: 'U13',
+        role: 'player',
+        createdAt: '2026-01-01T00:00:00.000Z',
+    };
+
+    it("returns the member's team assignments", async () => {
+        mockSelect.mockResolvedValueOnce([sampleAssignment]);
+
+        const res = await request(app).get('/members/member-1/teams').set('Authorization', `Bearer ${adminToken}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual([sampleAssignment]);
+    });
+
+    it('returns an empty array when the member has no assignments', async () => {
+        mockSelect.mockResolvedValueOnce([]);
+
+        const res = await request(app).get('/members/member-1/teams').set('Authorization', `Bearer ${adminToken}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual([]);
+    });
+
+    it('orders results by team label ascending', async () => {
+        mockSelect.mockResolvedValueOnce([]);
+        await request(app).get('/members/member-1/teams').set('Authorization', `Bearer ${adminToken}`);
+        expect(mockOrderBy).toHaveBeenCalledWith('teams.label', 'asc');
+    });
+
+    it('returns 401 when unauthenticated', async () => {
+        const res = await request(app).get('/members/member-1/teams');
+        expect(res.status).toBe(401);
+    });
+
+    it('returns 403 when authenticated as a regular user', async () => {
+        const res = await request(app).get('/members/member-1/teams').set('Authorization', `Bearer ${userToken}`);
+        expect(res.status).toBe(403);
     });
 });
 

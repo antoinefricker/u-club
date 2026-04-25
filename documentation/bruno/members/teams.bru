@@ -1,0 +1,25 @@
+meta {
+  name: List Member Team Assignments
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/members/:memberId/teams
+  body: none
+  auth: bearer
+}
+
+params:path {
+  memberId:
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+docs {
+  Returns an array of the member's team assignments, joined with team metadata
+  (teamLabel, teamGender, teamCategoryLabel). Ordered by teams.label ASC.
+  Returns an empty array — never 404 — when the member has no assignments.
+}

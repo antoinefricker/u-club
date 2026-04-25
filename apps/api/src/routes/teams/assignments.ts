@@ -3,7 +3,7 @@ import db from '../../db.js';
 import { requireAuth } from '../../middleware/auth.js';
 import { requireRole } from '../../middleware/requireRole.js';
 import { validate } from '../../middleware/validate.js';
-import { createTeamAssignmentSchema } from '../../schemas/teamAssignment.js';
+import { createTeamAssignmentSchema, updateTeamAssignmentSchema } from '../../schemas/teamAssignment.js';
 
 const router = Router({ mergeParams: true });
 
@@ -117,6 +117,79 @@ router.post(
             .returning(['id', 'teamId', 'memberId', 'role', 'createdAt']);
 
         res.status(201).json(assignment);
+    },
+);
+
+/**
+ * @openapi
+ * /teams/{teamId}/members/{memberId}:
+ *   put:
+ *     tags: [Teams]
+ *     summary: Update a member's role on a team
+ *     parameters:
+ *       - in: path
+ *         name: teamId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: path
+ *         name: memberId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [role]
+ *             properties:
+ *               role:
+ *                 type: string
+ *                 enum: [player, coach, assistant, sparring]
+ *     responses:
+ *       200:
+ *         description: Updated assignment
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/TeamAssignment'
+ *       400:
+ *         description: Missing or invalid fields
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       404:
+ *         description: Assignment not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.put(
+    '/:memberId',
+    requireAuth,
+    requireRole('admin', 'manager'),
+    validate(updateTeamAssignmentSchema),
+    async (req: Request, res: Response) => {
+        const { teamId, memberId } = req.params;
+        const { role } = req.body;
+
+        const [updated] = await db('teamAssignments')
+            .where({ teamId, memberId })
+            .update({ role })
+            .returning(['id', 'teamId', 'memberId', 'role', 'createdAt']);
+
+        if (!updated) {
+            res.status(404).json({ error: 'Assignment not found' });
+            return;
+        }
+
+        res.json(updated);
     },
 );
 

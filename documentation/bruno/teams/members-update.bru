@@ -1,0 +1,33 @@
+meta {
+  name: Update Team Member Role
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{baseUrl}}/teams/:teamId/members/:memberId
+  body: json
+  auth: bearer
+}
+
+params:path {
+  teamId:
+  memberId:
+}
+
+body:json {
+  {
+    "role": "coach"
+  }
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+docs {
+  Body: { role: "player" | "coach" | "assistant" | "sparring" }
+  - 200: returns the updated assignment row.
+  - 400: missing or invalid role.
+  - 404: assignment (teamId + memberId pair) not found.
+}
