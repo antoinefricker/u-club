@@ -144,12 +144,12 @@ export function MemberFormPage() {
                         </Grid.Col>
                         <Grid.Col span={{ base: 12, sm: 1 }}></Grid.Col>
                         <Grid.Col span={12}>
-                            <Group>
-                                <Button type="submit" loading={createMember.isPending || updateMember.isPending}>
-                                    {isEdit ? 'Update' : 'Create'}
-                                </Button>
+                            <Group style={{ display: 'flex', justifyContent: 'flex-end' }}>
                                 <Button variant="subtle" onClick={() => navigate('/admin/members')}>
                                     Cancel
+                                </Button>
+                                <Button type="submit" loading={createMember.isPending || updateMember.isPending}>
+                                    {isEdit ? 'Save' : 'Create'}
                                 </Button>
                             </Group>
                         </Grid.Col>

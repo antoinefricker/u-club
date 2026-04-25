@@ -7,6 +7,7 @@ import { FormWrapper } from '../../components/admin/forms/FormWrapper';
 import { PageTitle } from '../../components/layout/PageTitle';
 import { useTeamCategory, useCreateTeamCategory, useUpdateTeamCategory } from '../../hooks/useTeamCategories';
 import { useClubs } from '../../hooks/useClubs';
+import { InputHelper } from '../../components/admin/forms/InputHelper';
 
 export function TeamCategoryFormPage() {
     const { id } = useParams<{ id: string }>();
@@ -89,9 +90,9 @@ export function TeamCategoryFormPage() {
                                 data={clubOptions}
                                 required
                                 disabled={isEdit}
-                                description={isEdit ? "Can't be changed after creation" : undefined}
                                 {...form.getInputProps('clubId')}
                             />
+                            {isEdit && <InputHelper>Can&apos;t be changed after creation</InputHelper>}
                         </Grid.Col>
                         <Grid.Col span={{ base: 12, sm: 6 }}>
                             <TextInput
@@ -102,12 +103,12 @@ export function TeamCategoryFormPage() {
                             />
                         </Grid.Col>
                         <Grid.Col span={12}>
-                            <Group>
-                                <Button type="submit" loading={createCategory.isPending || updateCategory.isPending}>
-                                    {isEdit ? 'Update' : 'Create'}
-                                </Button>
+                            <Group style={{ display: 'flex', justifyContent: 'flex-end' }}>
                                 <Button variant="subtle" onClick={() => navigate('/admin/team-categories')}>
                                     Cancel
+                                </Button>
+                                <Button type="submit" loading={createCategory.isPending || updateCategory.isPending}>
+                                    {isEdit ? 'Save' : 'Create'}
                                 </Button>
                             </Group>
                         </Grid.Col>

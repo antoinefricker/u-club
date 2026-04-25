@@ -95,12 +95,12 @@ export function ClubFormPage() {
                             />
                         </Grid.Col>
                         <Grid.Col span={12}>
-                            <Group>
-                                <Button type="submit" loading={createClub.isPending || updateClub.isPending}>
-                                    {isEdit ? 'Update' : 'Create'}
-                                </Button>
+                            <Group style={{ display: 'flex', justifyContent: 'flex-end' }}>
                                 <Button variant="subtle" onClick={() => navigate('/admin/clubs')}>
                                     Cancel
+                                </Button>
+                                <Button type="submit" loading={createClub.isPending || updateClub.isPending}>
+                                    {isEdit ? 'Save' : 'Create'}
                                 </Button>
                             </Group>
                         </Grid.Col>
