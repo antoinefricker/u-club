@@ -55,8 +55,11 @@ vi.mock('../../mailer.js', () => ({
 
 const { default: app } = await import('../../app.js');
 const adminToken = createTestToken('uuid-1', 'admin@example.com', 'admin');
+const managerToken = createTestToken('uuid-2', 'manager@example.com', 'manager');
+const userToken = createTestToken('uuid-3', 'user@example.com', 'user');
 
-const sampleStatus = { id: 'status-1', label: 'Active' };
+const STATUS_ID = '11111111-1111-1111-1111-111111111111';
+const sampleStatus = { id: STATUS_ID, label: 'Active' };
 
 beforeEach(() => {
     process.env.JWT_SECRET = 'test-secret';
@@ -139,6 +142,49 @@ describe('GET /member-statuses', () => {
         const res = await request(app).get(`/member-statuses?${qs}`).set('Authorization', `Bearer ${adminToken}`);
         expect(res.status).toBe(400);
         expect(res.body).toHaveProperty('error', 'validation error');
+    });
+});
+
+describe('GET /member-statuses/:id', () => {
+    it('returns the status', async () => {
+        mockFirst.mockResolvedValueOnce(sampleStatus);
+
+        const res = await request(app)
+            .get(`/member-statuses/${STATUS_ID}`)
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual(sampleStatus);
+    });
+
+    it('allows manager role', async () => {
+        mockFirst.mockResolvedValueOnce(sampleStatus);
+
+        const res = await request(app)
+            .get(`/member-statuses/${STATUS_ID}`)
+            .set('Authorization', `Bearer ${managerToken}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual(sampleStatus);
+    });
+
+    it('returns 404 when missing', async () => {
+        mockFirst.mockResolvedValueOnce(undefined);
+
+        const res = await request(app).get('/member-statuses/nonexistent').set('Authorization', `Bearer ${adminToken}`);
+
+        expect(res.status).toBe(404);
+        expect(res.body).toHaveProperty('error', 'member status not found');
+    });
+
+    it('returns 401 when unauthenticated', async () => {
+        const res = await request(app).get(`/member-statuses/${STATUS_ID}`);
+        expect(res.status).toBe(401);
+    });
+
+    it('returns 403 when authenticated as a regular user', async () => {
+        const res = await request(app).get(`/member-statuses/${STATUS_ID}`).set('Authorization', `Bearer ${userToken}`);
+        expect(res.status).toBe(403);
     });
 });
 
