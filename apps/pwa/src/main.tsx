@@ -63,6 +63,7 @@ import { TeamFormPage } from './pages/admin/TeamFormPage.tsx';
 import { TeamCategoriesListPage } from './pages/admin/TeamCategoriesListPage.tsx';
 import { TeamCategoryFormPage } from './pages/admin/TeamCategoryFormPage.tsx';
 import { MemberStatusesListPage } from './pages/admin/MemberStatusesListPage.tsx';
+import { MemberStatusFormPage } from './pages/admin/MemberStatusFormPage.tsx';
 import { MembersListPage } from './pages/admin/MembersListPage.tsx';
 import { MemberFormPage } from './pages/admin/MemberFormPage.tsx';
 
@@ -95,6 +96,8 @@ createRoot(document.getElementById('root')!).render(
                                     <Route path="team-categories/new" element={<TeamCategoryFormPage />} />
                                     <Route path="team-categories/:id" element={<TeamCategoryFormPage />} />
                                     <Route path="member-statuses" element={<MemberStatusesListPage />} />
+                                    <Route path="member-statuses/new" element={<MemberStatusFormPage />} />
+                                    <Route path="member-statuses/:id" element={<MemberStatusFormPage />} />
                                     <Route path="members" element={<MembersListPage />} />
                                     <Route path="members/new" element={<MemberFormPage />} />
                                     <Route path="members/:id" element={<MemberFormPage />} />
