@@ -137,6 +137,7 @@ export function MembersListPage() {
                                     to={`/admin/members/${member.id}`}
                                     c="inherit"
                                     underline="hover"
+                                    size="sm"
                                 >
                                     {member.firstName} {member.lastName}
                                 </Anchor>

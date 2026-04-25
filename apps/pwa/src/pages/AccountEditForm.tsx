@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { IconMail } from '@tabler/icons-react';
 import { PhoneInput } from '../components/inputs/PhoneInput';
-import { Alert, Anchor, Button, Grid, PasswordInput, Text, TextInput, Textarea } from '@mantine/core';
+import { Alert, Anchor, Button, Grid, Group, PasswordInput, TextInput, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useAuthContext } from '../auth/useAuthContext';
@@ -9,6 +9,7 @@ import { useUserUpdate, type UpdateUserPayload } from '../hooks/useUserUpdate';
 import { emailValidation } from '../utils/formValidations/emailValidation';
 import { phoneValidation } from '../utils/formValidations/phoneValidation';
 import { passwordValidation, confirmPasswordValidation } from '../utils/formValidations/passwordValidation';
+import { InputHelper } from '../components/admin/forms/InputHelper';
 
 type AccountFormValues = UpdateUserPayload & {
     password: string;
@@ -109,11 +110,7 @@ export function AccountEditForm() {
                     >
                         {showPassword ? 'Cancel password change' : 'Change password'}
                     </Anchor>
-                    {showPassword && (
-                        <Text size="sm" c="dimmed" mt={-10}>
-                            Leave blank to keep current password
-                        </Text>
-                    )}
+                    {showPassword && <InputHelper mt={-10}>Leave blank to keep current password</InputHelper>}
                 </Grid.Col>
                 {showPassword && (
                     <>
@@ -126,10 +123,23 @@ export function AccountEditForm() {
                     </>
                 )}
 
-                <Grid.Col span={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <Button type="submit" color="success" loading={mutation.isPending}>
-                        Save changes
-                    </Button>
+                <Grid.Col span={12}>
+                    <Group justify="flex-end">
+                        <Button
+                            variant="subtle"
+                            onClick={() => {
+                                form.reset();
+                                setShowPassword(false);
+                                setError(null);
+                            }}
+                            disabled={mutation.isPending}
+                        >
+                            Cancel
+                        </Button>
+                        <Button type="submit" loading={mutation.isPending}>
+                            Save
+                        </Button>
+                    </Group>
                 </Grid.Col>
             </Grid>
         </form>

@@ -1,10 +1,10 @@
-import { ActionIcon, Alert, Button, Group, Loader, Select, Table } from '@mantine/core';
+import { ActionIcon, Alert, Anchor, Button, Group, Loader, Select, Table } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { PageTitle } from '../../components/layout/PageTitle';
 import { ListFilters } from '../../components/admin/lists/ListFilters';
 import { ListPagination } from '../../components/admin/lists/ListPagination';
 import { EmptyListRow } from '../../components/admin/lists/EmptyListRow';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import { useTeams, useDeleteTeam } from '../../hooks/useTeams';
 import { TEAM_GENDER_LABELS, TEAM_GENDER_OPTIONS, type TeamGender } from '../../types/Team';
@@ -129,7 +129,17 @@ export function TeamsListPage() {
                     {teams?.length === 0 && <EmptyListRow colSpan={5} />}
                     {teams?.map((team) => (
                         <Table.Tr key={team.id}>
-                            <Table.Td>{team.label}</Table.Td>
+                            <Table.Td>
+                                <Anchor
+                                    component={Link}
+                                    to={`/admin/teams/${team.id}`}
+                                    c="inherit"
+                                    underline="hover"
+                                    size="sm"
+                                >
+                                    {team.label}
+                                </Anchor>
+                            </Table.Td>
                             <Table.Td>{clubNameById.get(team.clubId) ?? team.clubId}</Table.Td>
                             <Table.Td>{team.categoryLabel ?? '—'}</Table.Td>
                             <Table.Td>{TEAM_GENDER_LABELS[team.gender]}</Table.Td>

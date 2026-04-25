@@ -155,12 +155,12 @@ export function TeamFormPage() {
                             />
                         </Grid.Col>
                         <Grid.Col span={12}>
-                            <Group>
-                                <Button type="submit" loading={createTeam.isPending || updateTeam.isPending}>
-                                    {isEdit ? 'Update' : 'Create'}
-                                </Button>
+                            <Group style={{ display: 'flex', justifyContent: 'flex-end' }}>
                                 <Button variant="subtle" onClick={() => navigate('/admin/teams')}>
                                     Cancel
+                                </Button>
+                                <Button type="submit" loading={createTeam.isPending || updateTeam.isPending}>
+                                    {isEdit ? 'Save' : 'Create'}
                                 </Button>
                             </Group>
                         </Grid.Col>

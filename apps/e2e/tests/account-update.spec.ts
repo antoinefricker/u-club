@@ -42,14 +42,14 @@ test.describe("Account update", () => {
   test("should update display name", async ({ page }) => {
     await page.getByLabel("Display name").clear();
     await page.getByLabel("Display name").fill("Updated Name");
-    await page.getByRole("button", { name: "Save changes" }).click();
+    await page.getByRole("button", { name: "Save", exact: true }).click();
 
     await expect(page.getByText("Account updated")).toBeVisible();
   });
 
   test("should show error for empty display name", async ({ page }) => {
     await page.getByLabel("Display name").clear();
-    await page.getByRole("button", { name: "Save changes" }).click();
+    await page.getByRole("button", { name: "Save", exact: true }).click();
 
     await expect(page.getByText("Display name is required")).toBeVisible();
   });
@@ -57,7 +57,7 @@ test.describe("Account update", () => {
   test("should show error for invalid email", async ({ page }) => {
     await page.getByLabel("Email").clear();
     await page.getByLabel("Email").fill("not-an-email");
-    await page.getByRole("button", { name: "Save changes" }).click();
+    await page.getByRole("button", { name: "Save", exact: true }).click();
 
     await expect(page.getByText("Invalid email")).toBeVisible();
   });

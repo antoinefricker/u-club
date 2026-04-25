@@ -1,10 +1,10 @@
-import { ActionIcon, Alert, Button, Group, Loader, Select, Table } from '@mantine/core';
+import { ActionIcon, Alert, Anchor, Button, Group, Loader, Select, Table } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { PageTitle } from '../../components/layout/PageTitle';
 import { ListFilters } from '../../components/admin/lists/ListFilters';
 import { ListPagination } from '../../components/admin/lists/ListPagination';
 import { EmptyListRow } from '../../components/admin/lists/EmptyListRow';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import { useTeamCategories, useDeleteTeamCategory } from '../../hooks/useTeamCategories';
 import { useClubs } from '../../hooks/useClubs';
@@ -84,7 +84,17 @@ export function TeamCategoriesListPage() {
                     {categories?.length === 0 && <EmptyListRow colSpan={3} />}
                     {categories?.map((category) => (
                         <Table.Tr key={category.id}>
-                            <Table.Td>{category.label}</Table.Td>
+                            <Table.Td>
+                                <Anchor
+                                    component={Link}
+                                    to={`/admin/team-categories/${category.id}`}
+                                    c="inherit"
+                                    underline="hover"
+                                    size="sm"
+                                >
+                                    {category.label}
+                                </Anchor>
+                            </Table.Td>
                             <Table.Td>{clubNameById.get(category.clubId) ?? category.clubId}</Table.Td>
                             <Table.Td>
                                 <Group gap="xs" justify="flex-end">

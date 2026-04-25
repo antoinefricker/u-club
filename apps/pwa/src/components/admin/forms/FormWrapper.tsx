@@ -9,7 +9,7 @@ interface FormWrapperProps {
 
 export function FormWrapper({ children }: FormWrapperProps) {
     return (
-        <Box maw={800} mt="md" className={classes.root}>
+        <Box maw={900} mt="md" className={classes.root}>
             {children}
         </Box>
     );

@@ -10,6 +10,7 @@
 
 ### 2. Admin
 
+- [x] Add link to edition page on all resource label from list view
 - [ ] Member list
   - [x] Fix search filter UI
   - [ ] Show member related team assignements
@@ -22,8 +23,8 @@
 
 ### 3. User
 
-- [ ] Remove my clubs page
-- [ ] Remove my teams page
+- [x] Remove my clubs page
+- [x] Remove my teams page
 - [ ] Implement dashboard
   - [ ] Show self team assignements
   - [ ] Show self relationships
@@ -48,6 +49,8 @@
 
 ### 5. Pages
 
+- [ ] Create page entity and CRUD
+- [ ] Create section entity and CRUD
 - [ ] Markdown editor
   - [ ] typography
   - [ ] separator

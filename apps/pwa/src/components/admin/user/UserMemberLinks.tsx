@@ -1,13 +1,17 @@
 import { useState } from 'react';
-import { Alert, Loader, Select, Table, TextInput, Text, ActionIcon, Group } from '@mantine/core';
 import {
-    IconCheck,
-    IconHandFingerRight,
-    IconHeartHandshake,
-    IconTrash,
-    IconUserPlus,
-    IconX,
-} from '@tabler/icons-react';
+    Alert,
+    Loader,
+    Select,
+    Table,
+    TextInput,
+    Text,
+    ActionIcon,
+    Group,
+    Tooltip,
+    useMantineTheme,
+} from '@mantine/core';
+import { IconCheck, IconArrowForward, IconTrash, IconUserPlus, IconX, IconEdit } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { useUserMembers, useUpdateUserMember, useDeleteUserMember } from '../../../hooks/useUserMembers';
 import { InviteUserModal } from './InviteUserModal';
@@ -24,6 +28,7 @@ interface RowEdit {
 }
 
 export function UserMemberLinks({ userId, useUserPointOfView, memberId }: UserMemberLinksProps) {
+    const theme = useMantineTheme();
     const bothProvided = !!(userId && memberId);
     const mode: 'user' | 'member' = memberId ? 'member' : 'user';
     const { data, isLoading, error } = useUserMembers({
@@ -35,6 +40,7 @@ export function UserMemberLinks({ userId, useUserPointOfView, memberId }: UserMe
     const updateMutation = useUpdateUserMember();
     const deleteMutation = useDeleteUserMember();
     const [edits, setEdits] = useState<Record<string, RowEdit>>({});
+    const [editingId, setEditingId] = useState<string | null>(null);
     const [invitingFor, setInvitingFor] = useState<InvitingFor | null>(null);
 
     if (bothProvided) {
@@ -63,6 +69,18 @@ export function UserMemberLinks({ userId, useUserPointOfView, memberId }: UserMe
         return edit.type !== rel.type || edit.description !== (rel.description ?? '');
     };
 
+    const handleEdit = (rel: { id: string; type: string; description: string | null }) => {
+        if (editingId && editingId !== rel.id) {
+            notifications.show({
+                title: 'Another link is being edited',
+                message: 'Save or cancel the current edit before editing another link.',
+                color: 'orange',
+            });
+            return;
+        }
+        setEditingId(rel.id);
+    };
+
     const handleSave = (id: string) => {
         const edit = edits[id];
         if (!edit) return;
@@ -75,6 +93,7 @@ export function UserMemberLinks({ userId, useUserPointOfView, memberId }: UserMe
                         delete next[id];
                         return next;
                     });
+                    setEditingId(null);
                     notifications.show({
                         title: 'Updated',
                         message: 'Relationship updated.',
@@ -91,6 +110,7 @@ export function UserMemberLinks({ userId, useUserPointOfView, memberId }: UserMe
             delete next[rel.id];
             return next;
         });
+        setEditingId(null);
     };
 
     const handleDelete = (id: string) => {
@@ -136,119 +156,74 @@ export function UserMemberLinks({ userId, useUserPointOfView, memberId }: UserMe
                 <Table.Thead>
                     <Table.Tr>
                         <Table.Th w={24}>#</Table.Th>
-                        <Table.Th>{mode === 'member' ? 'User' : 'Member'}</Table.Th>
-                        <Table.Th w={240}>Type</Table.Th>
-                        <Table.Th w={80} />
+                        <Table.Th w={260}>{mode === 'member' ? 'User' : 'Member'}</Table.Th>
+                        <Table.Th>Type</Table.Th>
+                        <Table.Th w={100} />
                     </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
                     {relationships.map((rel, index) => {
+                        const isEditing = editingId === rel.id;
                         const edit = getEdit(rel);
                         const dirty = isDirty(rel);
                         const showDescription = edit.type !== 'self';
 
+                        const relationshipName =
+                            mode === 'member' ? rel.userDisplayName : `${rel.memberFirstName} ${rel.memberLastName}`;
+
                         return (
                             <>
-                                <Table.Tr
-                                    key={rel.id}
-                                    style={{
-                                        borderBottom: showDescription ? 'none' : undefined,
-                                    }}
-                                >
-                                    <Table.Td
-                                        w={24}
-                                        style={{
-                                            paddingBottom: showDescription ? 4 : undefined,
-                                        }}
-                                    >
+                                <Table.Tr key={rel.id} style={{ borderBottom: isEditing ? 'none' : undefined }}>
+                                    <Table.Td>
                                         <Text size="xs" c="dimmed">
                                             {index + 1}
                                         </Text>
                                     </Table.Td>
-                                    <Table.Td
-                                        style={{
-                                            paddingBottom: showDescription ? 4 : undefined,
-                                        }}
-                                    >
-                                        {mode === 'member' ? (
-                                            <>
-                                                <Text fw={700}>{rel.userDisplayName}</Text>
-                                                <Text size="xs" c="dimmed">
-                                                    {rel.userEmail}
-                                                </Text>
-                                            </>
-                                        ) : (
-                                            <Text fw={700}>
-                                                {rel.memberFirstName} {rel.memberLastName}
+                                    <Table.Td>
+                                        <Text size="sm" fw={700}>
+                                            {relationshipName}
+                                        </Text>
+                                        {mode === 'member' && (
+                                            <Text size="xs" c="dimmed" mt={-4}>
+                                                {rel.userEmail}
                                             </Text>
                                         )}
                                     </Table.Td>
-                                    <Table.Td
-                                        style={{
-                                            paddingBottom: showDescription ? 4 : undefined,
-                                        }}
-                                    >
-                                        <Select
-                                            data={typeOptions}
-                                            value={edit.type}
-                                            onChange={(v) =>
-                                                v &&
-                                                setEdit(rel.id, {
-                                                    type: v,
-                                                    description: '',
-                                                })
-                                            }
-                                            leftSection={
-                                                edit.type === 'self' ? (
-                                                    <IconHandFingerRight size={16} />
-                                                ) : (
-                                                    <IconHeartHandshake size={16} />
-                                                )
-                                            }
-                                        />
+                                    <Table.Td>
+                                        {rel.type === 'self' && (useUserPointOfView ? 'Myself' : 'Itself')}
+                                        {rel.type !== 'self' &&
+                                            (useUserPointOfView
+                                                ? `I am ${rel.memberFirstName}'s ${edit.description || 'relative'}`
+                                                : `${rel.userDisplayName} is ${rel.memberFirstName}'s ${rel.description || 'relative'}`)}
                                     </Table.Td>
-                                    <Table.Td
-                                        rowSpan={2}
-                                        style={{
-                                            paddingBottom: showDescription ? 0 : undefined,
-                                        }}
-                                    >
-                                        {dirty ? (
-                                            <Group gap="xs">
+                                    <Table.Td>
+                                        <Group justify="flex-end" gap="xs">
+                                            <Tooltip
+                                                label={`Define your link with ${relationshipName}`}
+                                                position="left"
+                                                offset={1}
+                                            >
                                                 <ActionIcon
-                                                    color="green"
-                                                    variant="light"
-                                                    size="sm"
-                                                    onClick={() => handleSave(rel.id)}
+                                                    color="primary"
+                                                    variant="subtle"
+                                                    size="md"
+                                                    aria-label={`Edit your link with ${relationshipName}`}
+                                                    onClick={() => handleEdit(rel)}
                                                     loading={updateMutation.isPending}
                                                 >
-                                                    <IconCheck size={14} />
+                                                    <IconEdit />
                                                 </ActionIcon>
-                                                <ActionIcon
-                                                    color="gray"
-                                                    variant="light"
-                                                    size="sm"
-                                                    onClick={() => handleCancel(rel)}
+                                            </Tooltip>
+                                            {mode === 'user' && (
+                                                <Tooltip
+                                                    label={`Invite a user to link with ${relationshipName}`}
+                                                    position="left"
+                                                    offset={1}
                                                 >
-                                                    <IconX size={14} />
-                                                </ActionIcon>
-                                            </Group>
-                                        ) : (
-                                            <Group gap="xs">
-                                                <ActionIcon
-                                                    color="red"
-                                                    variant="light"
-                                                    size="sm"
-                                                    onClick={() => handleDelete(rel.id)}
-                                                >
-                                                    <IconTrash size={14} />
-                                                </ActionIcon>
-                                                {mode === 'user' && (
                                                     <ActionIcon
-                                                        color="blue"
-                                                        variant="light"
-                                                        size="sm"
-                                                        aria-label={`Invite a user to link with ${rel.memberFirstName} ${rel.memberLastName}`}
+                                                        color="primary"
+                                                        variant="subtle"
+                                                        aria-label={`Invite a user to link with ${relationshipName}`}
                                                         onClick={() =>
                                                             setInvitingFor({
                                                                 memberId: rel.memberId,
@@ -256,55 +231,110 @@ export function UserMemberLinks({ userId, useUserPointOfView, memberId }: UserMe
                                                                 lastName: rel.memberLastName,
                                                             })
                                                         }
+                                                        size="lg"
                                                     >
-                                                        <IconUserPlus size={14} />
+                                                        <IconUserPlus />
                                                     </ActionIcon>
-                                                )}
-                                            </Group>
-                                        )}
-                                    </Table.Td>
-                                </Table.Tr>
-                                <Table.Tr
-                                    key={`description-${rel.id}`}
-                                    style={{
-                                        visibility: showDescription ? 'visible' : 'collapse',
-                                    }}
-                                >
-                                    <Table.Td w={24} style={{ paddingTop: 0 }} />
-                                    <Table.Td colSpan={2} style={{ paddingTop: 0 }}>
-                                        <Group w="100%" align="center" gap="xs">
-                                            <Text
-                                                size="sm"
-                                                style={{
-                                                    flexShrink: 0,
-                                                    flexBasis: 'auto',
-                                                }}
+                                                </Tooltip>
+                                            )}
+                                            <Tooltip
+                                                label={`Delete your link with ${relationshipName}`}
+                                                position="left"
+                                                offset={1}
                                             >
-                                                {useUserPointOfView
-                                                    ? `I am ${rel.memberFirstName}'s`
-                                                    : `${rel.userDisplayName} is ${rel.memberFirstName}'s`}
-                                            </Text>
-                                            <TextInput
-                                                size="sm"
-                                                width="100%"
-                                                type={showDescription ? 'text' : 'hidden'}
-                                                variant="default"
-                                                placeholder="father, mother..."
-                                                value={edit.description}
-                                                onChange={(e) =>
-                                                    setEdit(rel.id, {
-                                                        description: e.target.value,
-                                                    })
-                                                }
-                                                style={{
-                                                    flexShrink: 1,
-                                                    flexGrow: 1,
-                                                    flexBasis: 'auto',
-                                                }}
-                                            />
+                                                <ActionIcon
+                                                    color="red"
+                                                    variant="subtle"
+                                                    size="md"
+                                                    aria-label={`Delete your link with ${relationshipName}`}
+                                                    onClick={() => handleDelete(rel.id)}
+                                                    loading={deleteMutation.isPending}
+                                                >
+                                                    <IconTrash />
+                                                </ActionIcon>
+                                            </Tooltip>
                                         </Group>
                                     </Table.Td>
                                 </Table.Tr>
+                                {isEditing && (
+                                    <Table.Tr key={`form-${rel.id}`} bg={theme.colors.gray[1]}>
+                                        <Table.Td></Table.Td>
+                                        <Table.Td>
+                                            <Group w="100%" align="center" gap="xs">
+                                                <IconArrowForward size={16} />
+                                                <Select
+                                                    data={typeOptions}
+                                                    value={edit.type}
+                                                    onChange={(v) =>
+                                                        v &&
+                                                        setEdit(rel.id, {
+                                                            type: v,
+                                                            description: '',
+                                                        })
+                                                    }
+                                                />
+                                            </Group>
+                                        </Table.Td>
+                                        <Table.Td>
+                                            {edit.type !== 'self' && (
+                                                <Group w="100%" align="center" gap="xs">
+                                                    <Text
+                                                        size="sm"
+                                                        style={{
+                                                            flexShrink: 0,
+                                                            flexGrow: 0,
+                                                            flexBasis: 'auto',
+                                                        }}
+                                                    >
+                                                        {useUserPointOfView
+                                                            ? `I am ${rel.memberFirstName}'s`
+                                                            : `${rel.userDisplayName} is ${rel.memberFirstName}'s`}
+                                                    </Text>
+                                                    <TextInput
+                                                        size="sm"
+                                                        width="100%"
+                                                        type={showDescription ? 'text' : 'hidden'}
+                                                        variant="default"
+                                                        placeholder="father, mother..."
+                                                        value={edit.description}
+                                                        onChange={(e) =>
+                                                            setEdit(rel.id, {
+                                                                description: e.target.value,
+                                                            })
+                                                        }
+                                                        style={{
+                                                            flexShrink: 1,
+                                                            flexGrow: 1,
+                                                            flexBasis: 'auto',
+                                                        }}
+                                                    />
+                                                </Group>
+                                            )}
+                                        </Table.Td>
+                                        <Table.Td>
+                                            <Group justify="flex-end" gap="xs">
+                                                <ActionIcon
+                                                    color="primary"
+                                                    variant="subtle"
+                                                    size="md"
+                                                    onClick={() => handleCancel(rel)}
+                                                >
+                                                    <IconX />
+                                                </ActionIcon>
+                                                <ActionIcon
+                                                    color="green"
+                                                    variant="subtle"
+                                                    size="md"
+                                                    onClick={() => handleSave(rel.id)}
+                                                    loading={updateMutation.isPending}
+                                                    disabled={!dirty}
+                                                >
+                                                    <IconCheck />
+                                                </ActionIcon>
+                                            </Group>
+                                        </Table.Td>
+                                    </Table.Tr>
+                                )}
                             </>
                         );
                     })}
