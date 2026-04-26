@@ -6,8 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "if": "Bash(gh pr *)",
-            "command": "jq -r '.tool_input.command' | grep -qE '^gh pr (create|edit) ' && echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"additionalContext\":\"Before creating/updating this PR: review the work in this branch and suggest any CLAUDE.md additions worth making (testing gotchas, project conventions, infrastructure quirks, recurring patterns). List candidates and ask which to include. Then proceed with the gh pr command.\"}}' || true"
+            "command": "jq -r '.tool_input.command' | grep -qE '(gh pr (create|edit)|gh api .*pulls/[0-9])' && echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"ask\",\"permissionDecisionReason\":\"Before creating/updating this PR: review the work in this branch and suggest any CLAUDE.md additions worth making (testing gotchas, project conventions, infrastructure quirks, recurring patterns). Confirm to proceed; cancel to do the review first.\"}}' || true"
           }
         ]
       }
