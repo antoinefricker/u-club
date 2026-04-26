@@ -171,10 +171,12 @@ export function TeamFormPage() {
             </FormWrapper>
             {team?.id && (
                 <FormWrapper>
-                    <Title order={3} mt="xl" mb="md">
-                        Team composition
-                    </Title>
-                    <AddTeamMemberButton teamId={team.id} />
+                    <Group justify="space-between" mt="xl" mb="md">
+                        <Title order={3} m={0}>
+                            Team composition
+                        </Title>
+                        <AddTeamMemberButton teamId={team.id} />
+                    </Group>
                     <TeamMembers teamId={team.id} />
                 </FormWrapper>
             )}
