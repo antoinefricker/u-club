@@ -1,0 +1,35 @@
+meta {
+  name: Update Team Assignment
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/team-assignments/:id
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+params:path {
+  id: paste-team-assignment-id-here
+}
+
+body:json {
+  {
+    "role": "coach"
+  }
+}
+
+docs {
+  Only the role can be updated. Changing teamId or memberId requires delete + create.
+
+  Authorization: admin/manager only.
+
+  Errors:
+  - 400 validation error (missing or invalid role)
+  - 404 assignment not found
+}

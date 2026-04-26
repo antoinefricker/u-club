@@ -1,0 +1,26 @@
+meta {
+  name: Delete Team Assignment
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/team-assignments/:id
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+params:path {
+  id: paste-team-assignment-id-here
+}
+
+docs {
+  Authorization: admin/manager only.
+
+  Errors:
+  - 404 assignment not found
+}
