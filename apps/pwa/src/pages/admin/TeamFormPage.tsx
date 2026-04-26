@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Button, Grid, Group, Loader, Select, TextInput, Textarea } from '@mantine/core';
+import { Button, Grid, Group, Loader, Select, TextInput, Textarea, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useNavigate, useParams } from 'react-router';
@@ -9,6 +9,7 @@ import { useTeam, useCreateTeam, useUpdateTeam } from '../../hooks/useTeams';
 import { TEAM_GENDER_OPTIONS, type TeamGender } from '../../types/Team';
 import { useClubs } from '../../hooks/useClubs';
 import { useTeamCategories } from '../../hooks/useTeamCategories';
+import { TeamMembers } from '../../components/admin/team/TeamMembers';
 
 export function TeamFormPage() {
     const { id } = useParams<{ id: string }>();
@@ -167,6 +168,14 @@ export function TeamFormPage() {
                     </Grid>
                 </form>
             </FormWrapper>
+            {team?.id && (
+                <FormWrapper>
+                    <Title order={3} mt="xl" mb="md">
+                        Team composition
+                    </Title>
+                    <TeamMembers teamId={team.id} />
+                </FormWrapper>
+            )}
         </>
     );
 }
