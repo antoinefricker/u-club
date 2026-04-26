@@ -13,12 +13,14 @@
 - [x] Add link to edition page on all resource label from list view
 - [ ] Member list
   - [x] Fix search filter UI
-  - [ ] Show member related team assignements
-  - [ ] Create/Edit/Delete member team assignements
+  - [x] Show member team assignements
+  - [x] Show user related members team assignements
+  - [x] Edit team members
   - [x] Show member relationships
   - [x] Edit/delete member relationships
   - [x] Send invite
   - [ ] Show member pending invitations
+  - [ ] Show user pending invitations
 - [x] Create/Edit/Delete member statuses
 
 ### 3. User
@@ -26,8 +28,6 @@
 - [x] Remove my clubs page
 - [x] Remove my teams page
 - [ ] Implement dashboard
-  - [ ] Show self team assignements
-  - [ ] Show self relationships
   - [ ] Show pending invitations
 - [ ] Team page
   - [ ] Info
