@@ -10,7 +10,9 @@ import { useMember, useCreateMember, useUpdateMember } from '../../hooks/useMemb
 import { useMemberStatuses } from '../../hooks/useMemberStatuses';
 import { MEMBER_GENDER_OPTIONS, type MemberGender } from '../../types/Member';
 import { UserMemberLinks } from '../../components/admin/user/UserMemberLinks';
+import { UserTeamAssignments } from '../../components/admin/user/UserTeamAssignments';
 import { InviteUserButton } from '../../components/admin/user/InviteUserButton';
+import { AssignToTeamButton } from '../../components/admin/user/AssignToTeamButton';
 
 export function MemberFormPage() {
     const { id } = useParams<{ id: string }>();
@@ -171,6 +173,17 @@ export function MemberFormPage() {
                 </Group>
                 <UserMemberLinks memberId={member?.id} useUserPointOfView={false} />
             </FormWrapper>
+            {member?.id && (
+                <FormWrapper>
+                    <Group justify="space-between" mt="xl" mb="md">
+                        <Title order={3} m={0}>
+                            Team assignments
+                        </Title>
+                        <AssignToTeamButton memberId={member.id} />
+                    </Group>
+                    <UserTeamAssignments memberId={member.id} editable />
+                </FormWrapper>
+            )}
         </>
     );
 }

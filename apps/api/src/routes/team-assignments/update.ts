@@ -12,7 +12,7 @@ const router = Router();
  * /team-assignments/{id}:
  *   put:
  *     tags: [TeamAssignments]
- *     summary: Update a team assignment's role
+ *     summary: Update a team assignment's team and/or role
  *     parameters:
  *       - in: path
  *         name: id
@@ -47,7 +47,13 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  *       404:
- *         description: Assignment not found
+ *         description: Assignment or new team not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       409:
+ *         description: Member is already assigned to the new team
  *         content:
  *           application/json:
  *             schema:
@@ -60,15 +66,38 @@ router.put(
     validate(updateTeamAssignmentSchema),
     async (req: Request, res: Response) => {
         const { id } = req.params;
-        const { role } = req.body;
+        const { teamId, role } = req.body;
 
-        const existing = await db('teamAssignments').where({ id }).first('id');
+        const existing = await db('teamAssignments').where({ id }).first('id', 'teamId', 'memberId');
         if (!existing) {
             res.status(404).json({ error: 'assignment not found' });
             return;
         }
 
-        await db('teamAssignments').where({ id }).update({ role, updatedAt: new Date().toISOString() });
+        if (teamId && teamId !== existing.teamId) {
+            const team = await db('teams').where({ id: teamId }).first('id');
+            if (!team) {
+                res.status(404).json({ error: 'team not found' });
+                return;
+            }
+
+            const conflict = await db('teamAssignments')
+                .where({ teamId, memberId: existing.memberId })
+                .whereNot({ id })
+                .first('id');
+            if (conflict) {
+                res.status(409).json({ error: 'member is already assigned to this team' });
+                return;
+            }
+        }
+
+        const updates: { teamId?: string; role?: string; updatedAt: string } = {
+            updatedAt: new Date().toISOString(),
+        };
+        if (teamId !== undefined) updates.teamId = teamId;
+        if (role !== undefined) updates.role = role;
+
+        await db('teamAssignments').where({ id }).update(updates);
 
         const row = await db('teamAssignments')
             .join('teams', 'teamAssignments.teamId', 'teams.id')

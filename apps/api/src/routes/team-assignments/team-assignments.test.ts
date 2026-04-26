@@ -20,6 +20,7 @@ const mockInsert = vi.fn().mockReturnThis();
 const mockReturning = vi.fn();
 const mockUpdate = vi.fn();
 const mockDel = vi.fn();
+const mockWhereNot = vi.fn().mockReturnThis();
 
 vi.mock('../../db.js', () => {
     const db = Object.assign(
@@ -42,6 +43,7 @@ vi.mock('../../db.js', () => {
             returning: mockReturning,
             update: mockUpdate,
             del: mockDel,
+            whereNot: mockWhereNot,
         })),
         { raw: vi.fn() },
     );
@@ -96,6 +98,7 @@ beforeEach(() => {
     mockCountDistinct.mockReturnThis();
     mockLimit.mockReturnThis();
     mockInsert.mockReturnThis();
+    mockWhereNot.mockReturnThis();
 });
 
 describe('GET /team-assignments', () => {
@@ -454,6 +457,13 @@ describe('POST /team-assignments', () => {
 
 describe('PUT /team-assignments/:id', () => {
     const ASSIGNMENT_ID = 'ta-1';
+    const CURRENT_TEAM_ID = '55555555-5555-5555-8555-555555555555';
+    const NEW_TEAM_ID = '66666666-6666-6666-8666-666666666666';
+    const existingAssignment = {
+        id: ASSIGNMENT_ID,
+        teamId: CURRENT_TEAM_ID,
+        memberId: MEMBER_UUID,
+    };
 
     it('returns 401 when unauthenticated', async () => {
         const res = await request(app).put(`/team-assignments/${ASSIGNMENT_ID}`).send({ role: 'coach' });
@@ -468,13 +478,20 @@ describe('PUT /team-assignments/:id', () => {
         expect(res.status).toBe(403);
     });
 
-    it('returns 400 when role is missing', async () => {
+    it('returns 400 when both teamId and role are missing', async () => {
         const res = await request(app)
             .put(`/team-assignments/${ASSIGNMENT_ID}`)
             .set('Authorization', `Bearer ${adminToken}`)
             .send({});
         expect(res.status).toBe(400);
         expect(res.body).toHaveProperty('error', 'validation error');
+        expect(res.body.details).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    message: 'at least one of teamId or role is required',
+                }),
+            ]),
+        );
     });
 
     it('returns 400 for invalid role enum', async () => {
@@ -482,6 +499,15 @@ describe('PUT /team-assignments/:id', () => {
             .put(`/team-assignments/${ASSIGNMENT_ID}`)
             .set('Authorization', `Bearer ${adminToken}`)
             .send({ role: 'captain' });
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'validation error');
+    });
+
+    it('returns 400 when teamId is not a UUID', async () => {
+        const res = await request(app)
+            .put(`/team-assignments/${ASSIGNMENT_ID}`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ teamId: 'not-a-uuid' });
         expect(res.status).toBe(400);
         expect(res.body).toHaveProperty('error', 'validation error');
     });
@@ -498,11 +524,38 @@ describe('PUT /team-assignments/:id', () => {
         expect(res.body).toHaveProperty('error', 'assignment not found');
     });
 
-    it('returns 200 with the enriched row on happy path', async () => {
-        mockFirst.mockResolvedValueOnce({ id: ASSIGNMENT_ID }); // existence check
-        mockUpdate.mockResolvedValueOnce(1); // update returns rowcount
+    it('returns 404 when the new teamId does not exist', async () => {
+        mockFirst.mockResolvedValueOnce(existingAssignment); // existing assignment
+        mockFirst.mockResolvedValueOnce(undefined); // new team lookup
+
+        const res = await request(app)
+            .put(`/team-assignments/${ASSIGNMENT_ID}`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ teamId: NEW_TEAM_ID });
+
+        expect(res.status).toBe(404);
+        expect(res.body).toHaveProperty('error', 'team not found');
+    });
+
+    it('returns 409 when member is already on the new team', async () => {
+        mockFirst.mockResolvedValueOnce(existingAssignment); // existing assignment
+        mockFirst.mockResolvedValueOnce({ id: NEW_TEAM_ID }); // new team exists
+        mockFirst.mockResolvedValueOnce({ id: 'other-assignment' }); // conflict check finds dup
+
+        const res = await request(app)
+            .put(`/team-assignments/${ASSIGNMENT_ID}`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ teamId: NEW_TEAM_ID });
+
+        expect(res.status).toBe(409);
+        expect(res.body).toHaveProperty('error', 'member is already assigned to this team');
+    });
+
+    it('returns 200 and updates only role on happy path (role only)', async () => {
+        mockFirst.mockResolvedValueOnce(existingAssignment);
+        mockUpdate.mockResolvedValueOnce(1);
         const updatedRow = { ...sampleAssignmentRow, role: 'coach', updatedAt: '2026-04-26T00:00:00.000Z' };
-        mockFirst.mockResolvedValueOnce(updatedRow); // enriched select
+        mockFirst.mockResolvedValueOnce(updatedRow);
 
         const res = await request(app)
             .put(`/team-assignments/${ASSIGNMENT_ID}`)
@@ -515,6 +568,63 @@ describe('PUT /team-assignments/:id', () => {
             role: 'coach',
             updatedAt: expect.any(String),
         });
+    });
+
+    it('returns 200 and updates only teamId on happy path (team only)', async () => {
+        mockFirst.mockResolvedValueOnce(existingAssignment);
+        mockFirst.mockResolvedValueOnce({ id: NEW_TEAM_ID }); // new team exists
+        mockFirst.mockResolvedValueOnce(undefined); // no conflict
+        mockUpdate.mockResolvedValueOnce(1);
+        const updatedRow = { ...sampleAssignmentRow, teamId: NEW_TEAM_ID };
+        mockFirst.mockResolvedValueOnce(updatedRow);
+
+        const res = await request(app)
+            .put(`/team-assignments/${ASSIGNMENT_ID}`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ teamId: NEW_TEAM_ID });
+
+        expect(res.status).toBe(200);
+        expect(mockUpdate).toHaveBeenCalledWith({
+            teamId: NEW_TEAM_ID,
+            updatedAt: expect.any(String),
+        });
+    });
+
+    it('returns 200 and updates both fields when provided', async () => {
+        mockFirst.mockResolvedValueOnce(existingAssignment);
+        mockFirst.mockResolvedValueOnce({ id: NEW_TEAM_ID });
+        mockFirst.mockResolvedValueOnce(undefined); // no conflict
+        mockUpdate.mockResolvedValueOnce(1);
+        const updatedRow = { ...sampleAssignmentRow, teamId: NEW_TEAM_ID, role: 'coach' };
+        mockFirst.mockResolvedValueOnce(updatedRow);
+
+        const res = await request(app)
+            .put(`/team-assignments/${ASSIGNMENT_ID}`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ teamId: NEW_TEAM_ID, role: 'coach' });
+
+        expect(res.status).toBe(200);
+        expect(mockUpdate).toHaveBeenCalledWith({
+            teamId: NEW_TEAM_ID,
+            role: 'coach',
+            updatedAt: expect.any(String),
+        });
+    });
+
+    it('skips team-existence/conflict checks when teamId equals current teamId', async () => {
+        mockFirst.mockResolvedValueOnce(existingAssignment);
+        mockUpdate.mockResolvedValueOnce(1);
+        const updatedRow = { ...sampleAssignmentRow, role: 'coach' };
+        mockFirst.mockResolvedValueOnce(updatedRow);
+
+        const res = await request(app)
+            .put(`/team-assignments/${ASSIGNMENT_ID}`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ teamId: CURRENT_TEAM_ID, role: 'coach' });
+
+        expect(res.status).toBe(200);
+        // mockFirst was called only twice: existence + final enriched select
+        expect(mockFirst).toHaveBeenCalledTimes(2);
     });
 });
 

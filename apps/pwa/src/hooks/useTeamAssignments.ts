@@ -69,11 +69,11 @@ export function useUpdateTeamAssignment() {
     const headers = useAuthHeaders();
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ id, role }: { id: string; role: TeamRole }) => {
+        mutationFn: async ({ id, ...changes }: { id: string; teamId?: string; role?: TeamRole }) => {
             const res = await fetch(`/api/team-assignments/${id}`, {
                 method: 'PUT',
                 headers,
-                body: JSON.stringify({ role }),
+                body: JSON.stringify(changes),
             });
             if (!res.ok) {
                 const body = await res.json();
