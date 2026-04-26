@@ -242,17 +242,26 @@ const options: swaggerJsdoc.Options = {
                         },
                     },
                 },
-                TeamAssignment: {
+                CreateTeamAssignmentRequest: {
                     type: 'object',
+                    required: ['teamId', 'memberId', 'role'],
                     properties: {
-                        id: { type: 'string', format: 'uuid' },
                         teamId: { type: 'string', format: 'uuid' },
                         memberId: { type: 'string', format: 'uuid' },
                         role: {
                             type: 'string',
                             enum: ['player', 'coach', 'assistant', 'sparring'],
                         },
-                        createdAt: { type: 'string', format: 'date-time' },
+                    },
+                },
+                UpdateTeamAssignmentRequest: {
+                    type: 'object',
+                    required: ['role'],
+                    properties: {
+                        role: {
+                            type: 'string',
+                            enum: ['player', 'coach', 'assistant', 'sparring'],
+                        },
                     },
                 },
                 TeamAssignmentRow: {
@@ -266,6 +275,7 @@ const options: swaggerJsdoc.Options = {
                             enum: ['player', 'coach', 'assistant', 'sparring'],
                         },
                         createdAt: { type: 'string', format: 'date-time' },
+                        updatedAt: { type: 'string', format: 'date-time' },
                         teamLabel: { type: 'string' },
                         teamGender: {
                             type: 'string',

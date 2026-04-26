@@ -4,7 +4,6 @@ import getRouter from './get.js';
 import createRouter from './create.js';
 import updateRouter from './update.js';
 import deleteRouter from './delete.js';
-import assignmentsRouter from './assignments.js';
 
 const router = Router();
 
@@ -13,7 +12,5 @@ router.use(getRouter);
 router.use(createRouter);
 router.use(updateRouter);
 router.use(deleteRouter);
-
-router.use('/:teamId/members', assignmentsRouter);
 
 export default router;

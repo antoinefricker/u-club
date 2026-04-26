@@ -11,10 +11,11 @@ const listQuerySchema = paginationQuerySchema
     .extend({
         userId: z.uuid({ error: 'userId must be a UUID' }).optional(),
         memberId: z.uuid({ error: 'memberId must be a UUID' }).optional(),
+        teamId: z.uuid({ error: 'teamId must be a UUID' }).optional(),
     })
-    .refine((data) => !(data.userId && data.memberId), {
-        message: 'userId and memberId are mutually exclusive',
-        path: ['memberId'],
+    .refine((data) => [data.userId, data.memberId, data.teamId].filter(Boolean).length <= 1, {
+        message: 'userId, memberId and teamId are mutually exclusive',
+        path: ['teamId'],
     });
 
 /**
@@ -33,13 +34,19 @@ const listQuerySchema = paginationQuerySchema
  *         schema:
  *           type: string
  *           format: uuid
- *         description: Filter by user ID — admin/manager only; ignored for regular users. Mutually exclusive with `memberId`.
+ *         description: Filter by user ID — admin/manager only; ignored for regular users. Mutually exclusive with `memberId` and `teamId`.
  *       - in: query
  *         name: memberId
  *         schema:
  *           type: string
  *           format: uuid
- *         description: Filter by member ID — admin/manager only; ignored for regular users. Mutually exclusive with `userId`.
+ *         description: Filter by member ID — admin/manager only; ignored for regular users. Mutually exclusive with `userId` and `teamId`.
+ *       - in: query
+ *         name: teamId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Filter by team ID — admin/manager only; ignored for regular users. Mutually exclusive with `userId` and `memberId`.
  *       - in: query
  *         name: page
  *         schema:
@@ -107,6 +114,7 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
             'teamAssignments.memberId',
             'teamAssignments.role',
             'teamAssignments.createdAt',
+            'teamAssignments.updatedAt',
             'teams.label as teamLabel',
             'teams.gender as teamGender',
             'teamCategories.label as teamCategoryLabel',
@@ -119,8 +127,10 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
         ]);
 
     if (isPrivileged) {
-        const { userId, memberId } = parsed.data;
-        if (memberId) {
+        const { userId, memberId, teamId } = parsed.data;
+        if (teamId) {
+            query.where('teamAssignments.teamId', teamId);
+        } else if (memberId) {
             query.where('teamAssignments.memberId', memberId);
         } else if (userId) {
             query.whereIn('teamAssignments.memberId', db('userMembers').select('memberId').where('userId', userId));

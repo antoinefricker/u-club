@@ -15,6 +15,7 @@ params:query {
   itemsPerPage: 25
   ~userId:
   ~memberId:
+  ~teamId:
 }
 
 auth:bearer {
@@ -25,12 +26,14 @@ docs {
   Optional query parameters:
   - page: integer, default 1, minimum 1
   - itemsPerPage: integer, default 25, range 1–100
-  - userId: UUID — admin/manager only; ignored for regular users (mutually exclusive with memberId)
-  - memberId: UUID — admin/manager only; ignored for regular users (mutually exclusive with userId)
+  - userId: UUID — admin/manager only; ignored for regular users
+  - memberId: UUID — admin/manager only; ignored for regular users
+  - teamId: UUID — admin/manager only; ignored for regular users
+  (userId / memberId / teamId are mutually exclusive)
 
   Authorization:
   - Regular users always see assignments scoped to members linked to them via userMembers.
-  - Admin/manager can list all assignments (optionally filtered by userId OR memberId).
+  - Admin/manager can list all assignments (optionally filtered by userId OR memberId OR teamId).
 
   Response envelope:
     { "data": [...], "pagination": { "page", "itemsPerPage", "totalItems", "totalPages" } }
