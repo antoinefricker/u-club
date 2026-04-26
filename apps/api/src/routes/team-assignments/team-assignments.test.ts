@@ -19,6 +19,7 @@ const mockOffset = vi.fn();
 const mockInsert = vi.fn().mockReturnThis();
 const mockReturning = vi.fn();
 const mockUpdate = vi.fn();
+const mockDel = vi.fn();
 
 vi.mock('../../db.js', () => {
     const db = Object.assign(
@@ -40,6 +41,7 @@ vi.mock('../../db.js', () => {
             insert: mockInsert,
             returning: mockReturning,
             update: mockUpdate,
+            del: mockDel,
         })),
         { raw: vi.fn() },
     );
@@ -513,5 +515,43 @@ describe('PUT /team-assignments/:id', () => {
             role: 'coach',
             updatedAt: expect.any(String),
         });
+    });
+});
+
+describe('DELETE /team-assignments/:id', () => {
+    const ASSIGNMENT_ID = 'ta-1';
+
+    it('returns 401 when unauthenticated', async () => {
+        const res = await request(app).delete(`/team-assignments/${ASSIGNMENT_ID}`);
+        expect(res.status).toBe(401);
+    });
+
+    it('returns 403 for a regular user', async () => {
+        const res = await request(app)
+            .delete(`/team-assignments/${ASSIGNMENT_ID}`)
+            .set('Authorization', `Bearer ${userToken}`);
+        expect(res.status).toBe(403);
+    });
+
+    it('returns 404 when assignment is not found', async () => {
+        mockDel.mockResolvedValueOnce(0);
+
+        const res = await request(app)
+            .delete(`/team-assignments/${ASSIGNMENT_ID}`)
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        expect(res.status).toBe(404);
+        expect(res.body).toHaveProperty('error', 'assignment not found');
+    });
+
+    it('returns 204 on happy path', async () => {
+        mockDel.mockResolvedValueOnce(1);
+
+        const res = await request(app)
+            .delete(`/team-assignments/${ASSIGNMENT_ID}`)
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        expect(res.status).toBe(204);
+        expect(mockWhere).toHaveBeenCalledWith({ id: ASSIGNMENT_ID });
     });
 });
