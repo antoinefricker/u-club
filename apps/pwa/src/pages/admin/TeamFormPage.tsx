@@ -10,6 +10,7 @@ import { TEAM_GENDER_OPTIONS, type TeamGender } from '../../types/Team';
 import { useClubs } from '../../hooks/useClubs';
 import { useTeamCategories } from '../../hooks/useTeamCategories';
 import { TeamMembers } from '../../components/admin/team/TeamMembers';
+import { AddTeamMemberButton } from '../../components/admin/team/AddTeamMemberButton';
 
 export function TeamFormPage() {
     const { id } = useParams<{ id: string }>();
@@ -173,6 +174,7 @@ export function TeamFormPage() {
                     <Title order={3} mt="xl" mb="md">
                         Team composition
                     </Title>
+                    <AddTeamMemberButton teamId={team.id} />
                     <TeamMembers teamId={team.id} />
                 </FormWrapper>
             )}
