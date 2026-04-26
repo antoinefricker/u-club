@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(gh pr *)",
+            "command": "jq -r '.tool_input.command' | grep -qE '^gh pr (create|edit) ' && echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"additionalContext\":\"Before creating/updating this PR: review the work in this branch and suggest any CLAUDE.md additions worth making (testing gotchas, project conventions, infrastructure quirks, recurring patterns). List candidates and ask which to include. Then proceed with the gh pr command.\"}}' || true"
+          }
+        ]
+      }
+    ]
+  }
+}
