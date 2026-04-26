@@ -11,7 +11,7 @@
 ### 2. Admin
 
 - [x] Add link to edition page on all resource label from list view
-- [ ] Member list
+- [x] Member list
   - [x] Fix search filter UI
   - [x] Show member team assignements
   - [x] Show user related members team assignements
@@ -19,8 +19,8 @@
   - [x] Show member relationships
   - [x] Edit/delete member relationships
   - [x] Send invite
-  - [ ] Show member pending invitations
-  - [ ] Show user pending invitations
+  - [x] Show member pending invitations
+  - [x] Show user pending invitations
 - [x] Create/Edit/Delete member statuses
 
 ### 3. User
