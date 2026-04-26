@@ -11,6 +11,7 @@ import { useMemberStatuses } from '../../hooks/useMemberStatuses';
 import { MEMBER_GENDER_OPTIONS, type MemberGender } from '../../types/Member';
 import { UserMemberLinks } from '../../components/admin/user/UserMemberLinks';
 import { UserTeamAssignments } from '../../components/admin/user/UserTeamAssignments';
+import { MemberPendingInvitations } from '../../components/admin/user/MemberPendingInvitations';
 import { InviteUserButton } from '../../components/admin/user/InviteUserButton';
 import { AssignToTeamButton } from '../../components/admin/user/AssignToTeamButton';
 
@@ -182,6 +183,14 @@ export function MemberFormPage() {
                         <AssignToTeamButton memberId={member.id} />
                     </Group>
                     <UserTeamAssignments memberId={member.id} editable />
+                </FormWrapper>
+            )}
+            {member?.id && (
+                <FormWrapper>
+                    <Title order={3} mt="xl" mb="md">
+                        Pending invitations
+                    </Title>
+                    <MemberPendingInvitations memberId={member.id} />
                 </FormWrapper>
             )}
         </>
