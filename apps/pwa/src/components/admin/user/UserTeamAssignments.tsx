@@ -59,12 +59,12 @@ export function UserTeamAssignments({ userId, memberId }: UserTeamAssignmentsPro
                                 </Text>
                             </Table.Td>
                             <Table.Td>
-                                <Text component="span" size="sm" fw={700}>
+                                <Text component="span" size="sm">
                                     {assignment.teamLabel}
                                 </Text>
                                 {subtitle && (
-                                    <Text component="span" size="sm" c="dimmed" pl="sm">
-                                        {subtitle}
+                                    <Text component="span" size="xs" c="dimmed">
+                                        &nbsp;/&nbsp;{subtitle}
                                     </Text>
                                 )}
                             </Table.Td>
