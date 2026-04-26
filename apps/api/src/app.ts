@@ -10,6 +10,7 @@ import teamCategoriesRouter from './routes/team-categories/index.js';
 import memberStatusesRouter from './routes/member-statuses/index.js';
 import membersRouter from './routes/members/index.js';
 import userMembersRouter from './routes/user-members/index.js';
+import teamAssignmentsRouter from './routes/team-assignments/index.js';
 import invitationsRouter from './routes/invitations/index.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
@@ -28,6 +29,7 @@ app.use('/team-categories', teamCategoriesRouter);
 app.use('/member-statuses', memberStatusesRouter);
 app.use('/members', membersRouter);
 app.use('/user-members', userMembersRouter);
+app.use('/team-assignments', teamAssignmentsRouter);
 app.use('/invitations', invitationsRouter);
 
 app.use(errorHandler);
