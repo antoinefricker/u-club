@@ -16,6 +16,8 @@ const mockCountDistinct = vi.fn().mockReturnThis();
 const mockFirst = vi.fn();
 const mockLimit = vi.fn().mockReturnThis();
 const mockOffset = vi.fn();
+const mockInsert = vi.fn().mockReturnThis();
+const mockReturning = vi.fn();
 
 vi.mock('../../db.js', () => {
     const db = Object.assign(
@@ -34,6 +36,8 @@ vi.mock('../../db.js', () => {
             first: mockFirst,
             limit: mockLimit,
             offset: mockOffset,
+            insert: mockInsert,
+            returning: mockReturning,
         })),
         { raw: vi.fn() },
     );
@@ -87,6 +91,7 @@ beforeEach(() => {
     mockCount.mockReturnThis();
     mockCountDistinct.mockReturnThis();
     mockLimit.mockReturnThis();
+    mockInsert.mockReturnThis();
 });
 
 describe('GET /team-assignments', () => {
@@ -324,6 +329,121 @@ describe('GET /team-assignments', () => {
                 totalItems: 0,
                 totalPages: 1,
             },
+        });
+    });
+});
+
+describe('POST /team-assignments', () => {
+    const validBody = {
+        teamId: TEAM_UUID,
+        memberId: MEMBER_UUID,
+        role: 'player',
+    };
+
+    it('returns 401 when unauthenticated', async () => {
+        const res = await request(app).post('/team-assignments').send(validBody);
+        expect(res.status).toBe(401);
+    });
+
+    it('returns 403 for a regular user', async () => {
+        const res = await request(app)
+            .post('/team-assignments')
+            .set('Authorization', `Bearer ${userToken}`)
+            .send(validBody);
+        expect(res.status).toBe(403);
+    });
+
+    it.each([
+        ['teamId', { memberId: MEMBER_UUID, role: 'player' }],
+        ['memberId', { teamId: TEAM_UUID, role: 'player' }],
+        ['role', { teamId: TEAM_UUID, memberId: MEMBER_UUID }],
+    ])('returns 400 when %s is missing', async (_field, body) => {
+        const res = await request(app)
+            .post('/team-assignments')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send(body);
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'validation error');
+    });
+
+    it('returns 400 for invalid role enum', async () => {
+        const res = await request(app)
+            .post('/team-assignments')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ ...validBody, role: 'captain' });
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'validation error');
+    });
+
+    it.each([
+        ['teamId', { ...validBody, teamId: 'not-a-uuid' }],
+        ['memberId', { ...validBody, memberId: 'not-a-uuid' }],
+    ])('returns 400 when %s is not a UUID', async (_field, body) => {
+        const res = await request(app)
+            .post('/team-assignments')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send(body);
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'validation error');
+    });
+
+    it('returns 404 when team is not found', async () => {
+        mockFirst.mockResolvedValueOnce(undefined); // teams lookup
+
+        const res = await request(app)
+            .post('/team-assignments')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send(validBody);
+
+        expect(res.status).toBe(404);
+        expect(res.body).toHaveProperty('error', 'team not found');
+    });
+
+    it('returns 404 when member is not found', async () => {
+        mockFirst.mockResolvedValueOnce({ id: TEAM_UUID }); // team exists
+        mockFirst.mockResolvedValueOnce(undefined); // members lookup
+
+        const res = await request(app)
+            .post('/team-assignments')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send(validBody);
+
+        expect(res.status).toBe(404);
+        expect(res.body).toHaveProperty('error', 'member not found');
+    });
+
+    it('returns 409 when (teamId, memberId) already exists', async () => {
+        mockFirst.mockResolvedValueOnce({ id: TEAM_UUID });
+        mockFirst.mockResolvedValueOnce({ id: MEMBER_UUID });
+        mockFirst.mockResolvedValueOnce({ id: 'ta-existing' });
+
+        const res = await request(app)
+            .post('/team-assignments')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send(validBody);
+
+        expect(res.status).toBe(409);
+        expect(res.body).toHaveProperty('error', 'member is already assigned to this team');
+    });
+
+    it('returns 201 with the enriched row on happy path', async () => {
+        mockFirst.mockResolvedValueOnce({ id: TEAM_UUID }); // team exists
+        mockFirst.mockResolvedValueOnce({ id: MEMBER_UUID }); // member exists
+        mockFirst.mockResolvedValueOnce(undefined); // not duplicate
+        mockReturning.mockResolvedValueOnce([{ id: 'ta-1' }]); // insert
+        mockFirst.mockResolvedValueOnce(sampleAssignmentRow); // enriched select
+
+        const res = await request(app)
+            .post('/team-assignments')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send(validBody);
+
+        expect(res.status).toBe(201);
+        expect(res.body).toEqual(sampleAssignmentRow);
+        expect(mockInsert).toHaveBeenCalledWith({
+            teamId: TEAM_UUID,
+            memberId: MEMBER_UUID,
+            role: 'player',
         });
     });
 });
