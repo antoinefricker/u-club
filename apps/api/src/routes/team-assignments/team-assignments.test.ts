@@ -56,6 +56,7 @@ const userToken = createTestToken('uuid-1', 'user@example.com', 'user');
 
 const USER_UUID_OTHER = '22222222-2222-2222-8222-222222222222';
 const MEMBER_UUID = '33333333-3333-3333-8333-333333333333';
+const TEAM_UUID = '44444444-4444-4444-8444-444444444444';
 
 const sampleAssignmentRow = {
     id: 'ta-1',
@@ -63,6 +64,7 @@ const sampleAssignmentRow = {
     memberId: 'member-1',
     role: 'player',
     createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
     teamLabel: 'Senior Men',
     teamGender: 'male',
     teamCategoryLabel: 'Senior',
@@ -98,17 +100,20 @@ describe('GET /team-assignments', () => {
         expect(res.status).toBe(401);
     });
 
-    it('returns 400 when userId and memberId are both provided', async () => {
-        const res = await request(app)
-            .get(`/team-assignments?userId=${USER_UUID_OTHER}&memberId=${MEMBER_UUID}`)
-            .set('Authorization', `Bearer ${adminToken}`);
+    it.each([
+        [`userId=${USER_UUID_OTHER}&memberId=${MEMBER_UUID}`],
+        [`userId=${USER_UUID_OTHER}&teamId=${TEAM_UUID}`],
+        [`memberId=${MEMBER_UUID}&teamId=${TEAM_UUID}`],
+        [`userId=${USER_UUID_OTHER}&memberId=${MEMBER_UUID}&teamId=${TEAM_UUID}`],
+    ])('returns 400 when filters are mixed (%s)', async (qs) => {
+        const res = await request(app).get(`/team-assignments?${qs}`).set('Authorization', `Bearer ${adminToken}`);
 
         expect(res.status).toBe(400);
         expect(res.body).toHaveProperty('error', 'validation error');
         expect(res.body.details).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
-                    message: 'userId and memberId are mutually exclusive',
+                    message: 'userId, memberId and teamId are mutually exclusive',
                 }),
             ]),
         );
@@ -126,6 +131,15 @@ describe('GET /team-assignments', () => {
     it('returns 400 when memberId is not a UUID', async () => {
         const res = await request(app)
             .get('/team-assignments?memberId=not-a-uuid')
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'validation error');
+    });
+
+    it('returns 400 when teamId is not a UUID', async () => {
+        const res = await request(app)
+            .get('/team-assignments?teamId=not-a-uuid')
             .set('Authorization', `Bearer ${adminToken}`);
 
         expect(res.status).toBe(400);
@@ -167,6 +181,30 @@ describe('GET /team-assignments', () => {
         expect(res.status).toBe(200);
         expect(mockWhere).toHaveBeenCalledWith('teamAssignments.memberId', MEMBER_UUID);
         expect(mockWhereIn).not.toHaveBeenCalled();
+    });
+
+    it('applies teamId filter when admin passes it', async () => {
+        mockList([sampleAssignmentRow], 1);
+
+        const res = await request(app)
+            .get(`/team-assignments?teamId=${TEAM_UUID}`)
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        expect(res.status).toBe(200);
+        expect(mockWhere).toHaveBeenCalledWith('teamAssignments.teamId', TEAM_UUID);
+        expect(mockWhereIn).not.toHaveBeenCalled();
+    });
+
+    it('ignores teamId query param for regular user (still scoped to self)', async () => {
+        mockList([sampleAssignmentRow], 1);
+
+        const res = await request(app)
+            .get(`/team-assignments?teamId=${TEAM_UUID}`)
+            .set('Authorization', `Bearer ${userToken}`);
+
+        expect(res.status).toBe(200);
+        expect(mockWhere).toHaveBeenCalledWith('userId', 'uuid-1');
+        expect(mockWhere).not.toHaveBeenCalledWith('teamAssignments.teamId', TEAM_UUID);
     });
 
     it('applies userId filter via userMembers subquery when admin passes it', async () => {
@@ -240,6 +278,7 @@ describe('GET /team-assignments', () => {
             'teamAssignments.memberId',
             'teamAssignments.role',
             'teamAssignments.createdAt',
+            'teamAssignments.updatedAt',
             'teams.label as teamLabel',
             'teams.gender as teamGender',
             'teamCategories.label as teamCategoryLabel',

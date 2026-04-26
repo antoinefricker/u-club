@@ -266,6 +266,7 @@ const options: swaggerJsdoc.Options = {
                             enum: ['player', 'coach', 'assistant', 'sparring'],
                         },
                         createdAt: { type: 'string', format: 'date-time' },
+                        updatedAt: { type: 'string', format: 'date-time' },
                         teamLabel: { type: 'string' },
                         teamGender: {
                             type: 'string',
