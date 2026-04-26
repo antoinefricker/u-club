@@ -18,6 +18,7 @@ const mockLimit = vi.fn().mockReturnThis();
 const mockOffset = vi.fn();
 const mockInsert = vi.fn().mockReturnThis();
 const mockReturning = vi.fn();
+const mockUpdate = vi.fn();
 
 vi.mock('../../db.js', () => {
     const db = Object.assign(
@@ -38,6 +39,7 @@ vi.mock('../../db.js', () => {
             offset: mockOffset,
             insert: mockInsert,
             returning: mockReturning,
+            update: mockUpdate,
         })),
         { raw: vi.fn() },
     );
@@ -444,6 +446,72 @@ describe('POST /team-assignments', () => {
             teamId: TEAM_UUID,
             memberId: MEMBER_UUID,
             role: 'player',
+        });
+    });
+});
+
+describe('PUT /team-assignments/:id', () => {
+    const ASSIGNMENT_ID = 'ta-1';
+
+    it('returns 401 when unauthenticated', async () => {
+        const res = await request(app).put(`/team-assignments/${ASSIGNMENT_ID}`).send({ role: 'coach' });
+        expect(res.status).toBe(401);
+    });
+
+    it('returns 403 for a regular user', async () => {
+        const res = await request(app)
+            .put(`/team-assignments/${ASSIGNMENT_ID}`)
+            .set('Authorization', `Bearer ${userToken}`)
+            .send({ role: 'coach' });
+        expect(res.status).toBe(403);
+    });
+
+    it('returns 400 when role is missing', async () => {
+        const res = await request(app)
+            .put(`/team-assignments/${ASSIGNMENT_ID}`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({});
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'validation error');
+    });
+
+    it('returns 400 for invalid role enum', async () => {
+        const res = await request(app)
+            .put(`/team-assignments/${ASSIGNMENT_ID}`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ role: 'captain' });
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('error', 'validation error');
+    });
+
+    it('returns 404 when the assignment is not found', async () => {
+        mockFirst.mockResolvedValueOnce(undefined);
+
+        const res = await request(app)
+            .put(`/team-assignments/${ASSIGNMENT_ID}`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ role: 'coach' });
+
+        expect(res.status).toBe(404);
+        expect(res.body).toHaveProperty('error', 'assignment not found');
+    });
+
+    it('returns 200 with the enriched row on happy path', async () => {
+        mockFirst.mockResolvedValueOnce({ id: ASSIGNMENT_ID }); // existence check
+        mockUpdate.mockResolvedValueOnce(1); // update returns rowcount
+        const updatedRow = { ...sampleAssignmentRow, role: 'coach', updatedAt: '2026-04-26T00:00:00.000Z' };
+        mockFirst.mockResolvedValueOnce(updatedRow); // enriched select
+
+        const res = await request(app)
+            .put(`/team-assignments/${ASSIGNMENT_ID}`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ role: 'coach' });
+
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual(updatedRow);
+        expect(mockUpdate).toHaveBeenCalledWith({
+            role: 'coach',
+            updatedAt: expect.any(String),
         });
     });
 });

@@ -254,6 +254,16 @@ const options: swaggerJsdoc.Options = {
                         },
                     },
                 },
+                UpdateTeamAssignmentRequest: {
+                    type: 'object',
+                    required: ['role'],
+                    properties: {
+                        role: {
+                            type: 'string',
+                            enum: ['player', 'coach', 'assistant', 'sparring'],
+                        },
+                    },
+                },
                 TeamAssignmentRow: {
                     type: 'object',
                     properties: {
