@@ -35,8 +35,8 @@ export function UserTeamAssignments({ userId, memberId }: UserTeamAssignmentsPro
             <Table.Thead>
                 <Table.Tr>
                     <Table.Th w={24}>#</Table.Th>
-                    <Table.Th>Team</Table.Th>
                     <Table.Th w={220}>Member</Table.Th>
+                    <Table.Th>Team</Table.Th>
                     <Table.Th w={140}>Role</Table.Th>
                 </Table.Tr>
             </Table.Thead>
@@ -54,20 +54,21 @@ export function UserTeamAssignments({ userId, memberId }: UserTeamAssignmentsPro
                                 </Text>
                             </Table.Td>
                             <Table.Td>
-                                <Text size="sm" fw={700}>
-                                    {assignment.teamLabel}
-                                </Text>
-                                {subtitle && (
-                                    <Text size="xs" c="dimmed" mt={-4}>
-                                        {subtitle}
-                                    </Text>
-                                )}
-                            </Table.Td>
-                            <Table.Td>
                                 <Text size="sm">
                                     {assignment.memberFirstName} {assignment.memberLastName}
                                 </Text>
                             </Table.Td>
+                            <Table.Td>
+                                <Text component="span" size="sm" fw={700}>
+                                    {assignment.teamLabel}
+                                </Text>
+                                {subtitle && (
+                                    <Text component="span" size="sm" c="dimmed" pl="sm">
+                                        {subtitle}
+                                    </Text>
+                                )}
+                            </Table.Td>
+
                             <Table.Td>
                                 <Text size="sm">{TEAM_ROLE_LABELS[assignment.role]}</Text>
                             </Table.Td>
