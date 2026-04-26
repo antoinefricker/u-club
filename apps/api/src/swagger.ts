@@ -242,19 +242,6 @@ const options: swaggerJsdoc.Options = {
                         },
                     },
                 },
-                TeamAssignment: {
-                    type: 'object',
-                    properties: {
-                        id: { type: 'string', format: 'uuid' },
-                        teamId: { type: 'string', format: 'uuid' },
-                        memberId: { type: 'string', format: 'uuid' },
-                        role: {
-                            type: 'string',
-                            enum: ['player', 'coach', 'assistant', 'sparring'],
-                        },
-                        createdAt: { type: 'string', format: 'date-time' },
-                    },
-                },
                 TeamAssignmentRow: {
                     type: 'object',
                     properties: {
