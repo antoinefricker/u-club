@@ -318,6 +318,10 @@ const options: swaggerJsdoc.Options = {
                             nullable: true,
                         },
                         createdAt: { type: 'string', format: 'date-time' },
+                        memberFirstName: { type: 'string' },
+                        memberLastName: { type: 'string' },
+                        invitedByDisplayName: { type: 'string' },
+                        invitedByEmail: { type: 'string', format: 'email' },
                     },
                 },
                 PaginationMeta: {

@@ -1,0 +1,36 @@
+meta {
+  name: List Pending Invitations
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/invitations?userId=&page=1&itemsPerPage=25
+  body: none
+  auth: bearer
+}
+
+params:query {
+  ~userId:
+  ~memberId:
+  page: 1
+  itemsPerPage: 25
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+docs {
+  Returns non-expired, non-accepted invitations matching the filter.
+
+  Query parameters (exactly one of `userId` / `memberId` is required):
+  - userId: UUID — pending invitations received by this user (matched by the user's email).
+    Regular users may only pass their own userId. Admin/manager: any uuid; 404 if user does not exist.
+  - memberId: UUID — pending invitations targeting this member. Admin/manager only.
+  - page: integer, default 1, minimum 1
+  - itemsPerPage: integer, default 25, range 1–100
+
+  Response envelope:
+    { "data": [...], "pagination": { "page", "itemsPerPage", "totalItems", "totalPages" } }
+}

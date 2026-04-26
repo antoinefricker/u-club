@@ -11,6 +11,7 @@ import { useMemberStatuses } from '../../hooks/useMemberStatuses';
 import { MEMBER_GENDER_OPTIONS, type MemberGender } from '../../types/Member';
 import { UserMemberLinks } from '../../components/admin/user/UserMemberLinks';
 import { UserTeamAssignments } from '../../components/admin/user/UserTeamAssignments';
+import { MemberPendingInvitations } from '../../components/admin/user/MemberPendingInvitations';
 import { InviteUserButton } from '../../components/admin/user/InviteUserButton';
 import { AssignToTeamButton } from '../../components/admin/user/AssignToTeamButton';
 
@@ -158,6 +159,17 @@ export function MemberFormPage() {
                     </Grid>
                 </form>
             </FormWrapper>
+            {member?.id && (
+                <FormWrapper>
+                    <Group justify="space-between" mt="xl" mb="md">
+                        <Title order={3} m={0}>
+                            Team assignments
+                        </Title>
+                        <AssignToTeamButton memberId={member.id} />
+                    </Group>
+                    <UserTeamAssignments memberId={member.id} editable />
+                </FormWrapper>
+            )}
             <FormWrapper>
                 <Group justify="space-between" mt="xl" mb="md">
                     <Title order={3} m={0}>
@@ -175,13 +187,10 @@ export function MemberFormPage() {
             </FormWrapper>
             {member?.id && (
                 <FormWrapper>
-                    <Group justify="space-between" mt="xl" mb="md">
-                        <Title order={3} m={0}>
-                            Team assignments
-                        </Title>
-                        <AssignToTeamButton memberId={member.id} />
-                    </Group>
-                    <UserTeamAssignments memberId={member.id} editable />
+                    <Title order={3} mt="xl" mb="md">
+                        Pending invitations
+                    </Title>
+                    <MemberPendingInvitations memberId={member.id} />
                 </FormWrapper>
             )}
         </>
