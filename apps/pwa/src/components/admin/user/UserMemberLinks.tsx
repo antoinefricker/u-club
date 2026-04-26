@@ -158,7 +158,7 @@ export function UserMemberLinks({ userId, useUserPointOfView, memberId }: UserMe
                         <Table.Th w={24}>#</Table.Th>
                         <Table.Th w={260}>{mode === 'member' ? 'User' : 'Member'}</Table.Th>
                         <Table.Th>Type</Table.Th>
-                        <Table.Th w={100} />
+                        <Table.Th w={110} />
                     </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
@@ -206,7 +206,7 @@ export function UserMemberLinks({ userId, useUserPointOfView, memberId }: UserMe
                                                 <ActionIcon
                                                     color="primary"
                                                     variant="subtle"
-                                                    size="md"
+                                                    size="sm"
                                                     aria-label={`Edit your link with ${relationshipName}`}
                                                     onClick={() => handleEdit(rel)}
                                                     loading={updateMutation.isPending}
@@ -231,7 +231,7 @@ export function UserMemberLinks({ userId, useUserPointOfView, memberId }: UserMe
                                                                 lastName: rel.memberLastName,
                                                             })
                                                         }
-                                                        size="lg"
+                                                        size="sm"
                                                     >
                                                         <IconUserPlus />
                                                     </ActionIcon>
@@ -245,7 +245,7 @@ export function UserMemberLinks({ userId, useUserPointOfView, memberId }: UserMe
                                                 <ActionIcon
                                                     color="red"
                                                     variant="subtle"
-                                                    size="md"
+                                                    size="sm"
                                                     aria-label={`Delete your link with ${relationshipName}`}
                                                     onClick={() => handleDelete(rel.id)}
                                                     loading={deleteMutation.isPending}
@@ -316,7 +316,7 @@ export function UserMemberLinks({ userId, useUserPointOfView, memberId }: UserMe
                                                 <ActionIcon
                                                     color="primary"
                                                     variant="subtle"
-                                                    size="md"
+                                                    size="sm"
                                                     onClick={() => handleCancel(rel)}
                                                 >
                                                     <IconX />
@@ -324,7 +324,7 @@ export function UserMemberLinks({ userId, useUserPointOfView, memberId }: UserMe
                                                 <ActionIcon
                                                     color="green"
                                                     variant="subtle"
-                                                    size="md"
+                                                    size="sm"
                                                     onClick={() => handleSave(rel.id)}
                                                     loading={updateMutation.isPending}
                                                     disabled={!dirty}

@@ -255,6 +255,27 @@ const options: swaggerJsdoc.Options = {
                         createdAt: { type: 'string', format: 'date-time' },
                     },
                 },
+                TeamAssignmentRow: {
+                    type: 'object',
+                    properties: {
+                        id: { type: 'string', format: 'uuid' },
+                        teamId: { type: 'string', format: 'uuid' },
+                        memberId: { type: 'string', format: 'uuid' },
+                        role: {
+                            type: 'string',
+                            enum: ['player', 'coach', 'assistant', 'sparring'],
+                        },
+                        createdAt: { type: 'string', format: 'date-time' },
+                        teamLabel: { type: 'string' },
+                        teamGender: {
+                            type: 'string',
+                            enum: ['male', 'female', 'mixed'],
+                        },
+                        teamCategoryLabel: { type: 'string', nullable: true },
+                        memberFirstName: { type: 'string' },
+                        memberLastName: { type: 'string' },
+                    },
+                },
                 UserMember: {
                     type: 'object',
                     properties: {
