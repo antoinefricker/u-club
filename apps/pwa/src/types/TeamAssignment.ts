@@ -11,6 +11,7 @@ export interface TeamAssignment {
     memberLastName: string;
     role: TeamRole;
     createdAt: string;
+    updatedAt: string;
 }
 
 export const TEAM_ROLE_LABELS: Record<TeamRole, string> = {
@@ -19,3 +20,10 @@ export const TEAM_ROLE_LABELS: Record<TeamRole, string> = {
     assistant: 'Assistant',
     sparring: 'Sparring',
 };
+
+export const TEAM_ROLE_OPTIONS: { value: TeamRole; label: string }[] = (
+    Object.keys(TEAM_ROLE_LABELS) as TeamRole[]
+).map((value) => ({
+    value,
+    label: TEAM_ROLE_LABELS[value],
+}));
