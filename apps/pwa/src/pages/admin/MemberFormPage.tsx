@@ -181,7 +181,7 @@ export function MemberFormPage() {
                         </Title>
                         <AssignToTeamButton memberId={member.id} />
                     </Group>
-                    <UserTeamAssignments memberId={member.id} />
+                    <UserTeamAssignments memberId={member.id} editable />
                 </FormWrapper>
             )}
         </>
