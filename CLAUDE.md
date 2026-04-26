@@ -12,6 +12,7 @@
 - Do not add co-author lines to commits.
 - Always propose the commit message and wait for user approval before committing.
 - When implementing a plan from `documentation/plans/`, split the work into one commit per top-level section of the plan (e.g. a separate commit for the API change, the API tests, the PWA hook, the PWA view, etc.) rather than bundling everything into one commit.
+- Commit the plan file (and the `index.md` entry) as `docs: add plan NNN — Title` BEFORE the implementation commits, so the plan is visible to anyone bisecting the branch.
 
 ## Code Quality
 
@@ -35,6 +36,15 @@ When creating or editing an API route, always follow this workflow:
 - Response envelope: `{ data, pagination: { page, itemsPerPage, totalItems, totalPages } }`. Never return a bare array.
 - Must apply a deterministic `ORDER BY` (default `id ASC`) — offset pagination without stable ordering is incorrect.
 - Use the shared helpers (`paginationQuerySchema` in `apps/api/src/schemas/pagination.ts` and `applyPagination` / `buildPaginationMeta` in `apps/api/src/utils/pagination.ts`) rather than reimplementing pagination inline.
+
+## Testing
+
+### Mock isolation in vitest
+
+The repo's API test files mock `db()` at module scope and rely on `beforeEach` to reset state. Two pitfalls:
+
+- **Prefer `vi.resetAllMocks()` for new test files** — it clears call history *and* the `mockResolvedValueOnce` queue, so leftover values can't bleed into the next test. Reserve the `vi.clearAllMocks()` + per-mock `mockReset()` workaround only for files that already use `clearAllMocks` and where switching wholesale would break unrelated tests; in that case `mockReset()` the mocks used with `mockResolvedValueOnce` (typically `mockFirst`, `mockOffset`, `mockReturning`, `mockDel`).
+- Test JWT subjects must be valid UUIDs whenever the route validates the corresponding param with `z.uuid()`. Use real UUIDs (e.g. `'11111111-1111-1111-8111-111111111111'`) for `createTestToken`, not fake strings like `'uuid-1'`.
 
 ## Database
 
@@ -70,6 +80,13 @@ When creating or refactoring a React context, follow the `AuthContextProvider` /
 ### Domain types
 
 - Domain/resource types (server entities like `Team`, `Club`, `Member`, `TeamGender`, …) live in `apps/pwa/src/types/`, one file per entity named after the type (e.g. `types/Team.ts`). Do not define them inline in hooks.
+
+### React 19 strict effects
+
+ESLint's `react-hooks/set-state-in-effect` forbids `useState` setters inside `useEffect`. The "reset modal state on close" pattern (`useEffect(() => { if (!opened) reset(); }, [opened])`) trips it. Two valid fixes:
+
+- **Conditionally render the modal from the parent** (`{opened && <Modal onClose={…} />}`) so each open mounts a fresh component instance. Simplest, but loses Mantine's exit animation since the component unmounts immediately.
+- **Keep the modal always rendered** with a `key` prop that changes on each open (e.g. `key={openCount}` where the parent increments `openCount` on every open). Each open swaps the key and remounts the children while preserving the wrapper's open/close transition.
 
 ## Pull Requests
 
