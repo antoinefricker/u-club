@@ -159,6 +159,17 @@ export function MemberFormPage() {
                     </Grid>
                 </form>
             </FormWrapper>
+            {member?.id && (
+                <FormWrapper>
+                    <Group justify="space-between" mt="xl" mb="md">
+                        <Title order={3} m={0}>
+                            Team assignments
+                        </Title>
+                        <AssignToTeamButton memberId={member.id} />
+                    </Group>
+                    <UserTeamAssignments memberId={member.id} editable />
+                </FormWrapper>
+            )}
             <FormWrapper>
                 <Group justify="space-between" mt="xl" mb="md">
                     <Title order={3} m={0}>
@@ -174,17 +185,6 @@ export function MemberFormPage() {
                 </Group>
                 <UserMemberLinks memberId={member?.id} useUserPointOfView={false} />
             </FormWrapper>
-            {member?.id && (
-                <FormWrapper>
-                    <Group justify="space-between" mt="xl" mb="md">
-                        <Title order={3} m={0}>
-                            Team assignments
-                        </Title>
-                        <AssignToTeamButton memberId={member.id} />
-                    </Group>
-                    <UserTeamAssignments memberId={member.id} editable />
-                </FormWrapper>
-            )}
             {member?.id && (
                 <FormWrapper>
                     <Title order={3} mt="xl" mb="md">
