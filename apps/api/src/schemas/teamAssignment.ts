@@ -9,12 +9,3 @@ export const createTeamAssignmentSchema = z.object({
     memberId: z.uuid({ error: 'memberId must be a UUID' }),
     role: teamRoleSchema,
 });
-
-export const updateTeamAssignmentSchema = z
-    .object({
-        teamId: z.uuid({ error: 'teamId must be a UUID' }).optional(),
-        role: teamRoleSchema.optional(),
-    })
-    .refine((data) => data.teamId !== undefined || data.role !== undefined, {
-        message: 'at least one of teamId or role is required',
-    });

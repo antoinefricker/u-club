@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Alert, Button, Group, Modal, Select } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { useCreateTeamAssignment } from '../../../hooks/useTeamAssignments';
+import { useCreateTeamAssignment, useTeamAssignments } from '../../../hooks/useTeamAssignments';
 import { useMembers } from '../../../hooks/useMembers';
 import { TEAM_ROLE_OPTIONS, type TeamRole } from '../../../types/TeamAssignment';
 
@@ -20,6 +20,7 @@ export function AddTeamMemberModal({ teamId, onClose }: AddTeamMemberModalProps)
         search: memberSearch || undefined,
         itemsPerPage: 50,
     });
+    const { data: teamAssignmentsData } = useTeamAssignments({ teamId, itemsPerPage: 100 });
     const createAssignment = useCreateTeamAssignment();
 
     const memberOptions =
@@ -28,11 +29,20 @@ export function AddTeamMemberModal({ teamId, onClose }: AddTeamMemberModalProps)
             label: `${m.firstName} ${m.lastName}`,
         })) ?? [];
 
+    const heldRoles = useMemo(() => {
+        if (!memberId || !teamAssignmentsData) return new Set<TeamRole>();
+        return new Set(teamAssignmentsData.data.filter((a) => a.memberId === memberId).map((a) => a.role));
+    }, [memberId, teamAssignmentsData]);
+
+    const availableRoleOptions = TEAM_ROLE_OPTIONS.filter((opt) => !heldRoles.has(opt.value));
+    const allRolesHeld = !!memberId && availableRoleOptions.length === 0;
+    const effectiveRole = role && !heldRoles.has(role) ? role : null;
+
     const handleSubmit = () => {
-        if (!memberId || !role) return;
+        if (!memberId || !effectiveRole) return;
         setError(null);
         createAssignment.mutate(
-            { teamId, memberId, role },
+            { teamId, memberId, role: effectiveRole },
             {
                 onSuccess: () => {
                     notifications.show({
@@ -49,7 +59,7 @@ export function AddTeamMemberModal({ teamId, onClose }: AddTeamMemberModalProps)
         );
     };
 
-    const submitDisabled = !memberId || !role || createAssignment.isPending;
+    const submitDisabled = !memberId || !effectiveRole || createAssignment.isPending;
 
     return (
         <Modal opened onClose={onClose} title="Add member to team" centered>
@@ -73,10 +83,11 @@ export function AddTeamMemberModal({ teamId, onClose }: AddTeamMemberModalProps)
             />
             <Select
                 label="Role"
-                placeholder="Select a role"
-                data={TEAM_ROLE_OPTIONS}
-                value={role}
+                placeholder={allRolesHeld ? 'Member already holds every role' : 'Select a role'}
+                data={availableRoleOptions}
+                value={effectiveRole}
                 onChange={(v) => setRole(v as TeamRole | null)}
+                disabled={allRolesHeld}
                 mb="md"
             />
             <Group justify="flex-end" mt="md">

@@ -419,7 +419,7 @@ describe('POST /team-assignments', () => {
         expect(res.body).toHaveProperty('error', 'member not found');
     });
 
-    it('returns 409 when (teamId, memberId) already exists', async () => {
+    it('returns 409 when (teamId, memberId, role) already exists', async () => {
         mockFirst.mockResolvedValueOnce({ id: TEAM_UUID });
         mockFirst.mockResolvedValueOnce({ id: MEMBER_UUID });
         mockFirst.mockResolvedValueOnce({ id: 'ta-existing' });
@@ -430,7 +430,7 @@ describe('POST /team-assignments', () => {
             .send(validBody);
 
         expect(res.status).toBe(409);
-        expect(res.body).toHaveProperty('error', 'member is already assigned to this team');
+        expect(res.body).toHaveProperty('error', 'member already has this role on this team');
     });
 
     it('returns 201 with the enriched row on happy path', async () => {
@@ -453,178 +453,27 @@ describe('POST /team-assignments', () => {
             role: 'player',
         });
     });
-});
 
-describe('PUT /team-assignments/:id', () => {
-    const ASSIGNMENT_ID = 'ta-1';
-    const CURRENT_TEAM_ID = '55555555-5555-5555-8555-555555555555';
-    const NEW_TEAM_ID = '66666666-6666-6666-8666-666666666666';
-    const existingAssignment = {
-        id: ASSIGNMENT_ID,
-        teamId: CURRENT_TEAM_ID,
-        memberId: MEMBER_UUID,
-    };
+    it('returns 201 when the member already holds a different role on the same team', async () => {
+        mockFirst.mockResolvedValueOnce({ id: TEAM_UUID }); // team exists
+        mockFirst.mockResolvedValueOnce({ id: MEMBER_UUID }); // member exists
+        mockFirst.mockResolvedValueOnce(undefined); // no row at this (team, member, role)
+        mockReturning.mockResolvedValueOnce([{ id: 'ta-2' }]); // insert
+        const coachRow = { ...sampleAssignmentRow, id: 'ta-2', role: 'coach' };
+        mockFirst.mockResolvedValueOnce(coachRow); // enriched select
 
-    it('returns 401 when unauthenticated', async () => {
-        const res = await request(app).put(`/team-assignments/${ASSIGNMENT_ID}`).send({ role: 'coach' });
-        expect(res.status).toBe(401);
-    });
-
-    it('returns 403 for a regular user', async () => {
         const res = await request(app)
-            .put(`/team-assignments/${ASSIGNMENT_ID}`)
-            .set('Authorization', `Bearer ${userToken}`)
-            .send({ role: 'coach' });
-        expect(res.status).toBe(403);
-    });
-
-    it('returns 400 when both teamId and role are missing', async () => {
-        const res = await request(app)
-            .put(`/team-assignments/${ASSIGNMENT_ID}`)
+            .post('/team-assignments')
             .set('Authorization', `Bearer ${adminToken}`)
-            .send({});
-        expect(res.status).toBe(400);
-        expect(res.body).toHaveProperty('error', 'validation error');
-        expect(res.body.details).toEqual(
-            expect.arrayContaining([
-                expect.objectContaining({
-                    message: 'at least one of teamId or role is required',
-                }),
-            ]),
-        );
-    });
+            .send({ ...validBody, role: 'coach' });
 
-    it('returns 400 for invalid role enum', async () => {
-        const res = await request(app)
-            .put(`/team-assignments/${ASSIGNMENT_ID}`)
-            .set('Authorization', `Bearer ${adminToken}`)
-            .send({ role: 'captain' });
-        expect(res.status).toBe(400);
-        expect(res.body).toHaveProperty('error', 'validation error');
-    });
-
-    it('returns 400 when teamId is not a UUID', async () => {
-        const res = await request(app)
-            .put(`/team-assignments/${ASSIGNMENT_ID}`)
-            .set('Authorization', `Bearer ${adminToken}`)
-            .send({ teamId: 'not-a-uuid' });
-        expect(res.status).toBe(400);
-        expect(res.body).toHaveProperty('error', 'validation error');
-    });
-
-    it('returns 404 when the assignment is not found', async () => {
-        mockFirst.mockResolvedValueOnce(undefined);
-
-        const res = await request(app)
-            .put(`/team-assignments/${ASSIGNMENT_ID}`)
-            .set('Authorization', `Bearer ${adminToken}`)
-            .send({ role: 'coach' });
-
-        expect(res.status).toBe(404);
-        expect(res.body).toHaveProperty('error', 'assignment not found');
-    });
-
-    it('returns 404 when the new teamId does not exist', async () => {
-        mockFirst.mockResolvedValueOnce(existingAssignment); // existing assignment
-        mockFirst.mockResolvedValueOnce(undefined); // new team lookup
-
-        const res = await request(app)
-            .put(`/team-assignments/${ASSIGNMENT_ID}`)
-            .set('Authorization', `Bearer ${adminToken}`)
-            .send({ teamId: NEW_TEAM_ID });
-
-        expect(res.status).toBe(404);
-        expect(res.body).toHaveProperty('error', 'team not found');
-    });
-
-    it('returns 409 when member is already on the new team', async () => {
-        mockFirst.mockResolvedValueOnce(existingAssignment); // existing assignment
-        mockFirst.mockResolvedValueOnce({ id: NEW_TEAM_ID }); // new team exists
-        mockFirst.mockResolvedValueOnce({ id: 'other-assignment' }); // conflict check finds dup
-
-        const res = await request(app)
-            .put(`/team-assignments/${ASSIGNMENT_ID}`)
-            .set('Authorization', `Bearer ${adminToken}`)
-            .send({ teamId: NEW_TEAM_ID });
-
-        expect(res.status).toBe(409);
-        expect(res.body).toHaveProperty('error', 'member is already assigned to this team');
-    });
-
-    it('returns 200 and updates only role on happy path (role only)', async () => {
-        mockFirst.mockResolvedValueOnce(existingAssignment);
-        mockUpdate.mockResolvedValueOnce(1);
-        const updatedRow = { ...sampleAssignmentRow, role: 'coach', updatedAt: '2026-04-26T00:00:00.000Z' };
-        mockFirst.mockResolvedValueOnce(updatedRow);
-
-        const res = await request(app)
-            .put(`/team-assignments/${ASSIGNMENT_ID}`)
-            .set('Authorization', `Bearer ${adminToken}`)
-            .send({ role: 'coach' });
-
-        expect(res.status).toBe(200);
-        expect(res.body).toEqual(updatedRow);
-        expect(mockUpdate).toHaveBeenCalledWith({
+        expect(res.status).toBe(201);
+        expect(res.body).toEqual(coachRow);
+        expect(mockInsert).toHaveBeenCalledWith({
+            teamId: TEAM_UUID,
+            memberId: MEMBER_UUID,
             role: 'coach',
-            updatedAt: expect.any(String),
         });
-    });
-
-    it('returns 200 and updates only teamId on happy path (team only)', async () => {
-        mockFirst.mockResolvedValueOnce(existingAssignment);
-        mockFirst.mockResolvedValueOnce({ id: NEW_TEAM_ID }); // new team exists
-        mockFirst.mockResolvedValueOnce(undefined); // no conflict
-        mockUpdate.mockResolvedValueOnce(1);
-        const updatedRow = { ...sampleAssignmentRow, teamId: NEW_TEAM_ID };
-        mockFirst.mockResolvedValueOnce(updatedRow);
-
-        const res = await request(app)
-            .put(`/team-assignments/${ASSIGNMENT_ID}`)
-            .set('Authorization', `Bearer ${adminToken}`)
-            .send({ teamId: NEW_TEAM_ID });
-
-        expect(res.status).toBe(200);
-        expect(mockUpdate).toHaveBeenCalledWith({
-            teamId: NEW_TEAM_ID,
-            updatedAt: expect.any(String),
-        });
-    });
-
-    it('returns 200 and updates both fields when provided', async () => {
-        mockFirst.mockResolvedValueOnce(existingAssignment);
-        mockFirst.mockResolvedValueOnce({ id: NEW_TEAM_ID });
-        mockFirst.mockResolvedValueOnce(undefined); // no conflict
-        mockUpdate.mockResolvedValueOnce(1);
-        const updatedRow = { ...sampleAssignmentRow, teamId: NEW_TEAM_ID, role: 'coach' };
-        mockFirst.mockResolvedValueOnce(updatedRow);
-
-        const res = await request(app)
-            .put(`/team-assignments/${ASSIGNMENT_ID}`)
-            .set('Authorization', `Bearer ${adminToken}`)
-            .send({ teamId: NEW_TEAM_ID, role: 'coach' });
-
-        expect(res.status).toBe(200);
-        expect(mockUpdate).toHaveBeenCalledWith({
-            teamId: NEW_TEAM_ID,
-            role: 'coach',
-            updatedAt: expect.any(String),
-        });
-    });
-
-    it('skips team-existence/conflict checks when teamId equals current teamId', async () => {
-        mockFirst.mockResolvedValueOnce(existingAssignment);
-        mockUpdate.mockResolvedValueOnce(1);
-        const updatedRow = { ...sampleAssignmentRow, role: 'coach' };
-        mockFirst.mockResolvedValueOnce(updatedRow);
-
-        const res = await request(app)
-            .put(`/team-assignments/${ASSIGNMENT_ID}`)
-            .set('Authorization', `Bearer ${adminToken}`)
-            .send({ teamId: CURRENT_TEAM_ID, role: 'coach' });
-
-        expect(res.status).toBe(200);
-        // mockFirst was called only twice: existence + final enriched select
-        expect(mockFirst).toHaveBeenCalledTimes(2);
     });
 });
 

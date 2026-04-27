@@ -254,17 +254,6 @@ const options: swaggerJsdoc.Options = {
                         },
                     },
                 },
-                UpdateTeamAssignmentRequest: {
-                    type: 'object',
-                    description: 'At least one of `teamId` or `role` is required.',
-                    properties: {
-                        teamId: { type: 'string', format: 'uuid' },
-                        role: {
-                            type: 'string',
-                            enum: ['player', 'coach', 'assistant', 'sparring'],
-                        },
-                    },
-                },
                 TeamAssignmentRow: {
                     type: 'object',
                     properties: {
