@@ -27,7 +27,7 @@
 
 ### Miscellaneous
 
-- [ ] Grid last cell bug
+- [x] Grid last cell bug
       Update mantine to 9.x version
 - [ ] Extract mantine theme from `app.tsx`
 - [ ] Allow multiple roles in team assignments
