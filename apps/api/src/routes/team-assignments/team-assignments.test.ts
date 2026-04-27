@@ -419,7 +419,7 @@ describe('POST /team-assignments', () => {
         expect(res.body).toHaveProperty('error', 'member not found');
     });
 
-    it('returns 409 when (teamId, memberId) already exists', async () => {
+    it('returns 409 when (teamId, memberId, role) already exists', async () => {
         mockFirst.mockResolvedValueOnce({ id: TEAM_UUID });
         mockFirst.mockResolvedValueOnce({ id: MEMBER_UUID });
         mockFirst.mockResolvedValueOnce({ id: 'ta-existing' });
@@ -430,7 +430,7 @@ describe('POST /team-assignments', () => {
             .send(validBody);
 
         expect(res.status).toBe(409);
-        expect(res.body).toHaveProperty('error', 'member is already assigned to this team');
+        expect(res.body).toHaveProperty('error', 'member already has this role on this team');
     });
 
     it('returns 201 with the enriched row on happy path', async () => {

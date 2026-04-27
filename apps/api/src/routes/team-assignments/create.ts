@@ -45,7 +45,7 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  *       409:
- *         description: Member is already assigned to this team
+ *         description: Member already has this role on this team
  *         content:
  *           application/json:
  *             schema:
@@ -71,9 +71,9 @@ router.post(
             return;
         }
 
-        const existing = await db('teamAssignments').where({ teamId, memberId }).first('id');
+        const existing = await db('teamAssignments').where({ teamId, memberId, role }).first('id');
         if (existing) {
-            res.status(409).json({ error: 'member is already assigned to this team' });
+            res.status(409).json({ error: 'member already has this role on this team' });
             return;
         }
 
