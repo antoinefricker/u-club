@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { ActionIcon, Alert, Group, Loader, Select, Table, Text, Tooltip, useMantineTheme } from '@mantine/core';
+import { ActionIcon, Alert, Anchor, Group, Loader, Select, Table, Text, Tooltip, useMantineTheme } from '@mantine/core';
 import { IconCheck, IconEdit, IconTrash, IconX } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
+import { Link } from 'react-router';
 import {
     useTeamAssignments,
     useUpdateTeamAssignment,
@@ -109,9 +110,15 @@ export function TeamMembers({ teamId }: TeamMembersProps) {
                                 </Text>
                             </Table.Td>
                             <Table.Td>
-                                <Text size="sm" fw={700}>
+                                <Anchor
+                                    component={Link}
+                                    to={`/admin/members/${assignment.memberId}`}
+                                    c="inherit"
+                                    underline="hover"
+                                    size="sm"
+                                >
                                     {memberName}
-                                </Text>
+                                </Anchor>
                             </Table.Td>
                             <Table.Td>
                                 {isEditing ? (
