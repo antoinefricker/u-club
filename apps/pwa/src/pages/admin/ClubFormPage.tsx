@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
-import { Button, Grid, Group, Loader, TextInput, Textarea } from '@mantine/core';
+import { Button, Grid, Loader, TextInput, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useNavigate, useParams } from 'react-router';
+import { AdminSection } from '../../components/admin/AdminSection';
 import { FormWrapper } from '../../components/admin/forms/FormWrapper';
 import { PageTitle } from '../../components/layout/PageTitle';
 import { useClub, useCreateClub, useUpdateClub } from '../../hooks/useClubs';
@@ -80,31 +81,48 @@ export function ClubFormPage() {
             <PageTitle label={isEdit ? 'Edit club' : 'New club'} />
             <FormWrapper>
                 <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
-                    <Grid gutter="md">
-                        <Grid.Col span={{ base: 12, sm: 6 }}>
-                            <TextInput label="Name" placeholder="Club name" required {...form.getInputProps('name')} />
-                        </Grid.Col>
-                        <Grid.Col span={{ base: 12, sm: 6 }}>
-                            <TextInput label="Code" placeholder="Club code" required {...form.getInputProps('code')} />
-                        </Grid.Col>
-                        <Grid.Col span={12}>
-                            <Textarea
-                                label="Description"
-                                placeholder="Optional description"
-                                {...form.getInputProps('description')}
-                            />
-                        </Grid.Col>
-                        <Grid.Col span={12}>
-                            <Group style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                <Button variant="subtle" onClick={() => navigate('/admin/clubs')}>
-                                    Cancel
-                                </Button>
-                                <Button type="submit" loading={createClub.isPending || updateClub.isPending}>
-                                    {isEdit ? 'Save' : 'Create'}
-                                </Button>
-                            </Group>
-                        </Grid.Col>
-                    </Grid>
+                    <AdminSection
+                        title="Club details"
+                        actionButtons={[
+                            <Button
+                                key="cancel"
+                                variant="subtle"
+                                color="white"
+                                onClick={() => navigate('/admin/clubs')}
+                            >
+                                Cancel
+                            </Button>,
+                            <Button key="submit" type="submit" loading={createClub.isPending || updateClub.isPending}>
+                                {isEdit ? 'Save' : 'Create'}
+                            </Button>,
+                        ]}
+                    >
+                        <Grid gutter="md">
+                            <Grid.Col span={{ base: 12, sm: 6 }}>
+                                <TextInput
+                                    label="Name"
+                                    placeholder="Club name"
+                                    required
+                                    {...form.getInputProps('name')}
+                                />
+                            </Grid.Col>
+                            <Grid.Col span={{ base: 12, sm: 6 }}>
+                                <TextInput
+                                    label="Code"
+                                    placeholder="Club code"
+                                    required
+                                    {...form.getInputProps('code')}
+                                />
+                            </Grid.Col>
+                            <Grid.Col span={12}>
+                                <Textarea
+                                    label="Description"
+                                    placeholder="Optional description"
+                                    {...form.getInputProps('description')}
+                                />
+                            </Grid.Col>
+                        </Grid>
+                    </AdminSection>
                 </form>
             </FormWrapper>
         </>

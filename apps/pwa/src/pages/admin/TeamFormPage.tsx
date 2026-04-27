@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
-import { Button, Grid, Group, Loader, Select, TextInput, Textarea, Title } from '@mantine/core';
+import { Button, Grid, Loader, Select, TextInput, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useNavigate, useParams } from 'react-router';
+import { AdminSection } from '../../components/admin/AdminSection';
 import { FormWrapper } from '../../components/admin/forms/FormWrapper';
 import { PageTitle } from '../../components/layout/PageTitle';
 import { useTeam, useCreateTeam, useUpdateTeam } from '../../hooks/useTeams';
@@ -108,76 +109,82 @@ export function TeamFormPage() {
 
             <FormWrapper>
                 <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
-                    <Grid gutter="md">
-                        <Grid.Col span={{ base: 12, sm: 6 }}>
-                            <TextInput
-                                label="Label"
-                                placeholder="Team label"
-                                required
-                                {...form.getInputProps('label')}
-                            />
-                        </Grid.Col>
-                        <Grid.Col span={{ base: 12, sm: 6 }}>
-                            <Select
-                                label="Club"
-                                placeholder="Select a club"
-                                data={clubOptions}
-                                required
-                                {...form.getInputProps('clubId')}
-                                onChange={(value) => {
-                                    form.setFieldValue('clubId', value ?? '');
-                                    form.setFieldValue('categoryId', '');
-                                }}
-                            />
-                        </Grid.Col>
-                        <Grid.Col span={{ base: 12, sm: 6 }}>
-                            <Select
-                                label="Category"
-                                placeholder={form.values.clubId ? 'No category' : 'Pick a club first'}
-                                data={categoryOptions}
-                                clearable
-                                disabled={!form.values.clubId}
-                                {...form.getInputProps('categoryId')}
-                            />
-                        </Grid.Col>
-                        <Grid.Col span={{ base: 12, sm: 6 }}>
-                            <Select
-                                label="Gender"
-                                placeholder="Select gender"
-                                data={TEAM_GENDER_OPTIONS}
-                                required
-                                {...form.getInputProps('gender')}
-                            />
-                        </Grid.Col>
-                        <Grid.Col span={12}>
-                            <Textarea
-                                label="Description"
-                                placeholder="Optional description"
-                                {...form.getInputProps('description')}
-                            />
-                        </Grid.Col>
-                        <Grid.Col span={12}>
-                            <Group style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                <Button variant="subtle" onClick={() => navigate('/admin/teams')}>
-                                    Cancel
-                                </Button>
-                                <Button type="submit" loading={createTeam.isPending || updateTeam.isPending}>
-                                    {isEdit ? 'Save' : 'Create'}
-                                </Button>
-                            </Group>
-                        </Grid.Col>
-                    </Grid>
+                    <AdminSection
+                        title="Team details"
+                        actionButtons={[
+                            <Button
+                                key="cancel"
+                                variant="subtle"
+                                color="white"
+                                onClick={() => navigate('/admin/teams')}
+                            >
+                                Cancel
+                            </Button>,
+                            <Button key="submit" type="submit" loading={createTeam.isPending || updateTeam.isPending}>
+                                {isEdit ? 'Save' : 'Create'}
+                            </Button>,
+                        ]}
+                    >
+                        <Grid gutter="md">
+                            <Grid.Col span={{ base: 12, sm: 6 }}>
+                                <TextInput
+                                    label="Label"
+                                    placeholder="Team label"
+                                    required
+                                    {...form.getInputProps('label')}
+                                />
+                            </Grid.Col>
+                            <Grid.Col span={{ base: 12, sm: 6 }}>
+                                <Select
+                                    label="Club"
+                                    placeholder="Select a club"
+                                    data={clubOptions}
+                                    required
+                                    {...form.getInputProps('clubId')}
+                                    onChange={(value) => {
+                                        form.setFieldValue('clubId', value ?? '');
+                                        form.setFieldValue('categoryId', '');
+                                    }}
+                                />
+                            </Grid.Col>
+                            <Grid.Col span={{ base: 12, sm: 6 }}>
+                                <Select
+                                    label="Category"
+                                    placeholder={form.values.clubId ? 'No category' : 'Pick a club first'}
+                                    data={categoryOptions}
+                                    clearable
+                                    disabled={!form.values.clubId}
+                                    {...form.getInputProps('categoryId')}
+                                />
+                            </Grid.Col>
+                            <Grid.Col span={{ base: 12, sm: 6 }}>
+                                <Select
+                                    label="Gender"
+                                    placeholder="Select gender"
+                                    data={TEAM_GENDER_OPTIONS}
+                                    required
+                                    {...form.getInputProps('gender')}
+                                />
+                            </Grid.Col>
+                            <Grid.Col span={12}>
+                                <Textarea
+                                    label="Description"
+                                    placeholder="Optional description"
+                                    {...form.getInputProps('description')}
+                                />
+                            </Grid.Col>
+                        </Grid>
+                    </AdminSection>
                 </form>
             </FormWrapper>
             {team?.id && (
                 <FormWrapper>
-                    <Group justify="space-between" mt="xl" mb="md">
-                        <Title order={3} m={0}>
-                            Team composition
-                        </Title>
-                        <AddTeamMemberButton teamId={team.id} />
-                    </Group>
-                    <TeamMembers teamId={team.id} />
+                    <AdminSection
+                        title="Team composition"
+                        actionButtons={[<AddTeamMemberButton key="add-member" teamId={team.id} />]}
+                    >
+                        <TeamMembers teamId={team.id} />
+                    </AdminSection>
                 </FormWrapper>
             )}
         </>
