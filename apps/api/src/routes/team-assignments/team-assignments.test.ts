@@ -453,6 +453,28 @@ describe('POST /team-assignments', () => {
             role: 'player',
         });
     });
+
+    it('returns 201 when the member already holds a different role on the same team', async () => {
+        mockFirst.mockResolvedValueOnce({ id: TEAM_UUID }); // team exists
+        mockFirst.mockResolvedValueOnce({ id: MEMBER_UUID }); // member exists
+        mockFirst.mockResolvedValueOnce(undefined); // no row at this (team, member, role)
+        mockReturning.mockResolvedValueOnce([{ id: 'ta-2' }]); // insert
+        const coachRow = { ...sampleAssignmentRow, id: 'ta-2', role: 'coach' };
+        mockFirst.mockResolvedValueOnce(coachRow); // enriched select
+
+        const res = await request(app)
+            .post('/team-assignments')
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ ...validBody, role: 'coach' });
+
+        expect(res.status).toBe(201);
+        expect(res.body).toEqual(coachRow);
+        expect(mockInsert).toHaveBeenCalledWith({
+            teamId: TEAM_UUID,
+            memberId: MEMBER_UUID,
+            role: 'coach',
+        });
+    });
 });
 
 describe('DELETE /team-assignments/:id', () => {
