@@ -11,9 +11,7 @@ export function AccountPage() {
             <PageTitle label="My account" />
 
             <FormWrapper>
-                <AdminSection title="Account details">
-                    <AccountEditForm />
-                </AdminSection>
+                <AccountEditForm />
 
                 <AdminSection title="Linked members">
                     <UserMemberLinks useUserPointOfView={true} />
