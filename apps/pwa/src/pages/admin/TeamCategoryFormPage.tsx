@@ -103,7 +103,7 @@ export function TeamCategoryFormPage() {
                             </Button>,
                         ]}
                     >
-                        <Grid gutter="md">
+                        <Grid gap="md">
                             <Grid.Col span={{ base: 12, sm: 6 }}>
                                 <Select
                                     label="Club"

@@ -125,7 +125,7 @@ export function TeamFormPage() {
                             </Button>,
                         ]}
                     >
-                        <Grid gutter="md">
+                        <Grid gap="md">
                             <Grid.Col span={{ base: 12, sm: 6 }}>
                                 <TextInput
                                     label="Label"
