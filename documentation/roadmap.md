@@ -8,7 +8,7 @@
 - [x] extract resource/domain types and constants to types folder
 - [x] general boyscouting
 
-### 2. Admin
+### 2. ~~Admin~~
 
 - [x] Add link to edition page on all resource label from list view
 - [x] Member list
@@ -108,6 +108,10 @@
 
 ### PWA
 
+- add cross links
+  - Admin/Team page: click on member opens member page (remove bold)
+  -
+  -
 - apps/pwa has no test framework, so usePagination / useListFilters rely on type safety + integration-level verification
 - **One time password**
 - **PWA polish**
