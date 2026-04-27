@@ -84,7 +84,7 @@ export function AccountEditForm() {
                     </Button>,
                 ]}
             >
-                <Grid gutter="md">
+                <Grid>
                     {error && (
                         <Grid.Col span={12}>
                             <Alert color="red" variant="light">
@@ -96,6 +96,7 @@ export function AccountEditForm() {
                     <Grid.Col span={{ base: 12, sm: 6 }}>
                         <TextInput label="Display name" required {...form.getInputProps('displayName')} />
                     </Grid.Col>
+
                     {user?.role !== 'user' && (
                         <Grid.Col span={{ base: 12, sm: 6 }}>
                             <TextInput label="Role" value={user?.role} disabled />
@@ -142,7 +143,7 @@ export function AccountEditForm() {
                         </>
                     )}
 
-                    <Grid.Col span={12}>
+                    <Grid.Col span={12} mt={0}>
                         <Textarea label="Bio" rows={3} resize="vertical" {...form.getInputProps('bio')} />
                     </Grid.Col>
                 </Grid>
