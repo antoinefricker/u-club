@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
-import { Button, Grid, Group, Loader, TextInput } from '@mantine/core';
+import { Button, Grid, Loader, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useNavigate, useParams } from 'react-router';
+import { AdminSection } from '../../components/admin/AdminSection';
 import { FormWrapper } from '../../components/admin/forms/FormWrapper';
 import { PageTitle } from '../../components/layout/PageTitle';
 import { useMemberStatus, useCreateMemberStatus, useUpdateMemberStatus } from '../../hooks/useMemberStatuses';
@@ -82,26 +83,37 @@ export function MemberStatusFormPage() {
 
             <FormWrapper>
                 <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
-                    <Grid gutter="md">
-                        <Grid.Col span={{ base: 12, sm: 6 }}>
-                            <TextInput
-                                label="Label"
-                                placeholder="Status label"
-                                required
-                                {...form.getInputProps('label')}
-                            />
-                        </Grid.Col>
-                        <Grid.Col span={12}>
-                            <Group style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                <Button variant="subtle" onClick={() => navigate('/admin/member-statuses')}>
-                                    Cancel
-                                </Button>
-                                <Button type="submit" loading={createStatus.isPending || updateStatus.isPending}>
-                                    {isEdit ? 'Save' : 'Create'}
-                                </Button>
-                            </Group>
-                        </Grid.Col>
-                    </Grid>
+                    <AdminSection
+                        title="Status details"
+                        actionButtons={[
+                            <Button
+                                key="cancel"
+                                variant="subtle"
+                                color="white"
+                                onClick={() => navigate('/admin/member-statuses')}
+                            >
+                                Cancel
+                            </Button>,
+                            <Button
+                                key="submit"
+                                type="submit"
+                                loading={createStatus.isPending || updateStatus.isPending}
+                            >
+                                {isEdit ? 'Save' : 'Create'}
+                            </Button>,
+                        ]}
+                    >
+                        <Grid gutter="md">
+                            <Grid.Col span={{ base: 12, sm: 6 }}>
+                                <TextInput
+                                    label="Label"
+                                    placeholder="Status label"
+                                    required
+                                    {...form.getInputProps('label')}
+                                />
+                            </Grid.Col>
+                        </Grid>
+                    </AdminSection>
                 </form>
             </FormWrapper>
         </>

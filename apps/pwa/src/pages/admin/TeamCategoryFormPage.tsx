@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
-import { Button, Grid, Group, Loader, Select, TextInput } from '@mantine/core';
+import { Button, Grid, Loader, Select, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useNavigate, useParams } from 'react-router';
+import { AdminSection } from '../../components/admin/AdminSection';
 import { FormWrapper } from '../../components/admin/forms/FormWrapper';
 import { PageTitle } from '../../components/layout/PageTitle';
 import { useTeamCategory, useCreateTeamCategory, useUpdateTeamCategory } from '../../hooks/useTeamCategories';
@@ -82,37 +83,48 @@ export function TeamCategoryFormPage() {
 
             <FormWrapper>
                 <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
-                    <Grid gutter="md">
-                        <Grid.Col span={{ base: 12, sm: 6 }}>
-                            <Select
-                                label="Club"
-                                placeholder="Select a club"
-                                data={clubOptions}
-                                required
-                                disabled={isEdit}
-                                {...form.getInputProps('clubId')}
-                            />
-                            {isEdit && <InputHelper>Can&apos;t be changed after creation</InputHelper>}
-                        </Grid.Col>
-                        <Grid.Col span={{ base: 12, sm: 6 }}>
-                            <TextInput
-                                label="Label"
-                                placeholder="Category label"
-                                required
-                                {...form.getInputProps('label')}
-                            />
-                        </Grid.Col>
-                        <Grid.Col span={12}>
-                            <Group style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                <Button variant="subtle" onClick={() => navigate('/admin/team-categories')}>
-                                    Cancel
-                                </Button>
-                                <Button type="submit" loading={createCategory.isPending || updateCategory.isPending}>
-                                    {isEdit ? 'Save' : 'Create'}
-                                </Button>
-                            </Group>
-                        </Grid.Col>
-                    </Grid>
+                    <AdminSection
+                        title="Category details"
+                        actionButtons={[
+                            <Button
+                                key="cancel"
+                                variant="subtle"
+                                color="white"
+                                onClick={() => navigate('/admin/team-categories')}
+                            >
+                                Cancel
+                            </Button>,
+                            <Button
+                                key="submit"
+                                type="submit"
+                                loading={createCategory.isPending || updateCategory.isPending}
+                            >
+                                {isEdit ? 'Save' : 'Create'}
+                            </Button>,
+                        ]}
+                    >
+                        <Grid gutter="md">
+                            <Grid.Col span={{ base: 12, sm: 6 }}>
+                                <Select
+                                    label="Club"
+                                    placeholder="Select a club"
+                                    data={clubOptions}
+                                    required
+                                    disabled={isEdit}
+                                    {...form.getInputProps('clubId')}
+                                />
+                                {isEdit && <InputHelper>Can&apos;t be changed after creation</InputHelper>}
+                            </Grid.Col>
+                            <Grid.Col span={{ base: 12, sm: 6 }}>
+                                <TextInput
+                                    label="Label"
+                                    placeholder="Category label"
+                                    required
+                                    {...form.getInputProps('label')}
+                                />
+                            </Grid.Col>
+                        </Grid>
+                    </AdminSection>
                 </form>
             </FormWrapper>
         </>

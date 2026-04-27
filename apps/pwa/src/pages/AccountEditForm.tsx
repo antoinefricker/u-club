@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { IconMail } from '@tabler/icons-react';
 import { PhoneInput } from '../components/inputs/PhoneInput';
-import { Alert, Anchor, Button, Grid, Group, PasswordInput, TextInput, Textarea } from '@mantine/core';
+import { Alert, Anchor, Button, Grid, PasswordInput, TextInput, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useAuthContext } from '../auth/useAuthContext';
@@ -9,6 +9,7 @@ import { useUserUpdate, type UpdateUserPayload } from '../hooks/useUserUpdate';
 import { emailValidation } from '../utils/formValidations/emailValidation';
 import { phoneValidation } from '../utils/formValidations/phoneValidation';
 import { passwordValidation, confirmPasswordValidation } from '../utils/formValidations/passwordValidation';
+import { AdminSection } from '../components/admin/AdminSection';
 import { InputHelper } from '../components/admin/forms/InputHelper';
 
 type AccountFormValues = UpdateUserPayload & {
@@ -62,86 +63,91 @@ export function AccountEditForm() {
 
     return (
         <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
-            <Grid gutter="md">
-                {error && (
-                    <Grid.Col span={12}>
-                        <Alert color="red" variant="light">
-                            {error}
-                        </Alert>
-                    </Grid.Col>
-                )}
-
-                <Grid.Col span={{ base: 12, sm: 6 }}>
-                    <TextInput label="Display name" required {...form.getInputProps('displayName')} />
-                </Grid.Col>
-                {user?.role !== 'user' && (
-                    <Grid.Col span={{ base: 12, sm: 6 }}>
-                        <TextInput label="Role" value={user?.role} disabled />
-                    </Grid.Col>
-                )}
-
-                <Grid.Col span={{ base: 12, sm: 6 }}>
-                    <TextInput
-                        label="Email"
-                        type="email"
-                        required
-                        leftSection={<IconMail size={16} />}
-                        {...form.getInputProps('email')}
-                    />
-                </Grid.Col>
-
-                <Grid.Col span={{ base: 12, sm: 6 }}>
-                    <PhoneInput {...form.getInputProps('phone')} onChange={(v) => form.setFieldValue('phone', v)} />
-                </Grid.Col>
-
-                <Grid.Col span={12}>
-                    <Textarea label="Bio" rows={3} resize="vertical" {...form.getInputProps('bio')} />
-                </Grid.Col>
-
-                <Grid.Col span={12}>
-                    <Anchor
-                        component="button"
-                        type="button"
-                        size="sm"
-                        mb="xs"
-                        c="dark"
-                        fw="bold"
-                        onClick={() => setShowPassword(!showPassword)}
+            <AdminSection
+                title="Account details"
+                actionButtons={[
+                    <Button
+                        key="cancel"
+                        variant="subtle"
+                        color="white"
+                        onClick={() => {
+                            form.reset();
+                            setShowPassword(false);
+                            setError(null);
+                        }}
+                        disabled={mutation.isPending}
                     >
-                        {showPassword ? 'Cancel password change' : 'Change password'}
-                    </Anchor>
-                    {showPassword && <InputHelper mt={-10}>Leave blank to keep current password</InputHelper>}
-                </Grid.Col>
-                {showPassword && (
-                    <>
-                        <Grid.Col span={{ base: 12, sm: 6 }}>
-                            <PasswordInput label="New password" {...form.getInputProps('password')} />
+                        Cancel
+                    </Button>,
+                    <Button key="submit" type="submit" loading={mutation.isPending}>
+                        Save
+                    </Button>,
+                ]}
+            >
+                <Grid>
+                    {error && (
+                        <Grid.Col span={12}>
+                            <Alert color="red" variant="light">
+                                {error}
+                            </Alert>
                         </Grid.Col>
-                        <Grid.Col span={{ base: 12, sm: 6 }}>
-                            <PasswordInput label="Confirm password" {...form.getInputProps('confirmPassword')} />
-                        </Grid.Col>
-                    </>
-                )}
+                    )}
 
-                <Grid.Col span={12}>
-                    <Group justify="flex-end">
-                        <Button
-                            variant="subtle"
-                            onClick={() => {
-                                form.reset();
-                                setShowPassword(false);
-                                setError(null);
-                            }}
-                            disabled={mutation.isPending}
+                    <Grid.Col span={{ base: 12, sm: 6 }}>
+                        <TextInput label="Display name" required {...form.getInputProps('displayName')} />
+                    </Grid.Col>
+
+                    {user?.role !== 'user' && (
+                        <Grid.Col span={{ base: 12, sm: 6 }}>
+                            <TextInput label="Role" value={user?.role} disabled />
+                        </Grid.Col>
+                    )}
+
+                    <Grid.Col span={{ base: 12, sm: 6 }}>
+                        <TextInput
+                            label="Email"
+                            type="email"
+                            required
+                            leftSection={<IconMail size={16} />}
+                            {...form.getInputProps('email')}
+                        />
+                    </Grid.Col>
+
+                    <Grid.Col span={{ base: 12, sm: 6 }}>
+                        <PhoneInput {...form.getInputProps('phone')} onChange={(v) => form.setFieldValue('phone', v)} />
+                    </Grid.Col>
+
+                    <Grid.Col span={12}>
+                        <Anchor
+                            component="button"
+                            type="button"
+                            size="sm"
+                            mb={showPassword ? 'xs' : 0}
+                            c="dark"
+                            fw="bold"
+                            onClick={() => setShowPassword(!showPassword)}
                         >
-                            Cancel
-                        </Button>
-                        <Button type="submit" loading={mutation.isPending}>
-                            Save
-                        </Button>
-                    </Group>
-                </Grid.Col>
-            </Grid>
+                            {showPassword ? 'Cancel password change' : 'Change password'}
+                        </Anchor>
+                        {showPassword && <InputHelper mt={-10}>Leave blank to keep current password</InputHelper>}
+                    </Grid.Col>
+
+                    {showPassword && (
+                        <>
+                            <Grid.Col span={{ base: 12, sm: 6 }}>
+                                <PasswordInput label="New password" {...form.getInputProps('password')} />
+                            </Grid.Col>
+                            <Grid.Col span={{ base: 12, sm: 6 }}>
+                                <PasswordInput label="Confirm password" {...form.getInputProps('confirmPassword')} />
+                            </Grid.Col>
+                        </>
+                    )}
+
+                    <Grid.Col span={12} mt={0}>
+                        <Textarea label="Bio" rows={3} resize="vertical" {...form.getInputProps('bio')} />
+                    </Grid.Col>
+                </Grid>
+            </AdminSection>
         </form>
     );
 }

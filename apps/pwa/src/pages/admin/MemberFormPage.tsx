@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
-import { Button, Grid, Group, Loader, Select, TextInput, Title } from '@mantine/core';
+import { Button, Grid, Loader, Select, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import dayjs from 'dayjs';
 import { useNavigate, useParams } from 'react-router';
+import { AdminSection } from '../../components/admin/AdminSection';
 import { FormWrapper } from '../../components/admin/forms/FormWrapper';
 import { PageTitle } from '../../components/layout/PageTitle';
 import { useMember, useCreateMember, useUpdateMember } from '../../hooks/useMembers';
@@ -105,92 +106,104 @@ export function MemberFormPage() {
 
             <FormWrapper>
                 <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
-                    <Grid gutter="md">
-                        <Grid.Col span={{ base: 12, sm: 6 }}>
-                            <TextInput
-                                label="First name"
-                                placeholder="First name"
-                                required
-                                {...form.getInputProps('firstName')}
-                            />
-                        </Grid.Col>
+                    <AdminSection
+                        title="Member details"
+                        actionButtons={[
+                            <Button
+                                key="cancel"
+                                variant="subtle"
+                                color="white"
+                                onClick={() => navigate('/admin/members')}
+                            >
+                                Cancel
+                            </Button>,
+                            <Button
+                                key="submit"
+                                type="submit"
+                                loading={createMember.isPending || updateMember.isPending}
+                            >
+                                {isEdit ? 'Save' : 'Create'}
+                            </Button>,
+                        ]}
+                    >
+                        <Grid gutter="md">
+                            <Grid.Col span={{ base: 12, sm: 6 }}>
+                                <TextInput
+                                    label="First name"
+                                    placeholder="First name"
+                                    required
+                                    {...form.getInputProps('firstName')}
+                                />
+                            </Grid.Col>
 
-                        <Grid.Col span={{ base: 12, sm: 6 }}>
-                            <TextInput
-                                label="Last name"
-                                placeholder="Last name"
-                                required
-                                {...form.getInputProps('lastName')}
-                            />
-                        </Grid.Col>
+                            <Grid.Col span={{ base: 12, sm: 6 }}>
+                                <TextInput
+                                    label="Last name"
+                                    placeholder="Last name"
+                                    required
+                                    {...form.getInputProps('lastName')}
+                                />
+                            </Grid.Col>
 
-                        <Grid.Col span={{ base: 12, sm: 3 }}>
-                            <Select
-                                label="Gender"
-                                placeholder="Select gender"
-                                data={MEMBER_GENDER_OPTIONS}
-                                required
-                                {...form.getInputProps('gender')}
-                            />
-                        </Grid.Col>
-                        <Grid.Col span={{ base: 12, sm: 3 }}>
-                            <TextInput label="Birth date" type="date" {...form.getInputProps('birthdate')} />
-                        </Grid.Col>
-                        <Grid.Col span={{ base: 12, sm: 3 }}>
-                            <Select
-                                label="Status"
-                                placeholder="No status"
-                                data={statusOptions}
-                                clearable
-                                {...form.getInputProps('statusId')}
-                            />
-                        </Grid.Col>
-                        <Grid.Col span={{ base: 12, sm: 1 }}></Grid.Col>
-                        <Grid.Col span={12}>
-                            <Group style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                <Button variant="subtle" onClick={() => navigate('/admin/members')}>
-                                    Cancel
-                                </Button>
-                                <Button type="submit" loading={createMember.isPending || updateMember.isPending}>
-                                    {isEdit ? 'Save' : 'Create'}
-                                </Button>
-                            </Group>
-                        </Grid.Col>
-                    </Grid>
+                            <Grid.Col span={{ base: 12, sm: 3 }}>
+                                <Select
+                                    label="Gender"
+                                    placeholder="Select gender"
+                                    data={MEMBER_GENDER_OPTIONS}
+                                    required
+                                    {...form.getInputProps('gender')}
+                                />
+                            </Grid.Col>
+                            <Grid.Col span={{ base: 12, sm: 3 }}>
+                                <TextInput label="Birth date" type="date" {...form.getInputProps('birthdate')} />
+                            </Grid.Col>
+                            <Grid.Col span={{ base: 12, sm: 3 }}>
+                                <Select
+                                    label="Status"
+                                    placeholder="No status"
+                                    data={statusOptions}
+                                    clearable
+                                    {...form.getInputProps('statusId')}
+                                />
+                            </Grid.Col>
+                        </Grid>
+                    </AdminSection>
                 </form>
             </FormWrapper>
             {member?.id && (
                 <FormWrapper>
-                    <Group justify="space-between" mt="xl" mb="md">
-                        <Title order={3} m={0}>
-                            Team assignments
-                        </Title>
-                        <AssignToTeamButton memberId={member.id} />
-                    </Group>
-                    <UserTeamAssignments memberId={member.id} editable />
+                    <AdminSection
+                        title="Team assignments"
+                        actionButtons={[<AssignToTeamButton key="assign" memberId={member.id} />]}
+                    >
+                        <UserTeamAssignments memberId={member.id} editable />
+                    </AdminSection>
                 </FormWrapper>
             )}
             <FormWrapper>
-                <Group justify="space-between" mt="xl" mb="md">
-                    <Title order={3} m={0}>
-                        Linked user accounts
-                    </Title>
-                    {member?.id && (
-                        <InviteUserButton
-                            memberId={member.id}
-                            memberFirstName={member.firstName}
-                            memberLastName={member.lastName}
-                        />
-                    )}
-                </Group>
-                <UserMemberLinks memberId={member?.id} useUserPointOfView={false} />
+                <AdminSection
+                    title="Linked user accounts"
+                    actionButtons={
+                        member?.id
+                            ? [
+                                  <InviteUserButton
+                                      key="invite"
+                                      memberId={member.id}
+                                      memberFirstName={member.firstName}
+                                      memberLastName={member.lastName}
+                                  />,
+                              ]
+                            : undefined
+                    }
+                >
+                    <UserMemberLinks memberId={member?.id} useUserPointOfView={false} />
+                </AdminSection>
             </FormWrapper>
             {member?.id && (
                 <FormWrapper>
-                    <Title order={3} mt="xl" mb="md">
-                        Pending invitations
-                    </Title>
-                    <MemberPendingInvitations memberId={member.id} />
+                    <AdminSection title="Pending invitations">
+                        <MemberPendingInvitations memberId={member.id} />
+                    </AdminSection>
                 </FormWrapper>
             )}
         </>
