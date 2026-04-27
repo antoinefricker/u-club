@@ -173,7 +173,7 @@ export function MemberFormPage() {
             <FormWrapper>
                 <Group justify="space-between" mt="xl" mb="md">
                     <Title order={3} m={0}>
-                        Family & members
+                        Linked user accounts
                     </Title>
                     {member?.id && (
                         <InviteUserButton
