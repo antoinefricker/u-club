@@ -62,12 +62,12 @@ export function AppNavigation({ onNavigate }: AppNavigationProps) {
                             </Title>
                         </Link>
                         <Link
-                            to="/admin/clubs"
+                            to="/admin/members"
                             className={[classes.link, classes.subLink].join(' ')}
                             onClick={onNavigate}
                         >
-                            <IconShieldHalf className={classes.linkIcon} stroke={1.5} />
-                            <span>Clubs</span>
+                            <IconUsers className={classes.linkIcon} stroke={1.5} />
+                            <span>Members</span>
                         </Link>
                         <Link
                             to="/admin/teams"
@@ -76,6 +76,14 @@ export function AppNavigation({ onNavigate }: AppNavigationProps) {
                         >
                             <IconShirtSport className={classes.linkIcon} stroke={1.5} />
                             <span>Teams</span>
+                        </Link>
+                        <Link
+                            to="/admin/clubs"
+                            className={[classes.link, classes.subLink].join(' ')}
+                            onClick={onNavigate}
+                        >
+                            <IconShieldHalf className={classes.linkIcon} stroke={1.5} />
+                            <span>Clubs</span>
                         </Link>
                         <Link
                             to="/admin/team-categories"
@@ -92,14 +100,6 @@ export function AppNavigation({ onNavigate }: AppNavigationProps) {
                         >
                             <IconBadge className={classes.linkIcon} stroke={1.5} />
                             <span>Member statuses</span>
-                        </Link>
-                        <Link
-                            to="/admin/members"
-                            className={[classes.link, classes.subLink].join(' ')}
-                            onClick={onNavigate}
-                        >
-                            <IconUsers className={classes.linkIcon} stroke={1.5} />
-                            <span>Members</span>
                         </Link>
                     </>
                 )}
