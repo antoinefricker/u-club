@@ -22,6 +22,7 @@
   - [x] Show member pending invitations
   - [x] Show user pending invitations
 - [x] Create/Edit/Delete member statuses
+- [x] Admin/Team page: click on member opens member page (remove bold)
 
 ### 3. User
 
@@ -108,10 +109,6 @@
 
 ### PWA
 
-- add cross links
-  - Admin/Team page: click on member opens member page (remove bold)
-  -
-  -
 - apps/pwa has no test framework, so usePagination / useListFilters rely on type safety + integration-level verification
 - **One time password**
 - **PWA polish**
