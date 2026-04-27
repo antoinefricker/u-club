@@ -25,8 +25,11 @@
 - [x] Admin/Team page: click on member opens member page (remove bold)
 - [x] redesign sections
 
-### Model
+### Miscellaneous
 
+- [ ] Grid last cell bug
+      Update mantine to 9.x version
+- [ ] Extract mantine theme from `app.tsx`
 - [ ] Allow multiple roles in team assignments
 - [ ] improve team and club model
       https://competitions.ffbb.com/ligues/ges/comites/0067/clubs/ges0067025/equipes/200000005159693/classement
