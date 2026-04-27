@@ -16,7 +16,7 @@ test.describe("Login", () => {
     await page.goto("/");
 
     await page.getByLabel("Email").fill(TEST_USER.email);
-    await page.getByLabel("Password").fill(TEST_USER.password);
+    await page.getByRole("textbox", { name: "Password" }).fill(TEST_USER.password);
     await page.getByRole("button", { name: "Connect" }).click();
 
     await expect(page.getByText(TEST_USER.displayName)).toBeVisible();
@@ -26,7 +26,7 @@ test.describe("Login", () => {
     await page.goto("/");
 
     await page.getByLabel("Email").fill(TEST_USER.email);
-    await page.getByLabel("Password").fill("wrongpassword");
+    await page.getByRole("textbox", { name: "Password" }).fill("wrongpassword");
     await page.getByRole("button", { name: "Connect" }).click();
 
     await expect(page.getByText("invalid email or password")).toBeVisible();
@@ -36,7 +36,7 @@ test.describe("Login", () => {
     await page.goto("/");
 
     await page.getByLabel("Email").fill("nonexistent@test.com");
-    await page.getByLabel("Password").fill("password123");
+    await page.getByRole("textbox", { name: "Password" }).fill("password123");
     await page.getByRole("button", { name: "Connect" }).click();
 
     await expect(page.getByText("invalid email or password")).toBeVisible();
