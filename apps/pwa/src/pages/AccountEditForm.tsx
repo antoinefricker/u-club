@@ -143,7 +143,7 @@ export function AccountEditForm() {
                         </>
                     )}
 
-                    <Grid.Col span={12} mt={0}>
+                    <Grid.Col span={12}>
                         <Textarea label="Bio" rows={3} resize="vertical" {...form.getInputProps('bio')} />
                     </Grid.Col>
                 </Grid>

@@ -1,5 +1,3 @@
-import classes from './FormWrapper.module.css';
-
 import { Box } from '@mantine/core';
 import type { ReactNode } from 'react';
 
@@ -9,7 +7,7 @@ interface FormWrapperProps {
 
 export function FormWrapper({ children }: FormWrapperProps) {
     return (
-        <Box maw={900} mt="md" className={classes.root}>
+        <Box maw={900} mt="md">
             {children}
         </Box>
     );
