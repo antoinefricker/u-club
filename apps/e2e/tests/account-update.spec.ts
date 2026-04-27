@@ -22,7 +22,7 @@ test.describe("Account update", () => {
 
     await page.goto("/");
     await page.getByLabel("Email").fill(testUser.email);
-    await page.getByLabel("Password").fill(testUser.password);
+    await page.getByRole("textbox", { name: "Password" }).fill(testUser.password);
     await page.getByRole("button", { name: "Connect" }).click();
     await expect(page.getByText(testUser.displayName)).toBeVisible();
 

@@ -7,7 +7,7 @@ test.describe("Registration", () => {
     await page.getByRole("button", { name: "Create an account" }).click();
     await page.getByLabel("Display name").fill("New User");
     await page.getByLabel("Email").fill(`register-${Date.now()}@test.com`);
-    await page.getByLabel("Password").fill("password123");
+    await page.getByRole("textbox", { name: "Password" }).fill("password123");
     await page.getByRole("button", { name: "Create my account" }).click();
 
     await expect(page.getByText("Check your email")).toBeVisible();
@@ -21,7 +21,7 @@ test.describe("Registration", () => {
 
     await page.getByRole("button", { name: "Create an account" }).click();
     await page.getByLabel("Email").fill("test@test.com");
-    await page.getByLabel("Password").fill("password123");
+    await page.getByRole("textbox", { name: "Password" }).fill("password123");
     await page.getByRole("button", { name: "Create my account" }).click();
 
     await expect(page.getByText("Display name is required")).toBeVisible();
@@ -33,7 +33,7 @@ test.describe("Registration", () => {
     await page.getByRole("button", { name: "Create an account" }).click();
     await page.getByLabel("Display name").fill("Test");
     await page.getByLabel("Email").fill("not-an-email");
-    await page.getByLabel("Password").fill("password123");
+    await page.getByRole("textbox", { name: "Password" }).fill("password123");
     await page.getByRole("button", { name: "Create my account" }).click();
 
     await expect(page.getByText("Invalid email")).toBeVisible();
@@ -45,7 +45,7 @@ test.describe("Registration", () => {
     await page.getByRole("button", { name: "Create an account" }).click();
     await page.getByLabel("Display name").fill("Test");
     await page.getByLabel("Email").fill("test@test.com");
-    await page.getByLabel("Password").fill("123");
+    await page.getByRole("textbox", { name: "Password" }).fill("123");
     await page.getByRole("button", { name: "Create my account" }).click();
 
     await expect(
