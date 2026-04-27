@@ -66,6 +66,7 @@ erDiagram
         timestamp updated_at
     }
 
+    %% UNIQUE(team_id, member_id, role) — a member can hold multiple distinct roles on the same team
     TEAM_ASSIGNMENT {
         uuid id PK
         uuid team_id FK
