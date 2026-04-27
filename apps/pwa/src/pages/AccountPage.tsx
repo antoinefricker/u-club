@@ -19,7 +19,7 @@ export function AccountPage() {
 
             <FormWrapper>
                 <Title order={3} mt="xl" mb="md">
-                    Family & members
+                    Linked members
                 </Title>
                 <UserMemberLinks useUserPointOfView={true} />
             </FormWrapper>
