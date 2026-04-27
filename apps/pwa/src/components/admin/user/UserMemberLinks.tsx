@@ -180,9 +180,7 @@ export function UserMemberLinks({ userId, useUserPointOfView, memberId }: UserMe
                                         </Text>
                                     </Table.Td>
                                     <Table.Td>
-                                        <Text size="sm" fw={700}>
-                                            {relationshipName}
-                                        </Text>
+                                        <Text size="sm">{relationshipName}</Text>
                                         {mode === 'member' && (
                                             <Text size="xs" c="dimmed" mt={-4}>
                                                 {rel.userEmail}
