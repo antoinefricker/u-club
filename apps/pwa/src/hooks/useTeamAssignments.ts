@@ -65,26 +65,6 @@ export function useCreateTeamAssignment() {
     });
 }
 
-export function useUpdateTeamAssignment() {
-    const headers = useAuthHeaders();
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: async ({ id, ...changes }: { id: string; teamId?: string; role?: TeamRole }) => {
-            const res = await fetch(`/api/team-assignments/${id}`, {
-                method: 'PUT',
-                headers,
-                body: JSON.stringify(changes),
-            });
-            if (!res.ok) {
-                const body = await res.json();
-                throw new Error(body.error ?? 'Failed to update team assignment');
-            }
-            return res.json();
-        },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['team-assignments'] }),
-    });
-}
-
 export function useDeleteTeamAssignment() {
     const headers = useAuthHeaders();
     const queryClient = useQueryClient();
